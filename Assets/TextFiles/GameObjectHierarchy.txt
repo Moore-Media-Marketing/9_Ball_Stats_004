@@ -1,0 +1,216 @@
+AdaptivePerformanceManager
+DataManager
+DropdownManager
+UIManager
+OverlayPanelManager
+ComparisonManager
+FeedbackManager
+GenerateGameObjectList
+Main Camera
+EventSystem
+Canvas
+  MainMenuPanel
+    HeaderText
+    ManageTeamsButton
+      Text (TMP)
+    ManagePlayerButton
+      Text (TMP)
+    GameAnalysisButton
+      Text (TMP)
+    ComparisonButton
+      Text (TMP)
+    ExitButton
+      Text (TMP)
+  TeamManagementPanel
+    HeaderText
+    TeamNameText
+    TeamNameInputField
+      Text Area
+        Placeholder
+        Text
+    TeamDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    UpdateTeamButton
+      Text (TMP)
+    DeleteButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  PlayerInputManagerPanel
+    HeaderText
+    TeamNameText
+    TeamNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameText
+    PlayerNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameInputField
+      Text Area
+        Placeholder
+        Text
+    GamesPlayedInputField
+      Text Area
+        Placeholder
+        Text
+    GamesWonInputField
+      Text Area
+        Placeholder
+        Text
+    SkillLevelDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    AddPlayerButton
+      Text (TMP)
+    RemovePlayerButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  ComparisonSetupPanel
+    HeaderText
+    ComparePlayersToggle
+      Background
+        Checkmark
+      Label
+    SelectHomeTeamText
+    SelectHomePlayerText
+    HomeDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    HomeTeamPlayerScrollView
+      Viewport
+        Content
+          playerTogglePrefab
+            Background
+              Checkmark
+            Label
+            Text (TMP)
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    SelectAwayTeamText
+    SelectAwayPlayerText
+    AwayDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    AwayTeamPlayerScrollView
+      Viewport
+        Content
+          playerTogglePrefab
+            Background
+              Checkmark
+            Label
+            Text (TMP)
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    CompareButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  ComparisonResultsPanel
+    HeaderText
+    homeTeamNameText
+    awayTeamNameText
+    playerComparisonContainer
+      Player1Comparison
+      Player2Comparison
+      Player3Comparison
+      Player4Comparison
+      Player5Comparison
+    winnerPredictionText
+    BackButton
+      UpdateBackButtonText
+  GameAnalysisPanel
+    HeaderText
+    Game Stats Text
+    OddsScrollView
+      Viewport
+        Content
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    AnalyzeGameButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  OverlayPanel
+    OverlayText
+    FeedbackText
