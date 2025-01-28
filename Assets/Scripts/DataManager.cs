@@ -6,10 +6,27 @@ public class DataManager:MonoBehaviour
 	private const string TEAM_DATA_KEY = "teams";  // Key for storing team data in PlayerPrefs
 	private const string PLAYER_DATA_KEY = "players";  // Key for storing player data in PlayerPrefs
 
-	private List<Team> teams = new List<Team>();  // List of all teams
-	private Dictionary<string, Player> players = new Dictionary<string, Player>();  // Dictionary for quick access to players by name
+	private List<Team> teams = new();  // List of all teams
+	private Dictionary<string, Player> players = new();  // Dictionary for quick access to players by name
+
+	// Singleton instance
+	public static DataManager Instance { get; private set; }
 
 	// --- Start ---
+	private void Awake()
+		{
+		// Ensure only one instance of DataManager exists
+		if (Instance == null)
+			{
+			Instance = this;
+			DontDestroyOnLoad(gameObject);  // Optional: Keep the instance across scenes
+			}
+		else
+			{
+			Destroy(gameObject);
+			}
+		}
+
 	private void Start()
 		{
 		LoadData();  // Load data on start
@@ -63,7 +80,7 @@ public class DataManager:MonoBehaviour
 			}
 
 		// Create and add new team
-		Team newTeam = new Team { name = teamName };
+		Team newTeam = new() { name = teamName };
 		teams.Add(newTeam);
 
 		SaveData();  // Save updated data
@@ -86,7 +103,7 @@ public class DataManager:MonoBehaviour
 		}
 
 	// --- Add Player ---
-	public void AddPlayer(string teamName, string playerName, int skillLevel)
+	public void AddPlayer(string teamName, string playerName, int skillLevel, int gamesPlayed, int gamesWon)
 		{
 		// Check if player already exists
 		if (players.ContainsKey(playerName))
@@ -95,12 +112,13 @@ public class DataManager:MonoBehaviour
 			return;
 			}
 
-		Player newPlayer = new Player
+		// Create new player
+		Player newPlayer = new()
 			{
 			name = playerName,
 			skillLevel = skillLevel,
-			matchesWon = 0,
-			matchesPlayed = 0
+			matchesWon = gamesWon,
+			matchesPlayed = gamesPlayed
 			};
 
 		players[playerName] = newPlayer;
@@ -144,6 +162,33 @@ public class DataManager:MonoBehaviour
 		return teams;
 		}
 
+	// --- Get Team Names ---
+	public List<string> GetTeamNames()
+		{
+		List<string> teamNames = new();
+		foreach (Team team in teams)
+			{
+			teamNames.Add(team.name);
+			}
+		return teamNames;
+		}
+
+	// --- Update Team Name ---
+	public void UpdateTeamName(string oldName, string newName)
+		{
+		Team teamToUpdate = teams.Find(t => t.name == oldName);
+
+		if (teamToUpdate != null)
+			{
+			teamToUpdate.name = newName;
+			SaveData();  // Save updated data
+			}
+		else
+			{
+			Debug.LogError("Team not found: " + oldName);
+			}
+		}
+
 	// --- Get Player By Name ---
 	public Player GetPlayerByName(string playerName)
 		{
@@ -161,7 +206,7 @@ public class DataManager:MonoBehaviour
 public class Team
 	{
 	public string name;  // Team name
-	public List<Player> players = new List<Player>();  // List of players in the team
+	public List<Player> players = new();  // List of players in the team
 	}
 
 [System.Serializable]
@@ -171,7 +216,7 @@ public class Player
 	public int skillLevel;  // Player skill level
 	public int matchesWon;  // Matches won by player
 	public int matchesPlayed;  // Matches played by player
-	public float winPercentage => matchesPlayed > 0 ? (float) matchesWon / matchesPlayed * 100 : 0;  // Calculate win percentage
+	public float WinPercentage => matchesPlayed > 0 ? (float) matchesWon / matchesPlayed * 100 : 0;  // Calculate win percentage
 	}
 
 [System.Serializable]

@@ -16,15 +16,15 @@ namespace NickWasHere
 		public GameObject customDropdownPrefab;
 
 		// List to keep track of all dropdowns created
-		private List<GameObject> dropdowns = new List<GameObject>();
+		private List<GameObject> dropdowns = new();
 
 		// Dropdown options for teams and players
 		[Header("Dropdown Options")]
 		[Tooltip("List of team names to populate in dropdown")]
-		public List<string> teamOptions = new List<string>();
+		public List<string> teamOptions = new();
 
 		[Tooltip("List of player names to populate in dropdown")]
-		public List<string> playerOptions = new List<string>();
+		public List<string> playerOptions = new();
 
 		// --- Methods ---
 		#region Dropdown Creation and Setup
@@ -50,7 +50,7 @@ namespace NickWasHere
 				dropdownComponent.ClearOptions();
 
 				// Prepare the options for TMP_Dropdown
-				List<TMP_Dropdown.OptionData> optionDataList = new List<TMP_Dropdown.OptionData>();
+				List<TMP_Dropdown.OptionData> optionDataList = new();
 				foreach (string option in options)
 					{
 					optionDataList.Add(new TMP_Dropdown.OptionData(option));

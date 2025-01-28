@@ -1,18 +1,17 @@
 using UnityEngine;
 
-// Updated the namespace to NickWasHere
 namespace NickWasHere
 	{
-	[System.Serializable]  // System.Serializable attribute should only be applied once
+	[System.Serializable]
 	public class Player
 		{
-		public string name;
-		public int skillLevel;
-		public int gamesPlayed;
-		public int gamesWon;
-		public float ppm;  // Points per match
-		public float pa;   // Points awarded
-		public float winPercentage => CalculateWinPercentage();
+		public string name;           // Player's name
+		public int skillLevel;        // Player's skill level
+		public int gamesPlayed;       // Total games played by the player
+		public int gamesWon;          // Total games won by the player
+		public float ppm;             // Points per match
+		public float pa;              // Points awarded
+		public float WinPercentage => CalculateWinPercentage();  // Win percentage
 
 		// Constructor to initialize the player
 		public Player(string name, int skillLevel)
@@ -32,7 +31,7 @@ namespace NickWasHere
 			return (float) gamesWon / gamesPlayed * 100f;
 			}
 
-		// Example method to update match stats
+		// Method to update match stats
 		public void UpdateStats(bool won, float pointsPerMatch, float pointsAwarded)
 			{
 			gamesPlayed++;
