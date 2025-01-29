@@ -1,27 +1,40 @@
 using UnityEngine;
 using TMPro; // For TextMeshPro
-using UnityEngine.Events;
 using System.Collections;
 
 namespace NickWasHere
 	{
 	public class OverlayFeedbackPanelManager:MonoBehaviour
 		{
-		// References to the UI elements
+		public static OverlayFeedbackPanelManager Instance; // Singleton Instance
+
+		// --- UI References --- //
+		[Header("UI Elements")]
 		public GameObject panel;            // The panel that holds both overlay and feedback content
 		public TextMeshProUGUI overlayText; // The text component for overlay messages
 		public TextMeshProUGUI feedbackText;// The text component for feedback messages
 		public float autoCloseTime = 2f;    // Time to auto-close the panel for feedback messages
-		private bool isTouched = false;     // To track if the panel is touched or interacted with
 
-		// For controlling if the panel is showing
-		private bool isPanelActive = false;
+		// --- State Control --- //
+		private bool isTouched = false;  // Tracks if the panel is interacted with
+		private bool isPanelActive = false; // Tracks panel visibility
+		private Coroutine autoCloseCoroutine; // Reference for auto-close coroutine
 
-		// Coroutine reference for auto-close functionality
-		private Coroutine autoCloseCoroutine;
+		// --- Awake: Ensure Singleton Instance --- //
+		private void Awake()
+			{
+			if (Instance == null)
+				{
+				Instance = this;
+				}
+			else
+				{
+				Destroy(gameObject); // Prevent duplicate instances
+				}
+			}
 
-		// Start is called before the first frame update
-		void Start()
+		// --- Start: Initialize Panel Visibility --- //
+		private void Start()
 			{
 			if (panel == null || overlayText == null || feedbackText == null)
 				{
@@ -29,89 +42,79 @@ namespace NickWasHere
 				return;
 				}
 
-			// Initially hide the panel
-			panel.SetActive(false);
+			panel.SetActive(false); // Hide panel at start
 			}
 
-		// Method to show the overlay/feedback panel
+		// --- Show Panel --- //
 		public void ShowPanel(string message, string feedback = "", bool isOverlay = true)
 			{
-			// Activate the panel and set appropriate text
-			panel.SetActive(true);
+			if (panel == null) return;
+
+			panel.SetActive(true); // Show panel
 
 			if (isOverlay)
 				{
-				// Show the overlay message and hide feedback
 				overlayText.text = message;
 				feedbackText.text = "";
 				}
 			else
 				{
-				// Show the feedback message and hide overlay
 				overlayText.text = "";
 				feedbackText.text = message;
-				}
 
-			// Reset the touched flag for auto-close logic
-			isTouched = false;
-
-			// Start the auto-close coroutine for feedback messages
-			if (autoCloseCoroutine != null)
-				{
-				StopCoroutine(autoCloseCoroutine);
-				}
-
-			if (!isOverlay)
-				{
+				// Start auto-close coroutine if it's a feedback message
+				if (autoCloseCoroutine != null)
+					{
+					StopCoroutine(autoCloseCoroutine);
+					}
 				autoCloseCoroutine = StartCoroutine(AutoClosePanel());
 				}
 
-			// Mark panel as active
+			isTouched = false; // Reset touch detection
 			isPanelActive = true;
 			}
 
-		// Method to hide the panel manually
+		// --- Hide Panel --- //
 		public void HidePanel()
 			{
-			// Deactivate the panel
+			if (panel == null) return;
+
 			panel.SetActive(false);
 			isPanelActive = false;
 			}
 
-		// Coroutine to auto-close the panel after the specified time
+		// --- Auto-Close Coroutine --- //
 		private IEnumerator AutoClosePanel()
 			{
 			yield return new WaitForSeconds(autoCloseTime);
 
 			if (!isTouched)
 				{
-				HidePanel(); // Close the panel if it wasn't touched
+				HidePanel();
 				}
 			}
 
-		// Method to handle user touch (or any interaction) to cancel the auto-close
+		// --- Handle User Interaction to Cancel Auto-Close --- //
 		public void OnPanelTouched()
 			{
 			if (isPanelActive)
 				{
 				isTouched = true;
-				HidePanel(); // Optionally hide the panel immediately when touched
+				HidePanel(); // Optionally hide the panel immediately
 				}
 			}
 
-		// Method for displaying error messages (just as an example usage)
+		// --- Convenience Methods --- //
 		public void DisplayErrorMessage(string message)
 			{
 			ShowPanel(message, "Please try again.", false);
 			}
 
-		// Method to show the overlay (for example usage)
 		public void ShowOverlayMessage(string message)
 			{
 			ShowPanel(message, "", true);
 			}
 
-		// If the user taps anywhere on the panel, this method can be called
 		public void OnPanelTapped()
 			{
 			OnPanelTouched();

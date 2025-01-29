@@ -13,13 +13,13 @@ namespace NickWasHere
 		public float pa;              // Points awarded
 		public float WinPercentage => CalculateWinPercentage();  // Win percentage
 
-		// Constructor to initialize the player
-		public Player(string name, int skillLevel)
+		// Constructor to initialize the player with name, skill level, games played, and games won
+		public Player(string name, int skillLevel, int gamesPlayed, int gamesWon)
 			{
 			this.name = name;
 			this.skillLevel = skillLevel;
-			this.gamesPlayed = 0;
-			this.gamesWon = 0;
+			this.gamesPlayed = gamesPlayed;
+			this.gamesWon = gamesWon;
 			this.ppm = 0;
 			this.pa = 0;
 			}
@@ -27,17 +27,17 @@ namespace NickWasHere
 		// Method to calculate win percentage
 		private float CalculateWinPercentage()
 			{
-			if (gamesPlayed == 0) return 0f;
-			return (float) gamesWon / gamesPlayed * 100f;
+			if (this.gamesPlayed == 0) return 0f;  // Use 'this' for clarity
+			return (float) this.gamesWon / this.gamesPlayed * 100f;  // Use 'this' for clarity
 			}
 
 		// Method to update match stats
 		public void UpdateStats(bool won, float pointsPerMatch, float pointsAwarded)
 			{
-			gamesPlayed++;
-			if (won) gamesWon++;
-			ppm = pointsPerMatch;
-			pa = pointsAwarded;
+			this.gamesPlayed++;  // Use 'this' for clarity
+			if (won) this.gamesWon++;  // Use 'this' for clarity
+			this.ppm = pointsPerMatch;
+			this.pa = pointsAwarded;
 			}
 		}
 	}

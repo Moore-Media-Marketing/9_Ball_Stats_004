@@ -54,7 +54,7 @@ namespace NickWasHere
 
 			// Add validation listeners
 			playerNameInput.onValueChanged.AddListener(ValidateInput);
-			skillLevelDropdown.onValueChanged.AddListener(ValidateInput);  // Modify this to use the correct method signature
+			skillLevelDropdown.onValueChanged.AddListener(ValidateInput);
 			gamesPlayedInput.onValueChanged.AddListener(ValidateInput);
 			gamesWonInput.onValueChanged.AddListener(ValidateInput);
 
@@ -91,9 +91,8 @@ namespace NickWasHere
 			// Assuming DataManager exists to handle player creation and storage
 			if (dataManager != null)
 				{
-				// Add the player to the DataManager (team name should be selected from dropdown)
-				string teamName = teamDropdown.options[teamDropdown.value].text;
-				dataManager.AddPlayer(teamName, playerName, skillLevel, gamesPlayed, gamesWon);
+				// Add the player to the DataManager (team name is assumed to be managed internally)
+				dataManager.AddPlayer(playerName, skillLevel, gamesPlayed, gamesWon);
 				}
 			else
 				{
@@ -118,9 +117,8 @@ namespace NickWasHere
 			// Assuming DataManager has a method to remove players
 			if (dataManager != null)
 				{
-				// Remove the player from the DataManager (team name should be selected from dropdown)
-				string teamName = teamDropdown.options[teamDropdown.value].text;
-				dataManager.RemovePlayer(teamName, playerName);
+				// Remove the player from the DataManager
+				dataManager.RemovePlayer(playerName);
 				}
 			else
 				{

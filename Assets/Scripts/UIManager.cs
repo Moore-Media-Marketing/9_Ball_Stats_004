@@ -68,10 +68,13 @@ public class UIManager:MonoBehaviour
 			return;
 			}
 
-		// Disable the currently active panel (if any)
-		if (currentPanelIndex >= 0 && currentPanelIndex < panels.Length)
+		// Disable all panels first to ensure the previous ones are hidden
+		foreach (GameObject panel in panels)
 			{
-			panels[currentPanelIndex].SetActive(false);
+			if (panel != null)
+				{
+				panel.SetActive(false);
+				}
 			}
 
 		// Push the current panel index to history if it's valid
