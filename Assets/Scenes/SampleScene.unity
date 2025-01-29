@@ -6850,6 +6850,7 @@ MonoBehaviour:
   teamDropdown: {fileID: 1198156799}
   updateTeamButton: {fileID: 844190906}
   deleteButton: {fileID: 1543668958}
+  addTeamButton: {fileID: 844190906}
   backButton: {fileID: 1060276294}
 --- !u!1 &1079602579
 GameObject:

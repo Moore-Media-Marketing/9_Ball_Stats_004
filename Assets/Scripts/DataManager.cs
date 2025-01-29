@@ -38,17 +38,58 @@ namespace NickWasHere
 		// --- Add a new team --- //
 		public void AddTeam(string teamName)
 			{
-			if (teams.Exists(t => t.teamName == teamName))  // Check if team already exists
+			// Check if team already exists
+			if (teams.Exists(t => t.teamName == teamName))
 				{
 				Debug.LogError($"Team '{teamName}' already exists.");
 				return;
 				}
 
-			// Create a new team with an empty list of players
+			// Create new team and add it to the list
 			Team newTeam = new(teamName);
 			teams.Add(newTeam);
 
+			// Save to PlayerPrefs
+			SaveTeamsToPlayerPrefs();
+
 			Debug.Log($"Team '{teamName}' added successfully.");
+			}
+
+		public void SaveTeamsToPlayerPrefs()
+			{
+			// Clear any existing teams in PlayerPrefs before saving new data
+			PlayerPrefs.DeleteKey("Teams");
+
+			// Save each team's name to PlayerPrefs
+			for (int i = 0; i < teams.Count; i++)
+				{
+				PlayerPrefs.SetString($"Team_{i}_Name", teams[i].teamName);
+				}
+
+			// Optionally save the total count of teams
+			PlayerPrefs.SetInt("TotalTeams", teams.Count);
+
+			PlayerPrefs.Save();
+			}
+
+		public void LoadTeamsFromPlayerPrefs()
+			{
+			// Retrieve the total number of teams saved
+			int totalTeams = PlayerPrefs.GetInt("TotalTeams", 0);
+
+			// Load each team's name from PlayerPrefs
+			teams.Clear();
+			for (int i = 0; i < totalTeams; i++)
+				{
+				string teamName = PlayerPrefs.GetString($"Team_{i}_Name", "");
+				if (!string.IsNullOrEmpty(teamName))
+					{
+					Team loadedTeam = new(teamName);
+					teams.Add(loadedTeam);
+					}
+				}
+
+			Debug.Log("Teams loaded from PlayerPrefs.");
 			}
 
 

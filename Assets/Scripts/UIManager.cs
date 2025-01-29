@@ -5,14 +5,17 @@ using UnityEngine.UI;
 
 public class UIManager:MonoBehaviour
 	{
+	// --- Singleton Instance --- //
 	public static UIManager Instance { get; private set; } // Singleton instance
 
+	// --- UI Elements --- //
 	[Header("Panels")]
 	public GameObject[] panels; // Array of all panels
 
 	[Header("Back Button")]
 	public Button backButton; // Back button to navigate to the previous panel
 
+	// --- Panel Tracking --- //
 	private int currentPanelIndex = -1; // Tracks the currently active panel
 	private Stack<int> panelHistory = new(); // History of panel navigation
 	private Dictionary<string, int> panelLookup; // Dictionary to map panel names to indices
