@@ -1,114 +1,80 @@
 using System;
 using System.Collections.Generic;
 
-[System.Serializable]
+[Serializable]
 public class Team
 	{
-	public string teamName;        // Team's name
-	public List<Player> Players { get; set; }   // Public property for players
+	// --- Team Variables ---
+	public string TeamName; // Name of the team
 
-	// Event to notify about team list changes
-	public event Action OnTeamListChanged;
+	public List<Player> Players; // List of players in the team
+	public float WinPercentage { get; private set; } // Win percentage, to be set manually or via a method
 
-	// Default constructor for initialization without parameters
-	public Team()
+	// --- Constructor to initialize Team with teamName, winPercentage, and list of players ---
+	public Team(string teamName, float winPercentage, List<Player> players)
 		{
-		teamName = "Default Team";
-		Players = new List<Player>(); // Initialize as an empty list of players
+		TeamName = teamName;
+		WinPercentage = winPercentage;
+		Players = players ?? new List<Player>(); // If players is null, initialize an empty list
 		}
 
-	// Constructor to initialize the team with a name and players
-	public Team(string teamName, List<Player> players = null)
+	// --- Constructor to initialize Team with teamName ---
+	public Team(string teamName)
 		{
-		this.teamName = teamName;
-		Players = players ?? new List<Player>(); // If no players are provided, initialize an empty list
+		TeamName = teamName;
+		Players = new List<Player>(); // Initialize the list of players
+		WinPercentage = 0f; // Default value for WinPercentage
 		}
 
-	// Property for team name
-	public string Name
-		{
-		get { return teamName; }
-		set { teamName = value; }
-		}
-
-	// Method to add a player and notify listeners
+	// --- Add Player Method ---
 	public void AddPlayer(Player player)
 		{
-		Players.Add(player);
-		OnTeamListChanged?.Invoke(); // Notify listeners
+		Players.Add(player); // Add a player to the team
 		}
 
-	// Method to remove a player and notify listeners
+	// --- Remove Player Method ---
 	public void RemovePlayer(Player player)
 		{
-		Players.Remove(player);
-		OnTeamListChanged?.Invoke(); // Notify listeners
+		Players.Remove(player); // Remove a player from the team
 		}
 
-	// Method to get the total skill level of all players on the team
-	public int GetTotalSkillLevel()
+	// --- Calculate Total Skill Level (Read-only) ---
+	public int TotalSkillLevel
 		{
-		int totalSkillLevel = 0;
-		foreach (var player in Players)
+		get
 			{
-			totalSkillLevel += player.skillLevel;
+			int totalSkill = 0;
+			foreach (var player in Players)
+				{
+				totalSkill += player.SkillLevel; // Assuming Player has a SkillLevel property
+				}
+			return totalSkill;
 			}
-		return totalSkillLevel;
 		}
 
-	// Method to calculate the team's win percentage
-	public float GetWinPercentage()
+	// --- Set Win Percentage ---
+	public void SetWinPercentage(int gamesWon, int gamesPlayed)
 		{
-		int totalGamesPlayed = 0;
-		int totalGamesWon = 0;
-
-		foreach (var player in Players)
+		if (gamesPlayed == 0) // Prevent division by zero
 			{
-			totalGamesPlayed += player.gamesPlayed;
-			totalGamesWon += player.gamesWon;
+			WinPercentage = 0f;
 			}
-
-		if (totalGamesPlayed == 0) return 0f;
-
-		return (float) totalGamesWon / totalGamesPlayed * 100f;
+		else
+			{
+			WinPercentage = (float) gamesWon / gamesPlayed; // Calculate win percentage
+			}
 		}
 
-	// Method to calculate the total games played by all players
-	public int GetTotalGamesPlayed()
+	// --- Display Team Information ---
+	public void DisplayTeamInfo()
 		{
-		int totalGamesPlayed = 0;
-		foreach (var player in Players)
+		Console.WriteLine("Team: " + TeamName);
+		Console.WriteLine("Total Skill Level: " + TotalSkillLevel);
+		Console.WriteLine("Win Percentage: " + WinPercentage * 100 + "%");
+		Console.WriteLine("Players: ");
+		foreach (Player player in Players)
 			{
-			totalGamesPlayed += player.gamesPlayed;
+			Console.WriteLine("- " + player.PlayerName + " (Skill Level: " + player.SkillLevel + ")");
 			}
-		return totalGamesPlayed;
-		}
-
-	// Method to calculate the total games won by all players
-	public int GetTotalGamesWon()
-		{
-		int totalGamesWon = 0;
-		foreach (var player in Players)
-			{
-			totalGamesWon += player.gamesWon;
-			}
-		return totalGamesWon;
-		}
-
-	// Method to compare two teams based on win percentage
-	public static string CompareTeams(Team team1, Team team2)
-		{
-		float winPercentage1 = team1.GetWinPercentage();
-		float winPercentage2 = team2.GetWinPercentage();
-
-		if (winPercentage1 > winPercentage2)
-			{
-			return $"{team1.Name} wins!";
-			}
-		else if (winPercentage1 < winPercentage2)
-			{
-			return $"{team2.Name} wins!";
-			}
-		return "It's a tie!";
 		}
 	}

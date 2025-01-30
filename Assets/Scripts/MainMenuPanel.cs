@@ -1,85 +1,79 @@
+using TMPro;
+
 using UnityEngine;
-using UnityEngine.UI; // For Button functionality
+using UnityEngine.UI;
 
-namespace NickWasHere
+public class MainMenuPanel:MonoBehaviour
 	{
-	public class MainMenuPanel:MonoBehaviour
+	// --- UI Elements ---
+	[Header("UI Elements")]
+	[SerializeField] private Button manageTeamsButton; // Manage teams button
+
+	[SerializeField] private Button managePlayersButton; // Manage players button
+	[SerializeField] private Button gameAnalysisButton; // Game analysis button
+	[SerializeField] private Button comparisonButton; // Comparison button
+	[SerializeField] private Button exitButton; // Exit button
+
+	[SerializeField] private TMP_Text headerText; // Header text for the panel
+
+	// --- Panel References ---
+	[Header("Panels")]
+	[SerializeField] private GameObject teamManagementPanel;
+
+	[SerializeField] private GameObject playerManagementPanel;
+	[SerializeField] private GameObject comparisonSetupPanel;
+	[SerializeField] private GameObject mainMenuPanel; // The main menu panel itself
+
+	// --- Initialization ---
+	private void Start()
 		{
-		// --- References to UI Buttons --- //
-		[Header("Main Menu Buttons")]
-		[Tooltip("Button to navigate to the Team Management Panel.")]
-		public Button teamManagementButton;
+		// Set the header text for the Main Menu
+		headerText.text = "Main Menu";
 
-		[Tooltip("Button to navigate to the Player Management Panel.")]
-		public Button playerManagementButton;
+		// --- Button Click Listeners ---
+		manageTeamsButton.onClick.AddListener(OnManageTeamsButtonClicked);
+		managePlayersButton.onClick.AddListener(OnManagePlayersButtonClicked);
 
-		[Tooltip("Button to navigate to the Comparison Setup Panel.")]
-		public Button comparisonSetupButton;
+		comparisonButton.onClick.AddListener(OnComparisonButtonClicked);
+		exitButton.onClick.AddListener(OnExitButtonClicked);
+		}
 
-		[Tooltip("Button to navigate to the Game Analysis Panel.")]
-		public Button gameAnalysisButton;
+	// --- Button Handlers ---
+	private void OnManageTeamsButtonClicked()
+		{
+		// Open the Team Management Panel
+		ShowPanel(teamManagementPanel);
+		}
 
-		[Tooltip("Button to exit the application.")]
-		public Button exitButton;
+	private void OnManagePlayersButtonClicked()
+		{
+		// Open the Player Management Panel
+		ShowPanel(playerManagementPanel);
+		}
 
-		// --- Unity Methods --- //
-		private void Start()
-			{
-			// Validate UI references
-			if (teamManagementButton == null || playerManagementButton == null ||
-				comparisonSetupButton == null || gameAnalysisButton == null || exitButton == null)
-				{
-				Debug.LogError("One or more button references are missing in MainMenuPanel.");
-				return;
-				}
+	private void OnComparisonButtonClicked()
+		{
+		// Open the Comparison Setup Panel
+		ShowPanel(comparisonSetupPanel);
+		}
 
-			// Hook up button listeners
-			teamManagementButton.onClick.AddListener(OnTeamManagementButtonClicked);
-			playerManagementButton.onClick.AddListener(OnPlayerManagementButtonClicked);
-			comparisonSetupButton.onClick.AddListener(OnComparisonSetupButtonClicked);
-			gameAnalysisButton.onClick.AddListener(OnGameAnalysisButtonClicked);
-			exitButton.onClick.AddListener(OnExitButtonClicked);
-			}
+	private void OnExitButtonClicked()
+		{
+		// Exit the application
+		Application.Quit();
+		}
 
-		// --- Button Event Handlers --- //
+	// --- Helper Method ---
+	private void ShowPanel(GameObject panelToShow)
+		{
+		// Hide all panels
+		teamManagementPanel.SetActive(false);
+		playerManagementPanel.SetActive(false);
+		comparisonSetupPanel.SetActive(false);
 
-		// Handles the Team Management button click
-		private void OnTeamManagementButtonClicked()
-			{
-			Debug.Log("Navigating to Team Management Panel...");
-			UIManager.Instance.ShowPanel("TeamManagementPanel"); // Replace with your panel name
-			}
+		mainMenuPanel.SetActive(false); // Hide the Main Menu
 
-		// Handles the Player Management button click
-		private void OnPlayerManagementButtonClicked()
-			{
-			Debug.Log("Navigating to Player Management Panel...");
-			UIManager.Instance.ShowPanel("PlayerManagementPanel"); // Replace with your panel name
-			}
-
-		// Handles the Comparison Setup button click
-		private void OnComparisonSetupButtonClicked()
-			{
-			Debug.Log("Navigating to Comparison Setup Panel...");
-			UIManager.Instance.ShowPanel("ComparisonSetupPanel"); // Replace with your panel name
-			}
-
-		// Handles the Game Analysis button click
-		private void OnGameAnalysisButtonClicked()
-			{
-			Debug.Log("Navigating to Game Analysis Panel...");
-			UIManager.Instance.ShowPanel("GameAnalysisPanel"); // Replace with your panel name
-			}
-
-		// Handles the Exit button click
-		private void OnExitButtonClicked()
-			{
-			Debug.Log("Exiting the application...");
-#if UNITY_EDITOR
-			UnityEditor.EditorApplication.isPlaying = false; // Exit Play mode in the Unity Editor
-#else
-            Application.Quit(); // Exit the application in a built version
-#endif
-			}
+		// Show the selected panel
+		panelToShow.SetActive(true);
 		}
 	}

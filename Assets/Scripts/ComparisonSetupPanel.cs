@@ -1,151 +1,162 @@
+using System;
+
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Collections.Generic;
-using System.Linq;
 
 public class ComparisonSetupPanel:MonoBehaviour
 	{
-	// --- Panel Elements --- //
-	public TextMeshProUGUI HeaderText;
+	// --- UI Elements ---
+	[Header("UI Elements")]
+	[SerializeField] private TMP_Text headerText; // Header text for the panel
 
-	public TextMeshProUGUI SelectHomeTeamText;
-	public TextMeshProUGUI SelectHomePlayerText;
-	public TMP_Dropdown HomeTeamDropdown;
-	public Transform HomeTeamPlayerScrollView;
-	public TextMeshProUGUI SelectAwayTeamText;
-	public TextMeshProUGUI SelectAwayPlayerText;
-	public TMP_Dropdown AwayTeamDropdown;
-	public Transform AwayTeamPlayerScrollView;
-	public Button CompareButton;
-	public Button BackButton;
+	[SerializeField] private TMP_Text selectHomeTeamText; // Text for selecting home team
+	[SerializeField] private TMP_Text selectAwayTeamText; // Text for selecting away team
+	[SerializeField] private TMP_Text selectHomePlayerText; // Text for selecting home player
+	[SerializeField] private TMP_Text selectAwayPlayerText; // Text for selecting away player
 
-	// --- Initialize the Panel with Available Teams and Players --- //
-	public void InitializePanel()
+	[SerializeField] private Toggle comparePlayersToggle; // Toggle to compare players or not
+	[SerializeField] private Button compareButton; // Button to start comparison
+	[SerializeField] private Button backButton; // Back button to go back to main menu
+
+	// --- Team Dropdowns ---
+	[Header("Team Dropdowns")]
+	[SerializeField] private TMP_Dropdown homeTeamDropdown; // Home team dropdown
+
+	[SerializeField] private TMP_Dropdown awayTeamDropdown; // Away team dropdown
+
+	// --- Player List Scroll Views ---
+	[Header("Player Selection")]
+	[SerializeField] private GameObject homeTeamPlayerScrollView; // Scroll view for home team players
+
+	[SerializeField] private GameObject awayTeamPlayerScrollView; // Scroll view for away team players
+	[SerializeField] private GameObject playerTogglePrefab; // Prefab for player toggle in scroll views
+
+	// --- Panel References ---
+	[Header("Panels")]
+	[SerializeField] private GameObject comparisonResultsPanel; // Comparison results panel
+
+	// --- Initialization ---
+	private void Start()
 		{
-		// Clear dropdown options and populate with available teams
-		HomeTeamDropdown.ClearOptions();
-		AwayTeamDropdown.ClearOptions();
+		// Set the header text for the Comparison Setup Panel
+		headerText.text = "Comparison Setup";
 
-		// Add available team names to both dropdowns
-		List<string> teamNames = GetTeamNames();
-		HomeTeamDropdown.AddOptions(teamNames);
-		AwayTeamDropdown.AddOptions(teamNames);
+		// Initialize Dropdowns and Player List View
+		homeTeamDropdown.onValueChanged.AddListener(OnHomeTeamSelected);
+		awayTeamDropdown.onValueChanged.AddListener(OnAwayTeamSelected);
+		compareButton.onClick.AddListener(OnCompareButtonClicked);
+		backButton.onClick.AddListener(OnBackButtonClicked);
 
-		// Clear previous player selections
-		ClearPlayerSelections(HomeTeamPlayerScrollView);
-		ClearPlayerSelections(AwayTeamPlayerScrollView);
+		// Initialize Home/Away Player Scroll Views (hidden initially)
+		homeTeamPlayerScrollView.SetActive(false);
+		awayTeamPlayerScrollView.SetActive(false);
 		}
 
-	// --- Get Team Names from DataManager --- //
-	private List<string> GetTeamNames()
+	// --- Button Handlers ---
+	private void OnHomeTeamSelected(int index)
 		{
-		return DataManager.Instance.GetTeamNames();
+		// Logic for selecting a home team and displaying the corresponding player list
+		PopulatePlayerList(homeTeamDropdown.options[index].text, homeTeamPlayerScrollView);
+		homeTeamPlayerScrollView.SetActive(true);
 		}
 
-	// --- Update Player List for Selected Team --- //
-	public void UpdatePlayerList(TMP_Dropdown teamDropdown, Transform playerScrollView)
+	private void OnAwayTeamSelected(int index)
 		{
-		// Get the selected team based on the dropdown
-		string selectedTeam = teamDropdown.options[teamDropdown.value].text;
+		// Logic for selecting an away team and displaying the corresponding player list
+		PopulatePlayerList(awayTeamDropdown.options[index].text, awayTeamPlayerScrollView);
+		awayTeamPlayerScrollView.SetActive(true);
+		}
 
-		// Clear previous player list
-		ClearPlayerSelections(playerScrollView);
-
-		// Get the list of player names
-		List<string> playerNames = DataManager.Instance.GetPlayersForTeam(selectedTeam)
-													   .Select(p => p.name)
-													   .ToList();
-
-		foreach (string playerName in playerNames)
+	private void OnCompareButtonClicked()
+		{
+		// Check if both teams are selected and players are chosen
+		if (homeTeamDropdown.value >= 0 && awayTeamDropdown.value >= 0)
 			{
-			// Create a new button for each player
-			GameObject playerButton = new(playerName);
-			playerButton.transform.SetParent(playerScrollView, false);
+			// If comparing players is enabled, compare players
+			if (comparePlayersToggle.isOn)
+				{
+				// Logic for comparing selected players in both teams
+				ComparePlayers();
+				}
 
-			// Add a button component to the player button
-			Button button = playerButton.AddComponent<Button>();
-
-			// Create a TextMeshProUGUI component for the button text
-			GameObject textObject = new("Text");
-			textObject.transform.SetParent(playerButton.transform, false);
-			TextMeshProUGUI buttonText = textObject.AddComponent<TextMeshProUGUI>();
-			buttonText.text = playerName;
-			buttonText.fontSize = 14;
-			buttonText.alignment = TextAlignmentOptions.Center;
-
-			// Add listener to the button for player selection
-			button.onClick.AddListener(() => OnPlayerSelected(playerName, teamDropdown));
+			// Show the Comparison Results Panel
+			comparisonResultsPanel.SetActive(true);
+			gameObject.SetActive(false); // Hide the Comparison Setup Panel
+			}
+		else
+			{
+			// Show error or prompt to select teams
+			Debug.LogWarning("Please select both teams before comparing.");
 			}
 		}
 
-	// --- Clear Player Selections --- //
-	private void ClearPlayerSelections(Transform playerScrollView)
+	private void OnBackButtonClicked()
 		{
-		foreach (Transform child in playerScrollView)
+		// Go back to the main menu or the previous panel
+		gameObject.SetActive(false); // Hide the current panel
+									 // You can show the previous panel here based on your app flow
+		}
+
+	// --- Player List Population ---
+	private void PopulatePlayerList(string teamName, GameObject scrollView)
+		{
+		// Clear previous player toggles in the list
+		foreach (Transform child in scrollView.transform)
 			{
 			Destroy(child.gameObject);
 			}
-		}
 
-	// --- Handle Player Selection --- //
-	private void OnPlayerSelected(string playerName, TMP_Dropdown teamDropdown)
-		{
-		Debug.Log($"{playerName} selected from {teamDropdown.options[teamDropdown.value].text}");
-		}
+		// Fetch the players for the selected team (this is just a placeholder for your logic)
+		var players = GetPlayersForTeam(teamName);
 
-	// --- Start Method for Initializing Button Listeners --- //
-	private void Start()
-		{
-		InitializePanel();
-
-		// Add listener for home team dropdown
-		HomeTeamDropdown.onValueChanged.AddListener((index) =>
-		{
-			UpdatePlayerList(HomeTeamDropdown, HomeTeamPlayerScrollView);
-		});
-
-		// Add listener for away team dropdown
-		AwayTeamDropdown.onValueChanged.AddListener((index) =>
-		{
-			UpdatePlayerList(AwayTeamDropdown, AwayTeamPlayerScrollView);
-		});
-
-		// Add listener for compare button
-		if (CompareButton != null)
+		// Instantiate player toggles for each player in the list
+		foreach (var player in players)
 			{
-			CompareButton.onClick.AddListener(OnCompareButtonClicked);
-			}
-
-		// Add listener for back button
-		if (BackButton != null)
-			{
-			BackButton.onClick.AddListener(OnBackButtonClicked);
+			GameObject toggleObj = Instantiate(playerTogglePrefab, scrollView.transform);
+			toggleObj.GetComponentInChildren<TMP_Text>().text = player.PlayerName; // Changed to PlayerName
+			toggleObj.GetComponent<Toggle>().onValueChanged.AddListener((isOn) => OnPlayerToggleChanged(player, isOn));
 			}
 		}
 
-	// --- Compare Button Logic using ComparisonManager --- //
-	private void OnCompareButtonClicked()
+	// --- Player Toggle Handler ---
+	private void OnPlayerToggleChanged(Player player, bool isOn)
 		{
-		string homeTeamName = HomeTeamDropdown.options[HomeTeamDropdown.value].text;
-		string awayTeamName = AwayTeamDropdown.options[AwayTeamDropdown.value].text;
-
-		Team homeTeam = DataManager.Instance.GetTeamByName(homeTeamName);
-		Team awayTeam = DataManager.Instance.GetTeamByName(awayTeamName);
-
-		if (homeTeam == null || awayTeam == null)
+		// Handle the player toggle state change (e.g., select/unselect players)
+		if (isOn)
 			{
-			Debug.LogError("One or both selected teams could not be found!");
-			return;
+			Debug.Log(player.PlayerName + " selected."); // Changed to PlayerName
 			}
-
-		ComparisonManager.Instance.CompareTeams(homeTeam, awayTeam);
-		Debug.Log($"Comparison started between {homeTeamName} and {awayTeamName}");
+		else
+			{
+			Debug.Log(player.PlayerName + " unselected."); // Changed to PlayerName
+			}
 		}
 
-	// --- Back Button Logic --- //
-	private void OnBackButtonClicked()
+	// --- Compare Players (if enabled) ---
+	private void ComparePlayers()
 		{
-		UIManager.Instance.GoBackToPreviousPanel();
+		// Logic to compare selected players from both teams
+		Debug.Log("Comparing players between teams...");
+		}
+
+	// --- Example Method to Get Players for a Team (to be replaced with actual data fetching logic) ---
+	private Player[] GetPlayersForTeam(string teamName)
+		{
+		if (teamName is null)
+			{
+			throw new ArgumentNullException(nameof(teamName));
+			}
+		// Placeholder method to simulate fetching players for a team
+		// Replace with actual data-fetching logic for your players
+		return new Player[]
+		{
+			new("Player 1", 5),
+			new("Player 2", 7),
+			new("Player 3", 6),
+			new("Player 4", 8),
+			new("Player 5", 6)
+		};
 		}
 	}

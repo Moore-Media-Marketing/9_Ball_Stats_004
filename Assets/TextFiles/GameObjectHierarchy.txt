@@ -1,9 +1,6 @@
 AdaptivePerformanceManager
-EventManager
 DataManager
 UIManager
-OverlayFeedbackPanelManager
-ComparisonManager
 GenerateGameObjectList
 Main Camera
 EventSystem
@@ -115,28 +112,6 @@ Canvas
       Text (TMP)
     BackButton
       UpdateBackButtonText
-  TeamPanel
-    HeaderText
-    TeamNameText
-    GamesPlayedText
-    GamesWonText
-    WinPercentageText
-    TotalSkillLevelText
-    PlayerListScrollView
-      Viewport
-        Content
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    DetailsButton
-      Text (TMP)
-    CompareButton
-      Text (TMP)
-    BackButton
-      UpdateBackButtonText
   ComparisonSetupPanel
     HeaderText
     ComparePlayersToggle
@@ -237,7 +212,6 @@ Canvas
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel
-    OverlayText
     FeedbackText
     RetryButton
       Text (TMP)
