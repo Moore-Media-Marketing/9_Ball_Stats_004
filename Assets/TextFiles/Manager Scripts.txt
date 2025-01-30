@@ -1,0 +1,11 @@
+OverlayFeedbackPanelManager.cs:
+Handles displaying feedback and overlay messages in the UI, with auto-close functionality.
+
+ComparisonManager.cs:
+Manages the comparison of teams and players, likely used for showing match results, comparing stats, and handling related logic.
+
+DataManager.cs:
+Manages storing, retrieving, and updating data for teams and players, ensuring that the app has access to up-to-date player and team information.
+
+UIManager.cs:
+Manages UI panels, dropdowns, and back button functionality, ensuring smooth navigation between different panels and managing the state of UI elements like dropdowns and buttons.

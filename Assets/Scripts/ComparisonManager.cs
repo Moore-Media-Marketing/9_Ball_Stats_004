@@ -18,6 +18,18 @@ public class ComparisonManager:MonoBehaviour
 			}
 		}
 
+	private void Start()
+		{
+		// Raise the event when a team is selected
+		EventManager.Instance.TriggerTeamSelectedEvent();
+		}
+
+	public void UpdatePlayerStats()
+		{
+		// Raise an event when player data is updated
+		EventManager.Instance.TriggerPlayerDataUpdatedEvent();
+		}
+
 	// --- References --- //
 	public DataManager dataManager; // Reference to DataManager
 	public UIManager uiManager; // Reference to UIManager
@@ -37,7 +49,7 @@ public class ComparisonManager:MonoBehaviour
 				7 => 55,
 				8 => 65,
 				9 => 75,
-				_ => 0,// Invalid skill level
+				_ => 0, // Invalid skill level
 				};
 		}
 

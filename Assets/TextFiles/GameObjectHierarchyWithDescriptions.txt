@@ -1,0 +1,323 @@
+Canvas
+  MainMenuPanel
+    HeaderText
+      // Displays the title of the main menu, e.g., "Main Menu".
+    ManageTeamsButton
+      Text (TMP)
+      // Button for navigating to the team management panel.
+    ManagePlayerButton
+      Text (TMP)
+      // Button for navigating to the player management panel.
+    GameAnalysisButton
+      Text (TMP)
+      // Button for navigating to the game analysis panel.
+    ComparisonButton
+      Text (TMP)
+      // Button for navigating to the comparison panel.
+    ExitButton
+      Text (TMP)
+      // Button for exiting the application.
+  TeamManagementPanel
+    HeaderText
+      // Displays the title of the team management panel, e.g., "Manage Teams".
+    TeamNameText
+      // Displays the current team name or placeholder if no team is selected.
+      Text (TMP)
+      // Updates when a team is selected or newly created, or when user starts editing.
+    TeamNameInputField
+      Text Area
+        Placeholder
+          // Placeholder text for team name input, e.g., "Enter team name...".
+        Text
+          // Displays the user-inputted team name.
+    TeamDropdown
+      Label
+        // Label for the dropdown, e.g., "Select Team".
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the name of the team in the dropdown.
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    ClearTeamNameButton
+      Text (TMP)
+      // Button to clear the input field for team name.
+    ModifyTeamNameButton
+      Text (TMP)
+      // Button to modify the selected team's name.
+      // If a team is selected, it populates the input field with the selected team name and changes button text to "Update Team".
+    AddUpdateTeamButton
+      Text (TMP)
+      // Default text: "Add Team".
+      // Changes to "Update Team" if a team is selected for modification or if a new name is entered.
+      // Handles adding a new team or updating the existing team in PlayerPrefs.
+    DeleteButton
+      Text (TMP)
+      // Button to delete the selected team from PlayerPrefs.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+      // Text updates to "Back" or "Cancel" based on context.
+  PlayerManagementPanel
+    HeaderText
+      // Displays the title of the player management panel, e.g., "Manage Players".
+    TeamNameText
+      // Displays the selected team name for player management.
+    TeamNameDropdown
+      Label
+        // Label for the dropdown, e.g., "Select Team".
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the name of the team in the dropdown.
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameText
+      // Displays the text for entering the player name.
+    PlayerNameDropdown
+      Label
+        // Label for the dropdown, e.g., "Select Player".
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the name of the player in the dropdown.
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameInputField
+      Text Area
+        Placeholder
+          // Placeholder for player name input.
+        Text
+          // Displays the user-inputted player name.
+    GamesPlayedInputField
+      Text Area
+        Placeholder
+          // Placeholder for games played input.
+        Text
+          // Displays the number of games played.
+    GamesWonInputField
+      Text Area
+        Placeholder
+          // Placeholder for games won input.
+        Text
+          // Displays the number of games won.
+    SkillLevelDropdown
+      Label
+        // Label for the dropdown, e.g., "Select Skill Level".
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the skill level options (1 to 9).
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    AddPlayerButton
+      Text (TMP)
+      // Button to add a new player.
+    RemovePlayerButton
+      Text (TMP)
+      // Button to remove a player from the team.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+  TeamPanel
+    HeaderText
+      // Displays the title of the team panel, e.g., "Team Overview".
+    TeamNameText
+      // Displays the selected team name.
+    GamesPlayedText
+      // Displays the total number of games played by the team.
+    GamesWonText
+      // Displays the total number of games won by the team.
+    WinPercentageText
+      // Displays the win percentage of the team.
+    TotalSkillLevelText
+      // Displays the total skill level of the team.
+    PlayerListScrollView
+      Viewport
+        Content
+          // Scrollable list of players in the team.
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+    DetailsButton
+      Text (TMP)
+      // Button for showing more detailed stats of the team.
+    CompareButton
+      Text (TMP)
+      // Button for comparing the team with another team.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+  ComparisonSetupPanel
+    HeaderText
+      // Displays the title of the comparison setup panel, e.g., "Setup Comparison".
+    ComparePlayersToggle
+      Background
+        Checkmark
+      Label
+        // Label for toggling player comparison on/off.
+    SelectHomeTeamText
+      // Displays "Select Home Team" text.
+    SelectHomePlayerText
+      // Displays "Select Home Player" text.
+    HomeDropdown
+      Label
+        // Label for selecting home team.
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the name of the home team.
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    HomeTeamPlayerScrollView
+      Viewport
+        Content
+          playerTogglePrefab
+            Background
+              Checkmark
+            Label
+            Text (TMP)
+              // Displays player name in the home team.
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    SelectAwayTeamText
+      // Displays "Select Away Team" text.
+    SelectAwayPlayerText
+      // Displays "Select Away Player" text.
+    AwayDropdown
+      Label
+        // Label for selecting away team.
+      Arrow
+        // Dropdown arrow indicator.
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+                // Displays the name of the away team.
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    AwayTeamPlayerScrollView
+      Viewport
+        Content
+          playerTogglePrefab
+            Background
+              Checkmark
+            Label
+            Text (TMP)
+              // Displays player name in the away team.
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    CompareButton
+      Text (TMP)
+      // Button for comparing the two teams.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+  ComparisonResultsPanel
+    HeaderText
+      // Displays the title of the comparison results panel, e.g., "Comparison Results".
+    homeTeamNameText
+      // Displays the name of the home team.
+    awayTeamNameText
+      // Displays the name of the away team.
+    playerComparisonContainer
+      Player1Comparison
+        // Displays comparison of player 1 between teams.
+      Player2Comparison
+        // Displays comparison of player 2 between teams.
+      Player3Comparison
+        // Displays comparison of player 3 between teams.
+      Player4Comparison
+        // Displays comparison of player 4 between teams.
+      Player5Comparison
+        // Displays comparison of player 5 between teams.
+    winnerPredictionText
+      // Displays the predicted winner based on the comparison.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+  GameAnalysisPanel
+    HeaderText
+      // Displays the title of the game analysis panel, e.g., "Game Analysis".
+    Game Stats Text
+      // Displays game stats like total score, skill levels, and more.
+    OddsScrollView
+      Viewport
+        Content
+          // Displays a list of betting odds or game analysis results.
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+    AnalyzeGameButton
+      Text (TMP)
+      // Button to analyze the game based on input data.
+    BackButton
+      Text (TMP)
+      // Button to navigate back to the previous menu.
+  OverlayFeedbackPanel
+    OverlayText
+      // Displays overlay messages for feedback, e.g., success or error messages.
+    FeedbackText
+      // Displays detailed feedback text (e.g., "Operation successful").
+    RetryButton
+      Text (TMP)
+      // Button to retry an action after failure or request.

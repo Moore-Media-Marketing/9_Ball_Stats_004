@@ -26,6 +26,10 @@ Canvas
       Text Area
         Placeholder
         Text
+    AddUpdateTeamButton
+      Text (TMP)
+    ClearTeamNameButton
+      Text (TMP)
     TeamDropdown
       Label
       Arrow
@@ -40,11 +44,7 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    ClearTeamNameButton
-      Text (TMP)
     ModifyTeamNameButton
-      Text (TMP)
-    AddUpdateTeamButton
       Text (TMP)
     DeleteButton
       Text (TMP)

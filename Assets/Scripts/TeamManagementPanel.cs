@@ -1,7 +1,7 @@
-using TMPro; // For TextMeshPro
 using UnityEngine;
-using UnityEngine.UI; // For Button, Dropdown, and UI interactions
-using System.Collections.Generic; // For List<Team>
+using TMPro;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class TeamManagementPanel:MonoBehaviour
 	{
@@ -43,16 +43,19 @@ public class TeamManagementPanel:MonoBehaviour
 
 		// --- Set up the dropdown ---
 		teamDropdown.onValueChanged.AddListener(OnTeamDropdownChanged);
+
+		// --- Display teams in the dropdown ---
+		DisplayTeamList();
 		}
 
 	// --- Display Team List Method ---
-	// Populates the team dropdown with the list of teams
 	private void DisplayTeamList()
 		{
 		Debug.Log("Displaying team list...");
 		teamDropdown.ClearOptions();
 		List<string> options = new() { "Select Team" };
 
+		// Fetch teams from DataManager
 		foreach (var team in Teams)
 			{
 			options.Add(team.Name);
@@ -65,14 +68,12 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 
 	// --- Handle Clear Team Name Button Click ---
-	// Clears the input field for team name
 	private void OnClearTeamNameButtonClicked()
 		{
 		teamNameInputField.text = string.Empty; // Clear the input field
 		}
 
 	// --- Handle Modify Team Name Button Click ---
-	// Modifies the name of the currently selected team
 	private void OnModifyTeamNameButtonClicked()
 		{
 		if (selectedTeam != null)
@@ -80,6 +81,9 @@ public class TeamManagementPanel:MonoBehaviour
 			selectedTeam.Name = teamNameInputField.text; // Update the team name
 			teamNameText.text = selectedTeam.Name;      // Update the displayed team name
 			Debug.Log($"Team name updated to: {selectedTeam.Name}");
+
+			// Save the updated team name in DataManager
+			DataManager.Instance.SaveDataToPlayerPrefs();
 			}
 		else
 			{
@@ -88,7 +92,6 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 
 	// --- Handle Add or Update Team Button Click ---
-	// Adds a new team or updates an existing one
 	private void OnAddUpdateTeamButtonClicked()
 		{
 		string teamName = teamNameInputField.text;
@@ -100,19 +103,15 @@ public class TeamManagementPanel:MonoBehaviour
 			}
 
 		// Check if the team already exists in the DataManager's teams list
-		if (Teams.Exists(t => t.Name == teamName))
-			{
-			Debug.LogWarning("Team name already exists.");
-			return;
-			}
-
-		// Check if the team already exists in the list
 		Team existingTeam = Teams.Find(t => t.Name == teamName);
 		if (existingTeam != null)
 			{
 			// Update the existing team
 			existingTeam.Name = teamName;
 			Debug.Log($"Updated existing team: {existingTeam.Name}");
+
+			// Save the updated team list
+			DataManager.Instance.SaveDataToPlayerPrefs();
 			}
 		else
 			{
@@ -120,6 +119,9 @@ public class TeamManagementPanel:MonoBehaviour
 			Team newTeam = new(teamName);
 			Teams.Add(newTeam);
 			Debug.Log($"Created new team: {newTeam.Name}");
+
+			// Save the new team list
+			DataManager.Instance.SaveDataToPlayerPrefs();
 			}
 
 		// Refresh the team dropdown list and display updated team info
@@ -127,13 +129,15 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 
 	// --- Handle Delete Team Button Click ---
-	// Deletes the selected team from the list
 	private void OnDeleteButtonClicked()
 		{
 		if (selectedTeam != null)
 			{
 			Teams.Remove(selectedTeam);
 			Debug.Log($"Deleted team: {selectedTeam.Name}");
+
+			// Save the updated team list
+			DataManager.Instance.SaveDataToPlayerPrefs();
 
 			// Refresh the team list in the dropdown and clear displayed team info
 			DisplayTeamList();
@@ -147,7 +151,6 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 
 	// --- Handle Team Dropdown Selection Change ---
-	// Updates the team name text and input field when a team is selected
 	private void OnTeamDropdownChanged(int index)
 		{
 		if (index > 0) // Exclude the "Select Team" option
@@ -165,7 +168,6 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 
 	// --- Handle Back Button Click ---
-	// Navigates back to the previous panel
 	private void OnBackButtonClicked()
 		{
 		// Example: Change the text of the back button dynamically
@@ -174,5 +176,20 @@ public class TeamManagementPanel:MonoBehaviour
 		// Hide this panel and go back to the previous screen (or panel)
 		gameObject.SetActive(false);
 		Debug.Log("Going back to previous panel.");
+
+		// Make sure the panel is deactivated first, then use UIManager to go back
+		UIManager.Instance.GoBackToPreviousPanel();
+		}
+
+	// --- Remove any Blocker buttons or objects --- 
+	private void RemoveBlocker()
+		{
+		// Look for any UI elements named 'Blocker' and remove them
+		Transform blockerTransform = transform.Find("Blocker");
+		if (blockerTransform != null)
+			{
+			Destroy(blockerTransform.gameObject); // Destroy the blocker element
+			Debug.Log("Removed Blocker element.");
+			}
 		}
 	}

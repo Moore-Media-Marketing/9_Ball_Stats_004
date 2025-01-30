@@ -23,24 +23,20 @@ public class UIManager:MonoBehaviour
 
 	[Header("Player Input Manager Panel Dropdowns")]
 	public TMP_Dropdown teamNameDropdown;
-
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_Dropdown skillLevelDropdown;
 
 	[Header("Comparison Setup Panel Dropdowns")]
 	public TMP_Dropdown homeDropdown;
-
 	public TMP_Dropdown awayDropdown;
 
 	// --- Panel Tracking --- //
 	private int currentPanelIndex = -1;
-
 	private Stack<int> panelHistory = new();
 	private Dictionary<string, int> panelLookup = new();
 
 	// --- Variables for home/away teams --- //
 	private Team homeTeam;
-
 	private Team awayTeam;
 
 	private void Awake()
@@ -49,16 +45,32 @@ public class UIManager:MonoBehaviour
 			{
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
+			Debug.Log("UIManager initialized and marked with DontDestroyOnLoad.");
 			}
 		else
 			{
 			Destroy(gameObject);
+			Debug.Log("UIManager already exists, destroyed duplicate.");
 			return;
 			}
 
 		InitializePanelLookup();
 		InitializeBackButton();
 		InitializeDropdowns();
+
+		// Subscribe to the team and player data update events
+		DataManager.Instance.OnPlayerDataUpdated += UpdatePlayerDropdowns;
+		DataManager.Instance.OnTeamDataUpdated += UpdateTeamDropdowns;
+		}
+
+	private void OnDestroy()
+		{
+		// Unsubscribe from the events to avoid memory leaks
+		if (DataManager.Instance != null)
+			{
+			DataManager.Instance.OnPlayerDataUpdated -= UpdatePlayerDropdowns;
+			DataManager.Instance.OnTeamDataUpdated -= UpdateTeamDropdowns;
+			}
 		}
 
 	// --- Initialize Panel Lookup --- //
@@ -132,6 +144,40 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
+	// Update the player dropdown when player data changes
+	private void UpdatePlayerDropdowns()
+		{
+		if (playerNameDropdown != null)
+			{
+			List<string> playerNames = DataManager.Instance.GetPlayerNames(); // Get the player names list
+			playerNameDropdown.ClearOptions();
+			playerNameDropdown.AddOptions(ConvertToOptionDataList(playerNames));
+			Debug.Log("Updated player dropdown.");
+			}
+		}
+
+	// Update the team dropdown when team data changes
+	private void UpdateTeamDropdowns()
+		{
+		if (teamDropdown != null)
+			{
+			teamDropdown.ClearOptions();
+			teamDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames()));
+			}
+
+		if (homeDropdown != null)
+			{
+			homeDropdown.ClearOptions();
+			homeDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames()));
+			}
+
+		if (awayDropdown != null)
+			{
+			awayDropdown.ClearOptions();
+			awayDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames()));
+			}
+		}
+
 	// Convert a list of strings or integers to TMP_Dropdown.OptionData
 	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<string> items)
 		{
@@ -139,17 +185,6 @@ public class UIManager:MonoBehaviour
 		foreach (string item in items)
 			{
 			optionDataList.Add(new TMP_Dropdown.OptionData(item));
-			}
-		return optionDataList;
-		}
-
-	// Convert a list of integers to TMP_Dropdown.OptionData
-	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<int> items)
-		{
-		List<TMP_Dropdown.OptionData> optionDataList = new();
-		foreach (int item in items)
-			{
-			optionDataList.Add(new TMP_Dropdown.OptionData(item.ToString()));
 			}
 		return optionDataList;
 		}
@@ -172,7 +207,21 @@ public class UIManager:MonoBehaviour
 
 		panels[panelIndex].SetActive(true);
 		currentPanelIndex = panelIndex;
-		Debug.Log($"Switched to panel {panelIndex}");
+
+		// Debug: Log the state of the back button
+		Debug.Log($"Showing panel {panels[panelIndex].name}, Back button interactable: {backButton.interactable}");
+
+		// Enable back button unless we are on the MainMenuPanel or OverlayFeedbackPanel
+		if (panels[panelIndex].name == "MainMenuPanel" || panels[panelIndex].name == "OverlayFeedbackPanel")
+			{
+			backButton.interactable = false;
+			Debug.Log("Back button is disabled.");
+			}
+		else
+			{
+			backButton.interactable = true;
+			Debug.Log("Back button is enabled.");
+			}
 		}
 
 	// --- Show Panel by Name --- //
@@ -205,11 +254,14 @@ public class UIManager:MonoBehaviour
 		{
 		if (panelHistory.Count > 0)
 			{
+			// Show the last panel in the history stack
 			ShowPanel(panelHistory.Pop());
 			}
 		else
 			{
 			Debug.Log("No previous panels in history.");
+			// If there's no history, we can fallback to the Main Menu or a default panel.
+			ShowPanel("MainMenuPanel");
 			}
 		}
 

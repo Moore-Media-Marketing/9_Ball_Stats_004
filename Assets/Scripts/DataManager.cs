@@ -11,219 +11,148 @@ public class DataManager:MonoBehaviour
 	public static DataManager Instance { get; private set; }
 
 	// List of teams and players
-	public List<Team> teams;
-	public List<Player> players;
+	public List<Team> teams = new();
+	public List<Player> players = new();
 
-	private const string TeamsKey = "TeamsData";
-	private const string PlayersKey = "PlayersData";
-
-	// Event to notify about team list changes
+	// Event to notify when the team list changes
 	public event Action OnTeamListChanged;
+
+	// Event to notify when the player data is updated (e.g., added or removed)
+	public event Action OnPlayerDataUpdated;
+
+	// Event to notify when the team data is updated (e.g., added or removed)
+	public event Action OnTeamDataUpdated;
 
 	private void Awake()
 		{
-		// Initialize the singleton instance
 		if (Instance == null)
 			{
 			Instance = this;
-			DontDestroyOnLoad(gameObject); // Prevents destruction when loading new scenes
+			DontDestroyOnLoad(gameObject);
 			}
 		else
 			{
-			Destroy(gameObject); // Destroy duplicate instances
-			return;
+			Destroy(gameObject);
 			}
 
-		// Initialize lists
-		teams = new List<Team>();
-		players = new List<Player>();
-
-		LoadData(); // Load saved data if necessary
-		}
-
-	// --- Get All Team Names --- //
-	public List<string> GetTeamNames()
-		{
-		return teams.Select(t => t.Name).ToList(); // Get all team names
-		}
-
-	// --- Get All Teams --- //
-	public List<Team> GetTeams()
-		{
-		return teams; // Return the list of teams
-		}
-
-	// --- Update Team --- //
-	public void UpdateTeam(Team updatedTeam)
-		{
-		Team existingTeam = teams.FirstOrDefault(t => t.Name == updatedTeam.Name);
-		if (existingTeam != null)
-			{
-			// Replace the old team with the updated team
-			int index = teams.IndexOf(existingTeam);
-			teams[index] = updatedTeam;
-			SaveTeamsToPlayerPrefs(); // Save the changes to PlayerPrefs
-			OnTeamListChanged?.Invoke(); // Notify listeners of the update
-			}
-		else
-			{
-			Debug.LogError($"Team with name {updatedTeam.Name} not found.");
-			}
-		}
-
-	// --- Add Team --- //
-	public void AddTeam(Team team)
-		{
-		if (!DoesTeamExist(team.Name))
-			{
-			teams.Add(team); // Add the new team
-			SaveTeamsToPlayerPrefs(); // Save the changes to PlayerPrefs
-			OnTeamListChanged?.Invoke(); // Notify listeners of the addition
-			}
-		else
-			{
-			Debug.LogError($"Team with name {team.Name} already exists.");
-			}
-		}
-
-	// --- Save Teams to PlayerPrefs --- //
-	public void SaveTeamsToPlayerPrefs()
-		{
-		List<string> teamJsonList = new();
-		foreach (var team in teams)
-			{
-			teamJsonList.Add(JsonUtility.ToJson(team)); // Serialize each team object
-			}
-		PlayerPrefs.SetString(TeamsKey, JsonUtility.ToJson(new Serialization<List<string>>(teamJsonList)));
-		PlayerPrefs.Save(); // Save changes to PlayerPrefs
-		}
-
-	// --- Remove Team --- //
-	public void RemoveTeam(string teamName)
-		{
-		Team teamToRemove = teams.FirstOrDefault(t => t.Name == teamName);
-		if (teamToRemove != null)
-			{
-			teams.Remove(teamToRemove); // Remove the team
-			SaveTeamsToPlayerPrefs(); // Save the changes to PlayerPrefs
-			OnTeamListChanged?.Invoke(); // Notify listeners of the removal
-			}
-		else
-			{
-			Debug.LogError($"Team with name {teamName} not found.");
-			}
-		}
-
-	// --- Player Management Methods --- //
-	public bool PlayerExists(string playerName)
-		{
-		return players.Any(p => p.name == playerName);
-		}
-
-	public void AddPlayer(Player player)
-		{
-		players.Add(player); // Add the new player
-		SaveData(); // Save the changes to PlayerPrefs
-		}
-
-	public void RemovePlayer(string playerName)
-		{
-		Player playerToRemove = players.FirstOrDefault(p => p.name == playerName);
-		if (playerToRemove != null)
-			{
-			players.Remove(playerToRemove); // Remove the player
-			SaveData(); // Save the changes to PlayerPrefs
-			}
-		else
-			{
-			Debug.LogError($"Player with name {playerName} not found.");
-			}
-		}
-
-	// --- Get All Player Names --- //
-	public List<string> GetPlayerNames()
-		{
-		return players.Select(p => p.name).ToList(); // Get all player names
-		}
-
-	// --- Get Skill Level Options --- //
-	public List<int> GetSkillLevelOptions()
-		{
-		return Enumerable.Range(1, 9).ToList(); // Skill levels are between 1 and 9
-		}
-
-	// --- Get Players for a Specific Team --- //
-	public List<string> GetPlayersForTeam(string teamName)
-		{
-		// Assuming each team holds a list of player names in its data
-		Team team = GetTeamByName(teamName);
-		if (team == null)
-			{
-			return new List<string>(); // Return an empty list if the team doesn't exist
-			}
-
-		List<string> playerNames = team.Players.Select(p => p.name).ToList(); // Get player names for the team
-		return playerNames;
-		}
-
-	// --- Team Management Methods --- //
-	public Team GetTeamByName(string teamName)
-		{
-		return teams.FirstOrDefault(t => t.Name == teamName);
-		}
-
-	public bool DoesTeamExist(string teamName)
-		{
-		return teams.Any(t => t.Name == teamName);
-		}
-
-	// --- Save Data to PlayerPrefs --- //
-	public void SaveData()
-		{
-		List<string> playerJsonList = new();
-		foreach (var player in players)
-			{
-			playerJsonList.Add(JsonUtility.ToJson(player)); // Serialize each player object
-			}
-		PlayerPrefs.SetString(PlayersKey, JsonUtility.ToJson(new Serialization<List<string>>(playerJsonList)));
-		PlayerPrefs.Save(); // Save changes to PlayerPrefs
+		LoadData();
 		}
 
 	// --- Load Data from PlayerPrefs --- //
 	private void LoadData()
 		{
-		if (PlayerPrefs.HasKey(TeamsKey))
+		// Load teams from PlayerPrefs
+		int teamCount = PlayerPrefs.GetInt("TeamCount", 0);
+		for (int i = 0; i < teamCount; i++)
 			{
-			string teamsJson = PlayerPrefs.GetString(TeamsKey);
-			List<string> teamJsonList = JsonUtility.FromJson<Serialization<List<string>>>(teamsJson).data;
-			foreach (var teamJson in teamJsonList)
+			string teamName = PlayerPrefs.GetString($"Team_{i}_Name", string.Empty);
+			if (!string.IsNullOrEmpty(teamName)) // Validate if teamName exists
 				{
-				Team team = JsonUtility.FromJson<Team>(teamJson);
+				Team team = new(teamName); // Assuming Team has a constructor that accepts a name
 				teams.Add(team);
 				}
 			}
 
-		if (PlayerPrefs.HasKey(PlayersKey))
+		// Load players from PlayerPrefs
+		int playerCount = PlayerPrefs.GetInt("PlayerCount", 0);
+		for (int i = 0; i < playerCount; i++)
 			{
-			string playersJson = PlayerPrefs.GetString(PlayersKey);
-			List<string> playerJsonList = JsonUtility.FromJson<Serialization<List<string>>>(playersJson).data;
-			foreach (var playerJson in playerJsonList)
+			string playerName = PlayerPrefs.GetString($"Player_{i}_Name", string.Empty);
+			int skillLevel = PlayerPrefs.GetInt($"Player_{i}_SkillLevel", 1); // Default to skill level 1 if not found
+			int gamesPlayed = PlayerPrefs.GetInt($"Player_{i}_GamesPlayed", 0); // Default to 0 if not found
+			int gamesWon = PlayerPrefs.GetInt($"Player_{i}_GamesWon", 0); // Default to 0 if not found
+			string teamName = PlayerPrefs.GetString($"Player_{i}_TeamName", string.Empty); // Team name (empty if no team assigned)
+
+			// Validate loaded player data
+			if (!string.IsNullOrEmpty(playerName))
 				{
-				Player player = JsonUtility.FromJson<Player>(playerJson);
+				Player player = new(playerName, skillLevel, gamesPlayed, gamesWon, teamName);
 				players.Add(player);
 				}
 			}
 		}
-	}
 
-// Serialization helper class
-[System.Serializable]
-public class Serialization<T>
-	{
-	public T data;
-
-	public Serialization(T data)
+	// --- Save Teams and Player Data to PlayerPrefs --- //
+	public void SaveDataToPlayerPrefs()
 		{
-		this.data = data;
+		// Save teams to PlayerPrefs
+		PlayerPrefs.SetInt("TeamCount", teams.Count);
+		for (int i = 0; i < teams.Count; i++)
+			{
+			PlayerPrefs.SetString($"Team_{i}_Name", teams[i].Name);
+			}
+
+		// Save players to PlayerPrefs
+		PlayerPrefs.SetInt("PlayerCount", players.Count);
+		for (int i = 0; i < players.Count; i++)
+			{
+			PlayerPrefs.SetString($"Player_{i}_Name", players[i].name);
+			PlayerPrefs.SetInt($"Player_{i}_SkillLevel", players[i].skillLevel);
+			PlayerPrefs.SetInt($"Player_{i}_GamesPlayed", players[i].gamesPlayed);
+			PlayerPrefs.SetInt($"Player_{i}_GamesWon", players[i].gamesWon);
+			PlayerPrefs.SetString($"Player_{i}_TeamName", players[i].TeamName);
+			}
+
+		// Save player data to PlayerPrefs
+		PlayerPrefs.Save();
+		}
+
+	// --- Get team names --- //
+	public List<string> GetTeamNames()
+		{
+		return teams.Select(t => t.Name).ToList();
+		}
+
+	// --- Get player names --- //
+	public List<string> GetPlayerNames()
+		{
+		return players.Select(p => p.name).ToList();
+		}
+
+	// --- Get skill levels --- //
+	public List<int> GetSkillLevelOptions()
+		{
+		return new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		}
+
+	// --- Get team by name --- //
+	public Team GetTeamByName(string name)
+		{
+		return teams.FirstOrDefault(t => t.Name == name);
+		}
+
+	// --- Add team --- //
+
+	public void AddTeam(Team team)
+		{
+		teams.Add(team);
+		OnTeamListChanged?.Invoke();  // Trigger the event for team list change
+		OnTeamDataUpdated?.Invoke();  // Trigger the event for team data update
+		SaveDataToPlayerPrefs();      // Save teams and players to PlayerPrefs after adding
+		}
+
+
+	// --- Remove team --- //
+	public void RemoveTeam(Team team)
+		{
+		teams.Remove(team);
+		OnTeamListChanged?.Invoke();  // Trigger the event for team list change
+		OnTeamDataUpdated?.Invoke();  // Trigger the event for team data update
+		SaveDataToPlayerPrefs();      // Save teams and players to PlayerPrefs after removing
+		}
+
+
+	// --- Add player --- //
+	public void AddPlayer(Player player)
+		{
+		players.Add(player);
+		OnPlayerDataUpdated?.Invoke();  // Trigger the event for player data update
+		}
+
+	// --- Remove player --- //
+	public void RemovePlayer(Player player)
+		{
+		players.Remove(player);
+		OnPlayerDataUpdated?.Invoke();  // Trigger the event for player data update
 		}
 	}
