@@ -20,9 +20,81 @@ public class ComparisonManager:MonoBehaviour
 
 	// --- References --- //
 	public DataManager dataManager; // Reference to DataManager
-
 	public UIManager uiManager; // Reference to UIManager
 	public ComparisonResultsPanel resultsPanel; // Reference to the comparison results panel
+
+	// --- Helper: Get Points Required to Win Based on Skill Level --- //
+	private int GetPointsRequiredToWin(int skillLevel)
+		{
+		return skillLevel switch
+			{
+				1 => 14,
+				2 => 19,
+				3 => 25,
+				4 => 31,
+				5 => 38,
+				6 => 46,
+				7 => 55,
+				8 => 65,
+				9 => 75,
+				_ => 0,// Invalid skill level
+				};
+		}
+
+	// --- Helper: Compare Player Matchup with Handicap --- //
+	private ComparisonResult ComparePlayersForMatchup(Player homePlayer, Player awayPlayer)
+		{
+		// Get the points required for each player based on their skill level
+		int homePlayerPointsRequired = GetPointsRequiredToWin(homePlayer.skillLevel);
+		int awayPlayerPointsRequired = GetPointsRequiredToWin(awayPlayer.skillLevel);
+
+		// Calculate the win percentage based on the points required
+		float homePlayerWinPercentage = (float) homePlayerPointsRequired / (homePlayerPointsRequired + awayPlayerPointsRequired) * 100;
+		float awayPlayerWinPercentage = (float) awayPlayerPointsRequired / (homePlayerPointsRequired + awayPlayerPointsRequired) * 100;
+
+		// Create the result for this matchup
+		ComparisonResult result = new()
+			{
+			HomePlayer = homePlayer,
+			AwayPlayer = awayPlayer,
+			HomePlayerWinPercentage = homePlayerWinPercentage,
+			AwayPlayerWinPercentage = awayPlayerWinPercentage,
+			HomePlayerPPM = homePlayer.ppm,
+			AwayPlayerPPM = awayPlayer.ppm,
+			};
+
+		return result;
+		}
+
+	// --- Helper: Calculate Team Skill Level --- //
+	private float CalculateTeamSkillLevel(Team team)
+		{
+		float skillLevel = 0;
+		foreach (var player in team.Players)
+			{
+			skillLevel += player.skillLevel; // Assuming the player's skill level is a float or int
+			}
+		return skillLevel;
+		}
+
+	// --- Helper: Check if Team is Valid According to 23-Rule --- //
+	private bool IsTeamValid(Team team)
+		{
+		int totalSkillLevel = 0;
+		int seniorPlayerCount = 0;
+
+		foreach (var player in team.Players)
+			{
+			totalSkillLevel += player.skillLevel;
+			if (player.skillLevel >= 6) // Senior skill level players are 6-9
+				{
+				seniorPlayerCount++;
+				}
+			}
+
+		// Ensure total skill level is <= 23 and only 2 senior players
+		return totalSkillLevel <= 23 && seniorPlayerCount <= 2;
+		}
 
 	// --- Player vs Player Comparison --- //
 	public void ComparePlayers(Player homePlayer, Player awayPlayer)
@@ -41,14 +113,21 @@ public class ComparisonManager:MonoBehaviour
 	// --- Team vs Team Comparison --- //
 	public void CompareTeams(Team homeTeam, Team awayTeam)
 		{
+		// Ensure teams are valid according to the 23-rule
+		if (!IsTeamValid(homeTeam) || !IsTeamValid(awayTeam))
+			{
+			Debug.LogError("One or both teams do not meet the 23-rule.");
+			return;
+			}
+
 		// Get all possible matchups between players from both teams
 		List<ComparisonResult> comparisonResults = new();
 
-		foreach (var homePlayer in homeTeam.Players) // FIXED: changed team.players to team.Players
+		foreach (var homePlayer in homeTeam.Players)
 			{
-			foreach (var awayPlayer in awayTeam.Players) // FIXED: changed team.players to team.Players
+			foreach (var awayPlayer in awayTeam.Players)
 				{
-				// Compare the players
+				// Compare the players with the handicap system applied
 				ComparisonResult result = ComparePlayersForMatchup(homePlayer, awayPlayer);
 				comparisonResults.Add(result);
 				}
@@ -61,33 +140,10 @@ public class ComparisonManager:MonoBehaviour
 		DisplayComparisonResults(comparisonResults, homeTeam, awayTeam);
 		}
 
-	// --- Helper: Compare Player Matchup --- //
-	private ComparisonResult ComparePlayersForMatchup(Player homePlayer, Player awayPlayer)
-		{
-		// Calculate win percentages and points per match (PPM)
-		float homePlayerWinPercentage = homePlayer.WinPercentage;
-		float awayPlayerWinPercentage = awayPlayer.WinPercentage;
-		float homePlayerPPM = homePlayer.ppm;
-		float awayPlayerPPM = awayPlayer.ppm;
-
-		// Create the result for this matchup
-		ComparisonResult result = new()
-			{
-			HomePlayer = homePlayer,
-			AwayPlayer = awayPlayer,
-			HomePlayerWinPercentage = homePlayerWinPercentage,
-			AwayPlayerWinPercentage = awayPlayerWinPercentage,
-			HomePlayerPPM = homePlayerPPM,
-			AwayPlayerPPM = awayPlayerPPM,
-			};
-
-		return result;
-		}
-
 	// --- Helper: Display Comparison Results --- //
 	private void DisplayComparisonResults(List<ComparisonResult> results, Team homeTeam, Team awayTeam)
 		{
-		// Display the comparison results in the UI (e.g., on the results panel)
+		// Display the comparison results in the UI
 		resultsPanel.ClearResults();
 
 		foreach (var result in results)
@@ -102,17 +158,6 @@ public class ComparisonManager:MonoBehaviour
 
 		// Pass the winner as a string
 		resultsPanel.DisplayWinner(homeTeamSkillLevel > awayTeamSkillLevel ? homeTeam.Name : awayTeam.Name);
-		}
-
-	// --- Helper: Calculate Team Skill Level --- //
-	private float CalculateTeamSkillLevel(Team team)
-		{
-		float skillLevel = 0;
-		foreach (var player in team.Players) // FIXED: changed team.players to team.Players
-			{
-			skillLevel += player.skillLevel; // Assuming the player's skill level is a float or int
-			}
-		return skillLevel;
 		}
 	}
 

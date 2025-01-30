@@ -18,7 +18,7 @@ public class TeamManagementPanel:MonoBehaviour
 	public TextMeshProUGUI backButtonText;          // Text for the back button (modifiable)
 
 	// --- Team data ---
-	private List<Team> teams = new();    // List to hold all teams
+	private List<Team> Teams => DataManager.Instance.teams;  // Access the teams from DataManager
 	private Team selectedTeam;                      // Currently selected team
 
 	// --- Start method ---
@@ -53,10 +53,10 @@ public class TeamManagementPanel:MonoBehaviour
 		teamDropdown.ClearOptions();
 		List<string> options = new() { "Select Team" };
 
-		foreach (var team in DataManager.Instance.teams)
+		foreach (var team in Teams)
 			{
-			options.Add(team.teamName);
-			Debug.Log("Adding team: " + team.teamName);
+			options.Add(team.Name);
+			Debug.Log("Adding team: " + team.Name);
 			}
 
 		teamDropdown.AddOptions(options);
@@ -99,8 +99,15 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Check if the team already exists
-		Team existingTeam = teams.Find(t => t.Name == teamName);
+		// Check if the team already exists in the DataManager's teams list
+		if (Teams.Exists(t => t.Name == teamName))
+			{
+			Debug.LogWarning("Team name already exists.");
+			return;
+			}
+
+		// Check if the team already exists in the list
+		Team existingTeam = Teams.Find(t => t.Name == teamName);
 		if (existingTeam != null)
 			{
 			// Update the existing team
@@ -111,7 +118,7 @@ public class TeamManagementPanel:MonoBehaviour
 			{
 			// Create a new team
 			Team newTeam = new(teamName);
-			teams.Add(newTeam);
+			Teams.Add(newTeam);
 			Debug.Log($"Created new team: {newTeam.Name}");
 			}
 
@@ -125,7 +132,7 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		if (selectedTeam != null)
 			{
-			teams.Remove(selectedTeam);
+			Teams.Remove(selectedTeam);
 			Debug.Log($"Deleted team: {selectedTeam.Name}");
 
 			// Refresh the team list in the dropdown and clear displayed team info
@@ -145,7 +152,7 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		if (index > 0) // Exclude the "Select Team" option
 			{
-			selectedTeam = teams[index - 1]; // Get the selected team based on dropdown index
+			selectedTeam = Teams[index - 1]; // Get the selected team based on dropdown index
 			teamNameInputField.text = selectedTeam.Name; // Set the input field to the selected team name
 			teamNameText.text = selectedTeam.Name; // Display the selected team's name
 			}
