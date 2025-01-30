@@ -2,6 +2,7 @@ ComparisonManager.cs
 ComparisonResultsPanel.cs
 ComparisonSetupPanel.cs
 DataManager.cs
+EventManager.cs
 GameAnalysisPanel.cs
 MainMenuPanel.cs
 OverlayFeedbackPanelManager.cs

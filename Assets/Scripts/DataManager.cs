@@ -35,7 +35,7 @@ public class DataManager:MonoBehaviour
 			Destroy(gameObject);
 			}
 
-		LoadData();
+		LoadData();  // Load saved data
 		}
 
 	// --- Load Data from PlayerPrefs --- //
@@ -81,6 +81,7 @@ public class DataManager:MonoBehaviour
 		SaveDataToPlayerPrefs();
 		}
 
+	// Method to save data into PlayerPrefs
 	public void SaveDataToPlayerPrefs()
 		{
 		// Save teams to PlayerPrefs
