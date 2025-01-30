@@ -11,8 +11,6 @@ Canvas
       Text (TMP)
     ManagePlayerButton
       Text (TMP)
-    GameAnalysisButton
-      Text (TMP)
     ComparisonButton
       Text (TMP)
     ExitButton
@@ -193,22 +191,6 @@ Canvas
       Player4Comparison
       Player5Comparison
     winnerPredictionText
-    BackButton
-      UpdateBackButtonText
-  GameAnalysisPanel
-    HeaderText
-    Game Stats Text
-    OddsScrollView
-      Viewport
-        Content
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    AnalyzeGameButton
-      Text (TMP)
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel

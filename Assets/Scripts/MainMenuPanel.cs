@@ -10,7 +10,7 @@ public class MainMenuPanel:MonoBehaviour
 	[SerializeField] private Button manageTeamsButton; // Manage teams button
 
 	[SerializeField] private Button managePlayersButton; // Manage players button
-	[SerializeField] private Button gameAnalysisButton; // Game analysis button
+	
 	[SerializeField] private Button comparisonButton; // Comparison button
 	[SerializeField] private Button exitButton; // Exit button
 
