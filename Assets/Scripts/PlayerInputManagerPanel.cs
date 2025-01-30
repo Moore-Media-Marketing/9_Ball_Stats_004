@@ -1,3 +1,5 @@
+using System.Linq;
+
 using TMPro;
 
 using UnityEngine;
@@ -115,11 +117,22 @@ namespace NickWasHere
 				return;
 				}
 
-			dataManager.RemovePlayer(playerName);
-			dataManager.SaveData();
+			// Find the player by name
+			Player playerToRemove = DataManager.Instance.players.FirstOrDefault(p => p.name == playerName);
+			if (playerToRemove != null)
+				{
+				// Pass the Player object to the RemovePlayer method
+				DataManager.Instance.RemovePlayer(playerToRemove);
+				}
+			else
+				{
+				Debug.LogError($"Player {playerName} not found in DataManager.");
+				}
 
+			dataManager.SaveData();
 			ClearInputFields();
 			}
+
 
 		private void OnBackButtonClicked()
 			{

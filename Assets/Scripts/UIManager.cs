@@ -12,7 +12,7 @@ public class UIManager:MonoBehaviour
 
 	// --- UI Elements --- //
 	[Header("Panels")]
-	[SerializeField] private GameObject[] panels;  // Remove feedback panel from this array
+	[SerializeField] private GameObject[] panels; // Remove feedback panel from this array
 
 	[Header("Back Button")]
 	[SerializeField] private Button backButton;
@@ -144,19 +144,18 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
-	// Update the player dropdown when player data changes
+	// --- Update Player Dropdowns --- //
 	private void UpdatePlayerDropdowns()
 		{
 		if (playerNameDropdown != null)
 			{
-			List<string> playerNames = DataManager.Instance.GetPlayerNames(); // Get the player names list
 			playerNameDropdown.ClearOptions();
-			playerNameDropdown.AddOptions(ConvertToOptionDataList(playerNames));
+			playerNameDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetPlayerNames()));
 			Debug.Log("Updated player dropdown.");
 			}
 		}
 
-	// Update the team dropdown when team data changes
+	// --- Update Team Dropdowns --- //
 	private void UpdateTeamDropdowns()
 		{
 		if (teamDropdown != null)
@@ -178,13 +177,23 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
-	// Convert a list of strings or integers to TMP_Dropdown.OptionData
+	// --- Convert a list of strings or integers to TMP_Dropdown.OptionData --- //
+	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<int> items)
+		{
+		List<TMP_Dropdown.OptionData> optionDataList = new();
+		foreach (int item in items)
+			{
+			optionDataList.Add(new TMP_Dropdown.OptionData(item.ToString())); // Convert integer to string
+			}
+		return optionDataList;
+		}
+
 	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<string> items)
 		{
 		List<TMP_Dropdown.OptionData> optionDataList = new();
 		foreach (string item in items)
 			{
-			optionDataList.Add(new TMP_Dropdown.OptionData(item));
+			optionDataList.Add(new TMP_Dropdown.OptionData(item)); // Directly add string items
 			}
 		return optionDataList;
 		}
@@ -208,20 +217,8 @@ public class UIManager:MonoBehaviour
 		panels[panelIndex].SetActive(true);
 		currentPanelIndex = panelIndex;
 
-		// Debug: Log the state of the back button
-		Debug.Log($"Showing panel {panels[panelIndex].name}, Back button interactable: {backButton.interactable}");
-
-		// Enable back button unless we are on the MainMenuPanel or OverlayFeedbackPanel
-		if (panels[panelIndex].name == "MainMenuPanel" || panels[panelIndex].name == "OverlayFeedbackPanel")
-			{
-			backButton.interactable = false;
-			Debug.Log("Back button is disabled.");
-			}
-		else
-			{
-			backButton.interactable = true;
-			Debug.Log("Back button is enabled.");
-			}
+		// Enable or disable back button
+		backButton.interactable = panels[panelIndex].name != "MainMenuPanel" && panels[panelIndex].name != "OverlayFeedbackPanel";
 		}
 
 	// --- Show Panel by Name --- //
@@ -254,13 +251,10 @@ public class UIManager:MonoBehaviour
 		{
 		if (panelHistory.Count > 0)
 			{
-			// Show the last panel in the history stack
 			ShowPanel(panelHistory.Pop());
 			}
 		else
 			{
-			Debug.Log("No previous panels in history.");
-			// If there's no history, we can fallback to the Main Menu or a default panel.
 			ShowPanel("MainMenuPanel");
 			}
 		}
@@ -283,27 +277,17 @@ public class UIManager:MonoBehaviour
 
 	private void OnHomeDropdownValueChanged(int index)
 		{
-		// Set the home team when the user selects from the dropdown
 		homeTeam = DataManager.Instance.GetTeamByName(homeDropdown.options[index].text);
 		Debug.Log("Selected Home Team: " + homeTeam.Name);
 		}
 
 	private void OnAwayDropdownValueChanged(int index)
 		{
-		// Set the away team when the user selects from the dropdown
 		awayTeam = DataManager.Instance.GetTeamByName(awayDropdown.options[index].text);
 		Debug.Log("Selected Away Team: " + awayTeam.Name);
 		}
 
-	// --- Method to get home team --- //
-	public Team GetHomeTeam()
-		{
-		return homeTeam;
-		}
-
-	// --- Method to get away team --- //
-	public Team GetAwayTeam()
-		{
-		return awayTeam;
-		}
+	// --- Get Home and Away Teams --- //
+	public Team GetHomeTeam() => homeTeam;
+	public Team GetAwayTeam() => awayTeam;
 	}

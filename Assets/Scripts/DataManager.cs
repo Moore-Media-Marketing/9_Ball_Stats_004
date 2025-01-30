@@ -43,13 +43,16 @@ public class DataManager:MonoBehaviour
 		{
 		// Load teams from PlayerPrefs
 		int teamCount = PlayerPrefs.GetInt("TeamCount", 0);
+		Debug.Log($"Loaded {teamCount} teams."); // Debugging line to check loaded teams
+
 		for (int i = 0; i < teamCount; i++)
 			{
 			string teamName = PlayerPrefs.GetString($"Team_{i}_Name", string.Empty);
-			if (!string.IsNullOrEmpty(teamName)) // Validate if teamName exists
+			if (!string.IsNullOrEmpty(teamName))
 				{
 				Team team = new(teamName); // Assuming Team has a constructor that accepts a name
 				teams.Add(team);
+				Debug.Log($"Loaded team: {teamName}"); // Debugging line to check loaded team
 				}
 			}
 
@@ -73,6 +76,11 @@ public class DataManager:MonoBehaviour
 		}
 
 	// --- Save Teams and Player Data to PlayerPrefs --- //
+	public void SaveData()
+		{
+		SaveDataToPlayerPrefs();
+		}
+
 	public void SaveDataToPlayerPrefs()
 		{
 		// Save teams to PlayerPrefs
@@ -95,6 +103,18 @@ public class DataManager:MonoBehaviour
 
 		// Save player data to PlayerPrefs
 		PlayerPrefs.Save();
+		}
+
+	// --- Get players for a specific team --- //
+	public List<Player> GetPlayersForTeam(string teamName)
+		{
+		return players.Where(p => p.TeamName == teamName).ToList();
+		}
+
+	// --- Check if a player exists by name --- //
+	public bool PlayerExists(string playerName)
+		{
+		return players.Any(p => p.name == playerName);
 		}
 
 	// --- Get team names --- //
@@ -122,15 +142,13 @@ public class DataManager:MonoBehaviour
 		}
 
 	// --- Add team --- //
-
 	public void AddTeam(Team team)
 		{
 		teams.Add(team);
 		OnTeamListChanged?.Invoke();  // Trigger the event for team list change
 		OnTeamDataUpdated?.Invoke();  // Trigger the event for team data update
-		SaveDataToPlayerPrefs();      // Save teams and players to PlayerPrefs after adding
+		SaveData();  // Save teams and players to PlayerPrefs after adding
 		}
-
 
 	// --- Remove team --- //
 	public void RemoveTeam(Team team)
@@ -138,9 +156,8 @@ public class DataManager:MonoBehaviour
 		teams.Remove(team);
 		OnTeamListChanged?.Invoke();  // Trigger the event for team list change
 		OnTeamDataUpdated?.Invoke();  // Trigger the event for team data update
-		SaveDataToPlayerPrefs();      // Save teams and players to PlayerPrefs after removing
+		SaveData();  // Save teams and players to PlayerPrefs after removing
 		}
-
 
 	// --- Add player --- //
 	public void AddPlayer(Player player)

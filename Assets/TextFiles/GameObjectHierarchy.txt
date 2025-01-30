@@ -1,4 +1,5 @@
 AdaptivePerformanceManager
+EventManager
 DataManager
 UIManager
 OverlayFeedbackPanelManager

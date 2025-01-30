@@ -7483,6 +7483,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1197576844}
   m_CullTransparentMesh: 1
+--- !u!1 &1208492718
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1208492719}
+  - component: {fileID: 1208492720}
+  m_Layer: 0
+  m_Name: EventManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1208492719
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208492718}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1208492720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208492718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0a8018499de0204aa49395d40853a89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnTeamSelected:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerDataUpdated:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1210264486
 GameObject:
   m_ObjectHideFlags: 0
@@ -11412,17 +11462,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 216a1c620014b014882c17c76d02bc27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  headerText: {fileID: 1442442119}
-  selectHomeTeamText: {fileID: 1855493173}
-  selectHomePlayerText: {fileID: 695971936}
-  homeTeamDropdown: {fileID: 647432627324966437}
-  homeTeamPlayerScrollView: {fileID: 101080380}
-  selectAwayTeamText: {fileID: 1471807661}
-  selectAwayPlayerText: {fileID: 1179513769}
-  awayTeamDropdown: {fileID: 647432627767420183}
-  awayTeamPlayerScrollView: {fileID: 1679297423}
-  compareButton: {fileID: 1460198874}
-  backButton: {fileID: 1869444153}
+  HeaderText: {fileID: 1442442119}
+  SelectHomeTeamText: {fileID: 1855493173}
+  SelectHomePlayerText: {fileID: 695971936}
+  HomeTeamDropdown: {fileID: 647432627324966437}
+  HomeTeamPlayerScrollView: {fileID: 101080380}
+  SelectAwayTeamText: {fileID: 1471807661}
+  SelectAwayPlayerText: {fileID: 1179513769}
+  AwayTeamDropdown: {fileID: 647432627767420183}
+  AwayTeamPlayerScrollView: {fileID: 1679297423}
+  CompareButton: {fileID: 1460198874}
+  BackButton: {fileID: 1869444153}
 --- !u!1 &1585296884
 GameObject:
   m_ObjectHideFlags: 0
@@ -25005,6 +25055,7 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1208492719}
   - {fileID: 648930128}
   - {fileID: 711083288}
   - {fileID: 1326040190}
