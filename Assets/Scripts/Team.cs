@@ -1,5 +1,6 @@
-using NickWasHere;
 using System.Collections.Generic;
+
+using NickWasHere;
 
 [System.Serializable]
 public class Team
@@ -21,7 +22,6 @@ public class Team
 		this.teamName = teamName;
 		this.players = players ?? new List<Player>();  // Use an empty list if no players are passed
 		}
-
 
 	// Property for team name
 	public string Name

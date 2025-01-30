@@ -1,7 +1,7 @@
-using UnityEngine;
 using TMPro; // For TextMeshPro
+
+using UnityEngine;
 using UnityEngine.UI; // For Button and UI interactions
-using System.Collections.Generic; // For List handling
 
 namespace NickWasHere
 	{
@@ -9,6 +9,7 @@ namespace NickWasHere
 		{
 		// References to UI elements
 		public TextMeshProUGUI teamNameText;          // Team name text
+
 		public TextMeshProUGUI gamesPlayedText;       // Games played text
 		public TextMeshProUGUI gamesWonText;          // Games won text
 		public TextMeshProUGUI winPercentageText;     // Win percentage text
@@ -22,7 +23,7 @@ namespace NickWasHere
 		private Team currentTeam;
 
 		// Start is called before the first frame update
-		void Start()
+		private void Start()
 			{
 			// Check if references are set
 			if (teamNameText == null || gamesPlayedText == null || gamesWonText == null ||

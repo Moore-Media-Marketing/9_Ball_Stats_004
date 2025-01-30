@@ -1,32 +1,53 @@
 using System.Collections.Generic;
 
+using NickWasHere;
+
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager:MonoBehaviour
 	{
 	// --- Singleton Instance --- //
-	public static UIManager Instance { get; private set; } // Singleton instance
+	public static UIManager Instance { get; private set; }
 
 	// --- UI Elements --- //
 	[Header("Panels")]
-	public GameObject[] panels; // Array of all panels
+	[SerializeField] private GameObject[] panels;
 
 	[Header("Back Button")]
-	public Button backButton; // Back button to navigate to the previous panel
+	[SerializeField] private Button backButton;
 
+	// --- Dropdowns for different panels --- //
+	[Header("Team Management Panel Dropdowns")]
+	public TMP_Dropdown teamDropdown;
+
+	[Header("Player Input Manager Panel Dropdowns")]
+
+	public TMP_Dropdown teamNameDropdown;
+
+	public TMP_Dropdown playerNameDropdown;
+
+	public TMP_Dropdown skillLevelDropdown;
+
+	[Header("Comparison Setup Panel Dropdowns")]
+	public TMP_Dropdown homeDropdown;
+
+	public TMP_Dropdown awayDropdown;
+	
 	// --- Panel Tracking --- //
-	private int currentPanelIndex = -1; // Tracks the currently active panel
-	private Stack<int> panelHistory = new(); // History of panel navigation
-	private Dictionary<string, int> panelLookup; // Dictionary to map panel names to indices
+	private int currentPanelIndex = -1;
 
-	// --- Awake --- //
+	private Stack<int> panelHistory = new();
+	private Dictionary<string, int> panelLookup = new();
+
 	private void Awake()
 		{
-		// Ensure only one instance of UIManager exists
 		if (Instance == null)
 			{
 			Instance = this;
+			DontDestroyOnLoad(gameObject);
 			}
 		else
 			{
@@ -34,11 +55,14 @@ public class UIManager:MonoBehaviour
 			return;
 			}
 
-		// Optionally, make the UIManager persistent across scenes
-		DontDestroyOnLoad(gameObject);
+		InitializePanelLookup();
+		InitializeBackButton();
+		InitializeDropdowns();
+		}
 
-		// Initialize panel lookup dictionary
-		panelLookup = new Dictionary<string, int>();
+	// --- Initialize Panel Lookup --- //
+	private void InitializePanelLookup()
+		{
 		for (int i = 0; i < panels.Length; i++)
 			{
 			if (panels[i] != null)
@@ -47,18 +71,63 @@ public class UIManager:MonoBehaviour
 				}
 			else
 				{
-				Debug.LogError($"Panel at index {i} is null in the UIManager.");
+				Debug.LogError($"Panel at index {i} is null in UIManager.");
 				}
 			}
+		}
 
-		// Set back button functionality
+	// --- Initialize Back Button --- //
+	private void InitializeBackButton()
+		{
 		if (backButton != null)
 			{
 			backButton.onClick.AddListener(GoBackToPreviousPanel);
 			}
 		else
 			{
-			Debug.LogError("Back button is not assigned in the UIManager.");
+			Debug.LogError("Back button is not assigned in UIManager.");
+			}
+		}
+
+	// --- Initialize Dropdowns --- //
+	private void InitializeDropdowns()
+		{
+		// Main Menu Dropdown Initialization
+		if (teamDropdown != null)
+			{
+			teamDropdown.ClearOptions();
+			teamDropdown.AddOptions(DataManager.Instance.GetTeamNames());
+			teamDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
+			}
+
+		// Player Input Manager Dropdown Initialization
+		if (playerNameDropdown != null)
+			{
+			playerNameDropdown.ClearOptions();
+			playerNameDropdown.AddOptions(DataManager.Instance.GetPlayerNames());
+			playerNameDropdown.onValueChanged.AddListener(OnPlayerNameDropdownValueChanged);
+			}
+
+		if (skillLevelDropdown != null)
+			{
+			skillLevelDropdown.ClearOptions();
+			skillLevelDropdown.AddOptions(DataManager.Instance.GetSkillLevelOptions());
+			skillLevelDropdown.onValueChanged.AddListener(OnSkillLevelDropdownValueChanged);
+			}
+
+		// Comparison Setup Dropdown Initialization
+		if (homeDropdown != null)
+			{
+			homeDropdown.ClearOptions();
+			homeDropdown.AddOptions(DataManager.Instance.GetHomeTeamNames());
+			homeDropdown.onValueChanged.AddListener(OnHomeDropdownValueChanged);
+			}
+
+		if (awayDropdown != null)
+			{
+			awayDropdown.ClearOptions();
+			awayDropdown.AddOptions(DataManager.Instance.GetAwayTeamNames());
+			awayDropdown.onValueChanged.AddListener(OnAwayDropdownValueChanged);
 			}
 		}
 
@@ -71,25 +140,15 @@ public class UIManager:MonoBehaviour
 			return;
 			}
 
-		// Disable all panels first to ensure the previous ones are hidden
-		foreach (GameObject panel in panels)
-			{
-			if (panel != null)
-				{
-				panel.SetActive(false);
-				}
-			}
+		HideAllPanels();
 
-		// Push the current panel index to history if it's valid
 		if (currentPanelIndex != -1)
 			{
 			panelHistory.Push(currentPanelIndex);
 			}
 
-		// Enable the requested panel
 		panels[panelIndex].SetActive(true);
 		currentPanelIndex = panelIndex;
-
 		Debug.Log($"Switched to panel {panelIndex}");
 		}
 
@@ -106,20 +165,54 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
-	// --- Go Back Functionality --- //
+	// --- Hide All Panels --- //
+	private void HideAllPanels()
+		{
+		foreach (GameObject panel in panels)
+			{
+			if (panel != null)
+				{
+				panel.SetActive(false);
+				}
+			}
+		}
+
+	// --- Go Back to Previous Panel --- //
 	public void GoBackToPreviousPanel()
 		{
 		if (panelHistory.Count > 0)
 			{
-			// Pop the last panel index from the history
-			int previousPanelIndex = panelHistory.Pop();
-
-			// Switch to the previous panel
-			ShowPanel(previousPanelIndex);
+			ShowPanel(panelHistory.Pop());
 			}
 		else
 			{
 			Debug.Log("No previous panels in history.");
 			}
+		}
+
+	// --- Dropdown Value Changed Handlers --- //
+	private void OnTeamDropdownValueChanged(int index)
+		{
+		Debug.Log("Selected Team: " + teamDropdown.options[index].text);
+		}
+
+	private void OnPlayerNameDropdownValueChanged(int index)
+		{
+		Debug.Log("Selected Player: " + playerNameDropdown.options[index].text);
+		}
+
+	private void OnSkillLevelDropdownValueChanged(int index)
+		{
+		Debug.Log("Selected Skill Level: " + skillLevelDropdown.options[index].text);
+		}
+
+	private void OnHomeDropdownValueChanged(int index)
+		{
+		Debug.Log("Selected Home Team: " + homeDropdown.options[index].text);
+		}
+
+	private void OnAwayDropdownValueChanged(int index)
+		{
+		Debug.Log("Selected Away Team: " + awayDropdown.options[index].text);
 		}
 	}

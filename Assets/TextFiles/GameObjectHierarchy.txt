@@ -1,5 +1,7 @@
 AdaptivePerformanceManager
-DropdownManager
+DataManager
+PanelManager
+UIManager
 OverlayFeedbackPanelManager
 ComparisonManager
 GenerateGameObjectList
@@ -39,7 +41,11 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    UpdateTeamButton
+    ClearTeamNameButton
+      Text (TMP)
+    ModifyTeamNameButton
+      Text (TMP)
+    AddUpdateTeamButton
       Text (TMP)
     DeleteButton
       Text (TMP)

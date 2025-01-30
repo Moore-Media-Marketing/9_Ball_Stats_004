@@ -1,11 +1,13 @@
-using UnityEngine;
 using TMPro; // Use TextMeshPro for text support
+
+using UnityEngine;
 using UnityEngine.UI; // For Button component
 
 public class GameAnalysisPanel:MonoBehaviour
 	{
 	// --- Panel Elements --- //
 	public TextMeshProUGUI headerText; // Header text for the panel
+
 	public TextMeshProUGUI gameStatsText; // Text to display game stats
 	public Transform oddsScrollView; // ScrollView to display the odds for various player combinations
 	public Button analyzeGameButton; // Button to analyze the game

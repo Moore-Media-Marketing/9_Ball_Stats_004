@@ -1,84 +1,106 @@
+using NickWasHere;
+
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // --- Make sure to include TMPro for text elements --- //
-
-using NickWasHere;
 
 public class TeamManagementPanel:MonoBehaviour
 	{
 	// --- UI Elements --- //
 	[Header("UI Elements")]
-	public TMP_InputField teamNameInputField; // TMP Input field for entering team name //
-	public TMP_Text teamNameText; // TMP Text to display the team name //
-	public TMP_Dropdown teamDropdown; // TMP Dropdown to select a team for deletion //
-	public Button updateTeamButton; // Button to update the selected team //
-	public Button deleteButton; // Button to delete the selected team //
-	public Button addTeamButton; // Button to add a new team //
-	public Button backButton; // Button to go back to the previous panel //
+	public TMP_InputField teamNameInputField; // Input field for entering team name
+
+	public TMP_Text teamNameText; // Text to display the team name
+	public Button modifyTeamNameButton; // Button to modify the selected team name
+	public Button addUpdateTeamButton; // Button to add or update a team
+	public Button deleteButton; // Button to delete a team
+	public Button clearTeamNameButton; // Button to clear the team name input
+	public Button backButton; // Button to go back to the previous panel
+
+	// --- Dropdown --- //
+	[Header("Dropdown Elements")]
+	public TMP_Dropdown teamDropdown; // Reference to the existing team dropdown in the UI
 
 	// --- Team Data --- //
-	private string selectedTeamName; // Currently selected team for updating or deletion //
+	private string selectedTeamName; // Currently selected team
 
-	// --- Start is called before the first frame update --- //
+	// --- Start --- //
 	private void Start()
 		{
-		// Set up button listeners //
-		updateTeamButton.onClick.AddListener(OnUpdateTeamButtonClicked);
+		// Set up button listeners
+		modifyTeamNameButton.onClick.AddListener(OnModifyTeamNameButtonClicked);
+		addUpdateTeamButton.onClick.AddListener(OnAddUpdateTeamButtonClicked);
 		deleteButton.onClick.AddListener(OnDeleteButtonClicked);
-		addTeamButton.onClick.AddListener(OnAddTeamButtonClicked); // Add listener for adding team
+		clearTeamNameButton.onClick.AddListener(OnClearTeamNameButtonClicked);
 		backButton.onClick.AddListener(OnBackButtonClicked);
 
-		// Initialize the dropdown and populate with team names //
+		// Initialize the team dropdown
 		InitializeTeamDropdown();
 		}
 
 	// --- Initialize Team Dropdown --- //
 	private void InitializeTeamDropdown()
 		{
-		// Clear any previous options //
+		if (teamDropdown == null)
+			{
+			Debug.LogError("Team Dropdown is not assigned in TeamManagementPanel.");
+			return;
+			}
+
+		// Populate team options
 		teamDropdown.ClearOptions();
+		var teamOptions = DataManager.Instance.GetTeamNames();
+		teamOptions.Insert(0, "Select Team"); // Add default option
+		teamDropdown.AddOptions(teamOptions);
 
-		// Retrieve all teams //
-		var teamNames = DataManager.Instance.GetTeamNames();
+		// Set default selection to "Select Team"
+		teamDropdown.value = 0;
 
-		// Add a default "Select Team" option //
-		teamNames.Insert(0, "Select Team");
-
-		// Add the options to the dropdown //
-		teamDropdown.AddOptions(teamNames);
-
-		// Add listener for dropdown value change //
+		// Add listener for dropdown value changes
 		teamDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
 
-		// Reset selection //
-		teamDropdown.value = 0;
+		// Set initial selection to "Select Team"
 		OnDropdownValueChanged(0);
 		}
 
 	// --- Dropdown Value Changed --- //
 	private void OnDropdownValueChanged(int index)
 		{
-		if (index > 0) // Skip the "Select Team" option //
+		if (index > 0) // Skip "Select Team" option
 			{
 			selectedTeamName = teamDropdown.options[index].text;
 			teamNameText.text = "Selected Team: " + selectedTeamName;
+			teamNameInputField.text = selectedTeamName; // Pre-fill input field for editing
+			addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Update Team"; // Change button text
 			}
 		else
 			{
 			selectedTeamName = null;
 			teamNameText.text = "No team selected.";
+			teamNameInputField.text = "";
+			addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Change button text
 			}
 		}
 
-	// --- Update Team Button Clicked --- //
-	private void OnUpdateTeamButtonClicked()
+	// --- Modify Team Name Button Clicked --- //
+	private void OnModifyTeamNameButtonClicked()
 		{
 		if (string.IsNullOrEmpty(selectedTeamName))
 			{
-			OverlayFeedbackPanelManager.Instance.ShowPanel("No team selected for updating.", "", false);
+			OverlayFeedbackPanelManager.Instance.ShowPanel("No team selected for modification.");
 			return;
 			}
 
+		// Populate input field with selected team name
+		teamNameInputField.text = selectedTeamName;
+		teamNameText.text = "Editing: " + selectedTeamName;
+		OverlayFeedbackPanelManager.Instance.ShowPanel("Editing team name.");
+		}
+
+	// --- Add or Update Team Button Clicked --- //
+	private void OnAddUpdateTeamButtonClicked()
+		{
 		string newTeamName = teamNameInputField.text.Trim();
 
 		if (string.IsNullOrEmpty(newTeamName))
@@ -87,16 +109,39 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Update the team name via DataManager //
-		DataManager.Instance.UpdateTeamName(selectedTeamName, newTeamName);
+		// If a team is selected, update it; otherwise, add a new team
+		if (!string.IsNullOrEmpty(selectedTeamName))
+			{
+			if (DataManager.Instance.DoesTeamExist(newTeamName) && selectedTeamName != newTeamName)
+				{
+				OverlayFeedbackPanelManager.Instance.ShowPanel("A team with this name already exists.");
+				return;
+				}
 
-		// Refresh UI //
+			DataManager.Instance.UpdateTeamName(selectedTeamName, newTeamName);
+			OverlayFeedbackPanelManager.Instance.ShowPanel("Team updated successfully.");
+			}
+		else
+			{
+			if (DataManager.Instance.DoesTeamExist(newTeamName))
+				{
+				OverlayFeedbackPanelManager.Instance.ShowPanel("Team already exists.");
+				return;
+				}
+
+			DataManager.Instance.AddTeam(newTeamName);
+			OverlayFeedbackPanelManager.Instance.ShowPanel("Team added successfully.");
+			}
+
+		// Save changes to PlayerPrefs
+		DataManager.Instance.SaveTeamsToPlayerPrefs();
+
+		// Refresh UI
 		InitializeTeamDropdown();
 		teamNameInputField.text = "";
-		selectedTeamName = null;
 		teamNameText.text = "No team selected.";
-
-		OverlayFeedbackPanelManager.Instance.ShowPanel("Team updated successfully.");
+		selectedTeamName = null;
+		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
 		}
 
 	// --- Delete Button Clicked --- //
@@ -108,38 +153,30 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Delete the team via DataManager //
+		// Delete the team via DataManager
 		DataManager.Instance.RemoveTeam(selectedTeamName);
 
-		// Refresh UI //
+		// Save changes to PlayerPrefs
+		DataManager.Instance.SaveTeamsToPlayerPrefs();
+
+		// Refresh UI
 		InitializeTeamDropdown();
 		selectedTeamName = null;
 		teamNameInputField.text = "";
 		teamNameText.text = "No team selected.";
+		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
 
 		OverlayFeedbackPanelManager.Instance.ShowPanel("Team deleted successfully.");
 		}
 
-	// --- Add Team Button Clicked --- //
-	private void OnAddTeamButtonClicked()
+	// --- Clear Team Name Button Clicked --- //
+	private void OnClearTeamNameButtonClicked()
 		{
-		string newTeamName = teamNameInputField.text.Trim();
-
-		if (string.IsNullOrEmpty(newTeamName))
-			{
-			OverlayFeedbackPanelManager.Instance.ShowPanel("Team name cannot be empty.");
-			return;
-			}
-
-		// Add new team via DataManager //
-		DataManager.Instance.AddTeam(newTeamName);
-
-		// Refresh UI //
-		InitializeTeamDropdown();
 		teamNameInputField.text = "";
+		selectedTeamName = null;
 		teamNameText.text = "No team selected.";
-
-		OverlayFeedbackPanelManager.Instance.ShowPanel("Team added successfully.");
+		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
+		OverlayFeedbackPanelManager.Instance.ShowPanel("Input cleared.");
 		}
 
 	// --- Back Button Clicked --- //

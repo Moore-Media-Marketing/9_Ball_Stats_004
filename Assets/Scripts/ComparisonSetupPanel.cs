@@ -1,11 +1,13 @@
-using UnityEngine;
 using TMPro; // Use TMPro for TextMeshPro support
+
+using UnityEngine;
 using UnityEngine.UI; // For Dropdowns and Buttons
 
 public class ComparisonSetupPanel:MonoBehaviour
 	{
 	// --- Panel Elements --- //
 	public TextMeshProUGUI headerText; // Header text for the panel
+
 	public TextMeshProUGUI selectHomeTeamText; // Text for selecting home team
 	public TextMeshProUGUI selectHomePlayerText; // Text for selecting home player
 	public TMP_Dropdown homeTeamDropdown; // Dropdown for home team selection

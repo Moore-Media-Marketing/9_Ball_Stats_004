@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI; // For Button functionality
-using TMPro; // For TextMeshPro
 
 namespace NickWasHere
 	{

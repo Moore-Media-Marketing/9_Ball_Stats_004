@@ -6,10 +6,13 @@ namespace NickWasHere
 	{
 	public class DataManager:MonoBehaviour
 		{
+		// --- Singleton Instance --- //
 		public static DataManager Instance { get; private set; }
 
-		private List<Team> teams = new();  // --- List to store teams --- //
-		private List<Player> players = new();  // --- List to store players --- //
+		// --- Lists to store teams and players --- //
+		private List<Team> teams = new();
+
+		private List<Player> players = new();
 
 		private void Awake()
 			{
@@ -21,6 +24,7 @@ namespace NickWasHere
 			else
 				{
 				Destroy(gameObject);
+				return;
 				}
 			}
 
@@ -35,88 +39,116 @@ namespace NickWasHere
 			return teamNames;
 			}
 
+		// --- Get all player names --- //
+		public List<string> GetPlayerNames()
+			{
+			List<string> playerNames = new();
+			foreach (var player in players)
+				{
+				playerNames.Add(player.name);
+				}
+			return playerNames;
+			}
+
+		// --- Get home team names --- //
+		public List<string> GetHomeTeamNames()
+			{
+			List<string> homeTeamNames = new();
+			foreach (var team in teams)
+				{
+				homeTeamNames.Add(team.teamName);
+				}
+			return homeTeamNames;
+			}
+
+		// --- Get away team names --- //
+		public List<string> GetAwayTeamNames()
+			{
+			List<string> awayTeamNames = new();
+			foreach (var team in teams)
+				{
+				awayTeamNames.Add(team.teamName);
+				}
+			return awayTeamNames;
+			}
+
+		// --- Get skill level options --- //
+		public List<string> GetSkillLevelOptions()
+			{
+			List<string> skillLevels = new();
+			for (int i = 1; i <= 9; i++)
+				{
+				skillLevels.Add(i.ToString());
+				}
+			return skillLevels;
+			}
+
 		// --- Add a new team --- //
 		public void AddTeam(string teamName)
 			{
-			// Check if team already exists
-			if (teams.Exists(t => t.teamName == teamName))
+			if (DoesTeamExist(teamName))
 				{
 				Debug.LogError($"Team '{teamName}' already exists.");
 				return;
 				}
 
-			// Create new team and add it to the list
-			Team newTeam = new(teamName);
-			teams.Add(newTeam);
-
-			// Save to PlayerPrefs
+			teams.Add(new Team(teamName));
 			SaveTeamsToPlayerPrefs();
-
 			Debug.Log($"Team '{teamName}' added successfully.");
 			}
 
+		// --- Save teams to PlayerPrefs --- //
 		public void SaveTeamsToPlayerPrefs()
 			{
-			// Clear any existing teams in PlayerPrefs before saving new data
 			PlayerPrefs.DeleteKey("Teams");
-
-			// Save each team's name to PlayerPrefs
 			for (int i = 0; i < teams.Count; i++)
 				{
 				PlayerPrefs.SetString($"Team_{i}_Name", teams[i].teamName);
 				}
-
-			// Optionally save the total count of teams
 			PlayerPrefs.SetInt("TotalTeams", teams.Count);
-
 			PlayerPrefs.Save();
 			}
 
+		// --- Load teams from PlayerPrefs --- //
 		public void LoadTeamsFromPlayerPrefs()
 			{
-			// Retrieve the total number of teams saved
-			int totalTeams = PlayerPrefs.GetInt("TotalTeams", 0);
-
-			// Load each team's name from PlayerPrefs
 			teams.Clear();
+			int totalTeams = PlayerPrefs.GetInt("TotalTeams", 0);
 			for (int i = 0; i < totalTeams; i++)
 				{
 				string teamName = PlayerPrefs.GetString($"Team_{i}_Name", "");
 				if (!string.IsNullOrEmpty(teamName))
 					{
-					Team loadedTeam = new(teamName);
-					teams.Add(loadedTeam);
+					teams.Add(new Team(teamName));
 					}
 				}
-
 			Debug.Log("Teams loaded from PlayerPrefs.");
 			}
 
-
-
+		// --- Check if a team exists --- //
+		public bool DoesTeamExist(string teamName)
+			{
+			return teams.Exists(t => t.teamName == teamName);
+			}
 
 		// --- Update team name --- //
 		public void UpdateTeamName(string oldName, string newName)
 			{
 			Debug.Log($"Updating Team: {oldName} to {newName}");
-
 			Team team = teams.Find(t => t.teamName == oldName);
 			if (team == null)
 				{
 				Debug.LogError("Team not found: " + oldName);
 				return;
 				}
-
-			team.teamName = newName;  // --- Update team name --- //
+			team.teamName = newName;
 			Debug.Log("Team updated successfully.");
 			}
 
 		// --- Remove a team --- //
 		public void RemoveTeam(string teamName)
 			{
-			int removedCount = teams.RemoveAll(t => t.teamName == teamName);
-
-			if (removedCount > 0)
+			if (teams.RemoveAll(t => t.teamName == teamName) > 0)
 				{
 				Debug.Log($"Team '{teamName}' removed successfully.");
 				}
@@ -129,24 +161,19 @@ namespace NickWasHere
 		// --- Add a new player --- //
 		public void AddPlayer(string playerName, int skillLevel, int gamesPlayed, int gamesWon)
 			{
-			if (players.Exists(p => p.name == playerName))  // Changed to 'name' instead of 'playerName'
+			if (players.Exists(p => p.name == playerName))
 				{
 				Debug.LogError($"Player '{playerName}' already exists.");
 				return;
 				}
-
-			Player newPlayer = new(playerName, skillLevel, gamesPlayed, gamesWon);  // Changed to include gamesPlayed and gamesWon
-			players.Add(newPlayer);
-
+			players.Add(new Player(playerName, skillLevel, gamesPlayed, gamesWon));
 			Debug.Log($"Player '{playerName}' added successfully.");
 			}
 
 		// --- Remove an existing player --- //
 		public void RemovePlayer(string playerName)
 			{
-			int removedCount = players.RemoveAll(p => p.name == playerName);  // Changed to 'name' instead of 'playerName'
-
-			if (removedCount > 0)
+			if (players.RemoveAll(p => p.name == playerName) > 0)
 				{
 				Debug.Log($"Player '{playerName}' removed successfully.");
 				}

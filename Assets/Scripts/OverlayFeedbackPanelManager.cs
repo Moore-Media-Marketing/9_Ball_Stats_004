@@ -1,6 +1,8 @@
-using UnityEngine;
-using TMPro; // For TextMeshPro
 using System.Collections;
+
+using TMPro; // For TextMeshPro
+
+using UnityEngine;
 
 namespace NickWasHere
 	{
@@ -11,12 +13,14 @@ namespace NickWasHere
 		// --- UI References --- //
 		[Header("UI Elements")]
 		public GameObject panel;            // The panel that holds both overlay and feedback content
+
 		public TextMeshProUGUI overlayText; // The text component for overlay messages
 		public TextMeshProUGUI feedbackText;// The text component for feedback messages
 		public float autoCloseTime = 2f;    // Time to auto-close the panel for feedback messages
 
 		// --- State Control --- //
 		private bool isTouched = false;  // Tracks if the panel is interacted with
+
 		private bool isPanelActive = false; // Tracks panel visibility
 		private Coroutine autoCloseCoroutine; // Reference for auto-close coroutine
 

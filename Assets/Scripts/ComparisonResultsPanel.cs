@@ -1,11 +1,13 @@
+using TMPro; // Use TMPro for TextMeshPro support
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Use TMPro for TextMeshPro support
 
 public class ComparisonResultsPanel:MonoBehaviour
 	{
 	// --- Panel Elements --- //
 	public TextMeshProUGUI headerText; // Header text for the panel
+
 	public TextMeshProUGUI homeTeamNameText; // Text displaying the home team's name
 	public TextMeshProUGUI awayTeamNameText; // Text displaying the away team's name
 	public GameObject playerComparisonContainer; // Container for displaying player comparison results

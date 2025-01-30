@@ -1,6 +1,7 @@
+using TMPro; // For TextMeshPro components
+
 using UnityEngine;
 using UnityEngine.UI; // For UI components
-using TMPro; // For TextMeshPro components
 
 namespace NickWasHere
 	{

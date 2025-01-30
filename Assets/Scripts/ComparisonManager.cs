@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace NickWasHere
 	{
@@ -7,6 +8,7 @@ namespace NickWasHere
 		{
 		// --- References --- //
 		public DataManager dataManager; // Reference to DataManager
+
 		public UIManager uiManager; // Reference to UIManager
 		public ComparisonResultsPanel resultsPanel; // Reference to the comparison results panel
 
