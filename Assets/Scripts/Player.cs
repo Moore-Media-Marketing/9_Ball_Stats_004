@@ -1,41 +1,42 @@
-namespace NickWasHere
+[System.Serializable]
+public class Player
 	{
-	[System.Serializable]
-	public class Player
+	public string name;
+	public int skillLevel;
+	public int gamesPlayed;
+	public int gamesWon;
+	public float ppm;
+	public float pa;
+	public string TeamName; // Add this property to associate a player with a team
+	public float WinPercentage => CalculateWinPercentage();
+
+	public Player(string name, int skillLevel, int gamesPlayed, int gamesWon, string teamName)
 		{
-		public string name;           // Player's name
-		public int skillLevel;        // Player's skill level
-		public int gamesPlayed;       // Total games played by the player
-		public int gamesWon;          // Total games won by the player
-		public float ppm;             // Points per match
-		public float pa;              // Points awarded
-		public float WinPercentage => CalculateWinPercentage();  // Win percentage
+		this.name = name;
+		this.skillLevel = skillLevel;
+		this.gamesPlayed = gamesPlayed;
+		this.gamesWon = gamesWon;
+		this.ppm = 0;
+		this.pa = 0;
+		this.TeamName = teamName; // Assign the team name
+		}
 
-		// Constructor to initialize the player with name, skill level, games played, and games won
-		public Player(string name, int skillLevel, int gamesPlayed, int gamesWon)
+	private float CalculateWinPercentage()
+		{
+		if (this.gamesPlayed == 0) return 0f;
+		return (float) this.gamesWon / this.gamesPlayed * 100f;
+		}
+
+	public void UpdateStats(bool won, float pointsPerMatch, float pointsAwarded)
+		{
+		if (pointsPerMatch < 0 || pointsAwarded < 0)
 			{
-			this.name = name;
-			this.skillLevel = skillLevel;
-			this.gamesPlayed = gamesPlayed;
-			this.gamesWon = gamesWon;
-			this.ppm = 0;
-			this.pa = 0;
+			return;
 			}
 
-		// Method to calculate win percentage
-		private float CalculateWinPercentage()
-			{
-			if (this.gamesPlayed == 0) return 0f;  // Use 'this' for clarity
-			return (float) this.gamesWon / this.gamesPlayed * 100f;  // Use 'this' for clarity
-			}
-
-		// Method to update match stats
-		public void UpdateStats(bool won, float pointsPerMatch, float pointsAwarded)
-			{
-			this.gamesPlayed++;  // Use 'this' for clarity
-			if (won) this.gamesWon++;  // Use 'this' for clarity
-			this.ppm = pointsPerMatch;
-			this.pa = pointsAwarded;
-			}
+		this.gamesPlayed++;
+		if (won) this.gamesWon++;
+		this.ppm = pointsPerMatch;
+		this.pa = pointsAwarded;
 		}
 	}

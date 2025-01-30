@@ -1,187 +1,171 @@
-using NickWasHere;
-
-using TMPro;
-
+using TMPro; // For TextMeshPro
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; // For Button, Dropdown, and UI interactions
+using System.Collections.Generic; // For List<Team>
 
 public class TeamManagementPanel:MonoBehaviour
 	{
-	// --- UI Elements --- //
-	[Header("UI Elements")]
-	public TMP_InputField teamNameInputField; // Input field for entering team name
+	// --- References to UI elements ---
+	public TextMeshProUGUI headerText;              // Header text for the panel
+	public TextMeshProUGUI teamNameText;            // Text to display selected team name
+	public TMP_InputField teamNameInputField;      // Input field for entering a team name
+	public TMP_Dropdown teamDropdown;              // Dropdown to select an existing team
+	public Button clearTeamNameButton;             // Button to clear the team name input field
+	public Button modifyTeamNameButton;            // Button to modify the team name
+	public Button addUpdateTeamButton;             // Button to add or update a team
+	public Button deleteButton;                    // Button to delete the selected team
+	public Button backButton;                      // Button to go back to the previous panel
+	public TextMeshProUGUI backButtonText;          // Text for the back button (modifiable)
 
-	public TMP_Text teamNameText; // Text to display the team name
-	public Button modifyTeamNameButton; // Button to modify the selected team name
-	public Button addUpdateTeamButton; // Button to add or update a team
-	public Button deleteButton; // Button to delete a team
-	public Button clearTeamNameButton; // Button to clear the team name input
-	public Button backButton; // Button to go back to the previous panel
+	// --- Team data ---
+	private List<Team> teams = new();    // List to hold all teams
+	private Team selectedTeam;                      // Currently selected team
 
-	// --- Dropdown --- //
-	[Header("Dropdown Elements")]
-	public TMP_Dropdown teamDropdown; // Reference to the existing team dropdown in the UI
-
-	// --- Team Data --- //
-	private string selectedTeamName; // Currently selected team
-
-	// --- Start --- //
+	// --- Start method ---
 	private void Start()
 		{
-		// Set up button listeners
+		// --- Check if references are set ---
+		if (headerText == null || teamNameText == null || teamNameInputField == null ||
+			teamDropdown == null || clearTeamNameButton == null || modifyTeamNameButton == null ||
+			addUpdateTeamButton == null || deleteButton == null || backButton == null ||
+			backButtonText == null)
+			{
+			Debug.LogError("Missing references in TeamManagementPanel.");
+			return;
+			}
+
+		// --- Hook up buttons to methods ---
+		clearTeamNameButton.onClick.AddListener(OnClearTeamNameButtonClicked);
 		modifyTeamNameButton.onClick.AddListener(OnModifyTeamNameButtonClicked);
 		addUpdateTeamButton.onClick.AddListener(OnAddUpdateTeamButtonClicked);
 		deleteButton.onClick.AddListener(OnDeleteButtonClicked);
-		clearTeamNameButton.onClick.AddListener(OnClearTeamNameButtonClicked);
 		backButton.onClick.AddListener(OnBackButtonClicked);
 
-		// Initialize the team dropdown
-		InitializeTeamDropdown();
+		// --- Set up the dropdown ---
+		teamDropdown.onValueChanged.AddListener(OnTeamDropdownChanged);
 		}
 
-	// --- Initialize Team Dropdown --- //
-	private void InitializeTeamDropdown()
+	// --- Display Team List Method ---
+	// Populates the team dropdown with the list of teams
+	private void DisplayTeamList()
 		{
-		if (teamDropdown == null)
-			{
-			Debug.LogError("Team Dropdown is not assigned in TeamManagementPanel.");
-			return;
-			}
-
-		// Populate team options
+		Debug.Log("Displaying team list...");
 		teamDropdown.ClearOptions();
-		var teamOptions = DataManager.Instance.GetTeamNames();
-		teamOptions.Insert(0, "Select Team"); // Add default option
-		teamDropdown.AddOptions(teamOptions);
+		List<string> options = new() { "Select Team" };
 
-		// Set default selection to "Select Team"
+		foreach (var team in DataManager.Instance.teams)
+			{
+			options.Add(team.teamName);
+			Debug.Log("Adding team: " + team.teamName);
+			}
+
+		teamDropdown.AddOptions(options);
 		teamDropdown.value = 0;
-
-		// Add listener for dropdown value changes
-		teamDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
-
-		// Set initial selection to "Select Team"
-		OnDropdownValueChanged(0);
+		teamDropdown.RefreshShownValue();
 		}
 
-	// --- Dropdown Value Changed --- //
-	private void OnDropdownValueChanged(int index)
-		{
-		if (index > 0) // Skip "Select Team" option
-			{
-			selectedTeamName = teamDropdown.options[index].text;
-			teamNameText.text = "Selected Team: " + selectedTeamName;
-			teamNameInputField.text = selectedTeamName; // Pre-fill input field for editing
-			addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Update Team"; // Change button text
-			}
-		else
-			{
-			selectedTeamName = null;
-			teamNameText.text = "No team selected.";
-			teamNameInputField.text = "";
-			addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Change button text
-			}
-		}
-
-	// --- Modify Team Name Button Clicked --- //
-	private void OnModifyTeamNameButtonClicked()
-		{
-		if (string.IsNullOrEmpty(selectedTeamName))
-			{
-			OverlayFeedbackPanelManager.Instance.ShowPanel("No team selected for modification.");
-			return;
-			}
-
-		// Populate input field with selected team name
-		teamNameInputField.text = selectedTeamName;
-		teamNameText.text = "Editing: " + selectedTeamName;
-		OverlayFeedbackPanelManager.Instance.ShowPanel("Editing team name.");
-		}
-
-	// --- Add or Update Team Button Clicked --- //
-	private void OnAddUpdateTeamButtonClicked()
-		{
-		string newTeamName = teamNameInputField.text.Trim();
-
-		if (string.IsNullOrEmpty(newTeamName))
-			{
-			OverlayFeedbackPanelManager.Instance.ShowPanel("Team name cannot be empty.");
-			return;
-			}
-
-		// If a team is selected, update it; otherwise, add a new team
-		if (!string.IsNullOrEmpty(selectedTeamName))
-			{
-			if (DataManager.Instance.DoesTeamExist(newTeamName) && selectedTeamName != newTeamName)
-				{
-				OverlayFeedbackPanelManager.Instance.ShowPanel("A team with this name already exists.");
-				return;
-				}
-
-			DataManager.Instance.UpdateTeamName(selectedTeamName, newTeamName);
-			OverlayFeedbackPanelManager.Instance.ShowPanel("Team updated successfully.");
-			}
-		else
-			{
-			if (DataManager.Instance.DoesTeamExist(newTeamName))
-				{
-				OverlayFeedbackPanelManager.Instance.ShowPanel("Team already exists.");
-				return;
-				}
-
-			DataManager.Instance.AddTeam(newTeamName);
-			OverlayFeedbackPanelManager.Instance.ShowPanel("Team added successfully.");
-			}
-
-		// Save changes to PlayerPrefs
-		DataManager.Instance.SaveTeamsToPlayerPrefs();
-
-		// Refresh UI
-		InitializeTeamDropdown();
-		teamNameInputField.text = "";
-		teamNameText.text = "No team selected.";
-		selectedTeamName = null;
-		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
-		}
-
-	// --- Delete Button Clicked --- //
-	private void OnDeleteButtonClicked()
-		{
-		if (string.IsNullOrEmpty(selectedTeamName))
-			{
-			OverlayFeedbackPanelManager.Instance.ShowPanel("No team selected for deletion.");
-			return;
-			}
-
-		// Delete the team via DataManager
-		DataManager.Instance.RemoveTeam(selectedTeamName);
-
-		// Save changes to PlayerPrefs
-		DataManager.Instance.SaveTeamsToPlayerPrefs();
-
-		// Refresh UI
-		InitializeTeamDropdown();
-		selectedTeamName = null;
-		teamNameInputField.text = "";
-		teamNameText.text = "No team selected.";
-		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
-
-		OverlayFeedbackPanelManager.Instance.ShowPanel("Team deleted successfully.");
-		}
-
-	// --- Clear Team Name Button Clicked --- //
+	// --- Handle Clear Team Name Button Click ---
+	// Clears the input field for team name
 	private void OnClearTeamNameButtonClicked()
 		{
-		teamNameInputField.text = "";
-		selectedTeamName = null;
-		teamNameText.text = "No team selected.";
-		addUpdateTeamButton.GetComponentInChildren<TMP_Text>().text = "Add Team"; // Reset button text
-		OverlayFeedbackPanelManager.Instance.ShowPanel("Input cleared.");
+		teamNameInputField.text = string.Empty; // Clear the input field
 		}
 
-	// --- Back Button Clicked --- //
+	// --- Handle Modify Team Name Button Click ---
+	// Modifies the name of the currently selected team
+	private void OnModifyTeamNameButtonClicked()
+		{
+		if (selectedTeam != null)
+			{
+			selectedTeam.Name = teamNameInputField.text; // Update the team name
+			teamNameText.text = selectedTeam.Name;      // Update the displayed team name
+			Debug.Log($"Team name updated to: {selectedTeam.Name}");
+			}
+		else
+			{
+			Debug.LogWarning("No team selected for modification.");
+			}
+		}
+
+	// --- Handle Add or Update Team Button Click ---
+	// Adds a new team or updates an existing one
+	private void OnAddUpdateTeamButtonClicked()
+		{
+		string teamName = teamNameInputField.text;
+
+		if (string.IsNullOrEmpty(teamName))
+			{
+			Debug.LogWarning("Please enter a team name.");
+			return;
+			}
+
+		// Check if the team already exists
+		Team existingTeam = teams.Find(t => t.Name == teamName);
+		if (existingTeam != null)
+			{
+			// Update the existing team
+			existingTeam.Name = teamName;
+			Debug.Log($"Updated existing team: {existingTeam.Name}");
+			}
+		else
+			{
+			// Create a new team
+			Team newTeam = new(teamName);
+			teams.Add(newTeam);
+			Debug.Log($"Created new team: {newTeam.Name}");
+			}
+
+		// Refresh the team dropdown list and display updated team info
+		DisplayTeamList();
+		}
+
+	// --- Handle Delete Team Button Click ---
+	// Deletes the selected team from the list
+	private void OnDeleteButtonClicked()
+		{
+		if (selectedTeam != null)
+			{
+			teams.Remove(selectedTeam);
+			Debug.Log($"Deleted team: {selectedTeam.Name}");
+
+			// Refresh the team list in the dropdown and clear displayed team info
+			DisplayTeamList();
+			teamNameInputField.text = string.Empty; // Clear the input field
+			teamNameText.text = "No team selected"; // Reset the displayed team name
+			}
+		else
+			{
+			Debug.LogWarning("No team selected for deletion.");
+			}
+		}
+
+	// --- Handle Team Dropdown Selection Change ---
+	// Updates the team name text and input field when a team is selected
+	private void OnTeamDropdownChanged(int index)
+		{
+		if (index > 0) // Exclude the "Select Team" option
+			{
+			selectedTeam = teams[index - 1]; // Get the selected team based on dropdown index
+			teamNameInputField.text = selectedTeam.Name; // Set the input field to the selected team name
+			teamNameText.text = selectedTeam.Name; // Display the selected team's name
+			}
+		else
+			{
+			selectedTeam = null; // No team selected
+			teamNameInputField.text = string.Empty; // Clear the input field
+			teamNameText.text = "No team selected"; // Show default message
+			}
+		}
+
+	// --- Handle Back Button Click ---
+	// Navigates back to the previous panel
 	private void OnBackButtonClicked()
 		{
-		UIManager.Instance.ShowPanel("MainMenuPanel");
+		// Example: Change the text of the back button dynamically
+		backButtonText.text = "Back to Main Menu"; // Adjust button text as needed
+
+		// Hide this panel and go back to the previous screen (or panel)
+		gameObject.SetActive(false);
+		Debug.Log("Going back to previous panel.");
 		}
 	}

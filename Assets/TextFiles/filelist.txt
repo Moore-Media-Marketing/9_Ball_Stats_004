@@ -1,4 +1,13 @@
+ComparisonManager.cs
+ComparisonResultsPanel.cs
+ComparisonSetupPanel.cs
 DataManager.cs
+GameAnalysisPanel.cs
+MainMenuPanel.cs
+OverlayFeedbackPanelManager.cs
 Player.cs
+PlayerInputManagerPanel.cs
 Team.cs
+TeamManagementPanel.cs
+TeamPanel.cs
 UIManager.cs

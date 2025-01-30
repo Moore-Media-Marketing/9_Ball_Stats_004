@@ -1,23 +1,23 @@
-using TMPro; // Use TMPro for TextMeshPro support
+using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI; // For Dropdowns and Buttons
+using UnityEngine.UI;
 
 public class ComparisonSetupPanel:MonoBehaviour
 	{
 	// --- Panel Elements --- //
-	public TextMeshProUGUI headerText; // Header text for the panel
+	public TextMeshProUGUI headerText;
 
-	public TextMeshProUGUI selectHomeTeamText; // Text for selecting home team
-	public TextMeshProUGUI selectHomePlayerText; // Text for selecting home player
-	public TMP_Dropdown homeTeamDropdown; // Dropdown for home team selection
-	public Transform homeTeamPlayerScrollView; // Container for home team players (scrollable list)
-	public TextMeshProUGUI selectAwayTeamText; // Text for selecting away team
-	public TextMeshProUGUI selectAwayPlayerText; // Text for selecting away player
-	public TMP_Dropdown awayTeamDropdown; // Dropdown for away team selection
-	public Transform awayTeamPlayerScrollView; // Container for away team players (scrollable list)
-	public Button compareButton; // Button to start comparison
-	public Button backButton; // Back button to go back to the previous screen
+	public TextMeshProUGUI selectHomeTeamText;
+	public TextMeshProUGUI selectHomePlayerText;
+	public TMP_Dropdown homeTeamDropdown;
+	public Transform homeTeamPlayerScrollView;
+	public TextMeshProUGUI selectAwayTeamText;
+	public TextMeshProUGUI selectAwayPlayerText;
+	public TMP_Dropdown awayTeamDropdown;
+	public Transform awayTeamPlayerScrollView;
+	public Button compareButton;
+	public Button backButton;
 
 	// --- Initialize the Panel with Available Teams and Players --- //
 	public void InitializePanel()
@@ -26,7 +26,7 @@ public class ComparisonSetupPanel:MonoBehaviour
 		homeTeamDropdown.ClearOptions();
 		awayTeamDropdown.ClearOptions();
 
-		// Assuming GetTeamNames() returns a list of team names (you can replace this with your actual method)
+		// Add available team names to both dropdowns
 		homeTeamDropdown.AddOptions(GetTeamNames());
 		awayTeamDropdown.AddOptions(GetTeamNames());
 
@@ -35,11 +35,11 @@ public class ComparisonSetupPanel:MonoBehaviour
 		ClearPlayerSelections(awayTeamPlayerScrollView);
 		}
 
-	// --- Get Team Names (Example) --- //
+	// --- Get Team Names from DataManager --- //
 	private System.Collections.Generic.List<string> GetTeamNames()
 		{
-		// Replace this with your actual logic to get team names
-		return new System.Collections.Generic.List<string> { "Team A", "Team B", "Team C" }; // Example teams
+		// Fetch team names from DataManager (retrieved from PlayerPrefs)
+		return DataManager.Instance.GetTeamNames();
 		}
 
 	// --- Update Player List for Selected Team --- //
@@ -52,14 +52,13 @@ public class ComparisonSetupPanel:MonoBehaviour
 		ClearPlayerSelections(playerScrollView);
 
 		// Add players to the scroll view based on the selected team
-		// Assuming GetPlayersForTeam() returns a list of player names for the selected team
 		var players = GetPlayersForTeam(selectedTeam);
 
 		foreach (string playerName in players)
 			{
 			// Create a new button for each player
 			GameObject playerButton = new(playerName);
-			playerButton.transform.SetParent(playerScrollView);
+			playerButton.transform.SetParent(playerScrollView, false); // Ensure correct hierarchy
 
 			// Add a button component to the player button
 			Button button = playerButton.AddComponent<Button>();
@@ -74,11 +73,11 @@ public class ComparisonSetupPanel:MonoBehaviour
 			}
 		}
 
-	// --- Get Players for Selected Team (Example) --- //
+	// --- Get Players for Selected Team from DataManager --- //
 	private System.Collections.Generic.List<string> GetPlayersForTeam(string teamName)
 		{
-		// Replace this with actual logic to fetch players for the selected team
-		return new System.Collections.Generic.List<string> { "Player 1", "Player 2", "Player 3" }; // Example players
+		// Retrieve player names for the selected team from DataManager (stored in PlayerPrefs)
+		return DataManager.Instance.GetPlayersForTeam(teamName);
 		}
 
 	// --- Clear Player Selections --- //
@@ -129,11 +128,28 @@ public class ComparisonSetupPanel:MonoBehaviour
 			}
 		}
 
-	// --- Compare Button Logic --- //
+	// --- Compare Button Logic using ComparisonManager --- //
 	private void OnCompareButtonClicked()
 		{
-		// Logic to start comparison (could transition to results panel or trigger comparison logic)
-		Debug.Log("Comparison started between teams.");
+		// Get the selected team names from the dropdown
+		string homeTeamName = homeTeamDropdown.options[homeTeamDropdown.value].text;
+		string awayTeamName = awayTeamDropdown.options[awayTeamDropdown.value].text;
+
+		// Retrieve the Team objects from DataManager
+		Team homeTeam = DataManager.Instance.GetTeamByName(homeTeamName);
+		Team awayTeam = DataManager.Instance.GetTeamByName(awayTeamName);
+
+		// Ensure both teams exist before proceeding
+		if (homeTeam == null || awayTeam == null)
+			{
+			Debug.LogError("One or both selected teams could not be found!");
+			return;
+			}
+
+		// Use ComparisonManager to compare the teams
+		ComparisonManager.Instance.CompareTeams(homeTeam, awayTeam);
+
+		Debug.Log($"Comparison started between {homeTeamName} and {awayTeamName}");
 		}
 
 	// --- Back Button Logic --- //

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-using NickWasHere;
-
 using TMPro;
 
 using UnityEngine;
@@ -14,7 +12,7 @@ public class UIManager:MonoBehaviour
 
 	// --- UI Elements --- //
 	[Header("Panels")]
-	[SerializeField] private GameObject[] panels;
+	[SerializeField] private GameObject[] panels;  // Remove feedback panel from this array
 
 	[Header("Back Button")]
 	[SerializeField] private Button backButton;
@@ -24,23 +22,26 @@ public class UIManager:MonoBehaviour
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Input Manager Panel Dropdowns")]
-
 	public TMP_Dropdown teamNameDropdown;
 
 	public TMP_Dropdown playerNameDropdown;
-
 	public TMP_Dropdown skillLevelDropdown;
 
 	[Header("Comparison Setup Panel Dropdowns")]
 	public TMP_Dropdown homeDropdown;
 
 	public TMP_Dropdown awayDropdown;
-	
+
 	// --- Panel Tracking --- //
 	private int currentPanelIndex = -1;
 
 	private Stack<int> panelHistory = new();
 	private Dictionary<string, int> panelLookup = new();
+
+	// --- Variables for home/away teams --- //
+	private Team homeTeam;
+
+	private Team awayTeam;
 
 	private void Awake()
 		{
@@ -96,7 +97,7 @@ public class UIManager:MonoBehaviour
 		if (teamDropdown != null)
 			{
 			teamDropdown.ClearOptions();
-			teamDropdown.AddOptions(DataManager.Instance.GetTeamNames());
+			teamDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames()));
 			teamDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
 			}
 
@@ -104,14 +105,14 @@ public class UIManager:MonoBehaviour
 		if (playerNameDropdown != null)
 			{
 			playerNameDropdown.ClearOptions();
-			playerNameDropdown.AddOptions(DataManager.Instance.GetPlayerNames());
+			playerNameDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetPlayerNames()));
 			playerNameDropdown.onValueChanged.AddListener(OnPlayerNameDropdownValueChanged);
 			}
 
 		if (skillLevelDropdown != null)
 			{
 			skillLevelDropdown.ClearOptions();
-			skillLevelDropdown.AddOptions(DataManager.Instance.GetSkillLevelOptions());
+			skillLevelDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetSkillLevelOptions()));
 			skillLevelDropdown.onValueChanged.AddListener(OnSkillLevelDropdownValueChanged);
 			}
 
@@ -119,16 +120,38 @@ public class UIManager:MonoBehaviour
 		if (homeDropdown != null)
 			{
 			homeDropdown.ClearOptions();
-			homeDropdown.AddOptions(DataManager.Instance.GetHomeTeamNames());
+			homeDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames())); // All teams are neutral initially
 			homeDropdown.onValueChanged.AddListener(OnHomeDropdownValueChanged);
 			}
 
 		if (awayDropdown != null)
 			{
 			awayDropdown.ClearOptions();
-			awayDropdown.AddOptions(DataManager.Instance.GetAwayTeamNames());
+			awayDropdown.AddOptions(ConvertToOptionDataList(DataManager.Instance.GetTeamNames())); // All teams are neutral initially
 			awayDropdown.onValueChanged.AddListener(OnAwayDropdownValueChanged);
 			}
+		}
+
+	// Convert a list of strings or integers to TMP_Dropdown.OptionData
+	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<string> items)
+		{
+		List<TMP_Dropdown.OptionData> optionDataList = new();
+		foreach (string item in items)
+			{
+			optionDataList.Add(new TMP_Dropdown.OptionData(item));
+			}
+		return optionDataList;
+		}
+
+	// Convert a list of integers to TMP_Dropdown.OptionData
+	private List<TMP_Dropdown.OptionData> ConvertToOptionDataList(List<int> items)
+		{
+		List<TMP_Dropdown.OptionData> optionDataList = new();
+		foreach (int item in items)
+			{
+			optionDataList.Add(new TMP_Dropdown.OptionData(item.ToString()));
+			}
+		return optionDataList;
 		}
 
 	// --- Show Panel by Index --- //
@@ -208,11 +231,27 @@ public class UIManager:MonoBehaviour
 
 	private void OnHomeDropdownValueChanged(int index)
 		{
-		Debug.Log("Selected Home Team: " + homeDropdown.options[index].text);
+		// Set the home team when the user selects from the dropdown
+		homeTeam = DataManager.Instance.GetTeamByName(homeDropdown.options[index].text);
+		Debug.Log("Selected Home Team: " + homeTeam.Name);
 		}
 
 	private void OnAwayDropdownValueChanged(int index)
 		{
-		Debug.Log("Selected Away Team: " + awayDropdown.options[index].text);
+		// Set the away team when the user selects from the dropdown
+		awayTeam = DataManager.Instance.GetTeamByName(awayDropdown.options[index].text);
+		Debug.Log("Selected Away Team: " + awayTeam.Name);
+		}
+
+	// --- Method to get home team --- //
+	public Team GetHomeTeam()
+		{
+		return homeTeam;
+		}
+
+	// --- Method to get away team --- //
+	public Team GetAwayTeam()
+		{
+		return awayTeam;
 		}
 	}

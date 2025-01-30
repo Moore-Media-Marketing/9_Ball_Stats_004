@@ -1,6 +1,5 @@
 AdaptivePerformanceManager
 DataManager
-PanelManager
 UIManager
 OverlayFeedbackPanelManager
 ComparisonManager
@@ -51,7 +50,7 @@ Canvas
       Text (TMP)
     BackButton
       UpdateBackButtonText
-  PlayerInputManagerPanel
+  PlayerManagementPanel
     HeaderText
     TeamNameText
     TeamNameDropdown
@@ -239,3 +238,5 @@ Canvas
   OverlayFeedbackPanel
     OverlayText
     FeedbackText
+    RetryButton
+      Text (TMP)
