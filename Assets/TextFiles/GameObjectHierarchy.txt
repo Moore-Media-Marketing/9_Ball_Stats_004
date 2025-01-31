@@ -1,5 +1,4 @@
 AdaptivePerformanceManager
-DataManager
 MatchupManager
 UIManager
 GenerateGameObjectList
@@ -338,5 +337,5 @@ Canvas
     HeaderText
     BackButton
       UpdateBackButtonText
-  OverlayFeedbackPanel
-    FeedbackText
+OverlayFeedbackPanel
+  FeedbackText

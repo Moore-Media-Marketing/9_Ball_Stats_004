@@ -1,5 +1,6 @@
-using UnityEngine;
 using SQLite;
+
+using UnityEngine;
 
 [System.Serializable]
 public class Player
@@ -14,7 +15,7 @@ public class Player
 	[Range(1, 9)]
 	public int SkillLevel;
 
-	#endregion
+	#endregion Player Information
 
 	#region Season Stats
 
@@ -31,7 +32,7 @@ public class Player
 	[Tooltip("Total points awarded this season.")]
 	public int PointsAwarded;
 
-	#endregion
+	#endregion Season Stats
 
 	#region Lifetime Stats
 
@@ -62,7 +63,7 @@ public class Player
 	[Tooltip("Number of Shutouts achieved.")]
 	public int Shutouts;
 
-	#endregion
+	#endregion Lifetime Stats
 
 	#region Database Fields
 
@@ -74,9 +75,10 @@ public class Player
 	public int TeamId { get; set; }
 
 	// Parameterless constructor for SQLite
-	public Player() { }
+	public Player()
+		{ }
 
-	#endregion
+	#endregion Database Fields
 
 	#region Constructor
 
@@ -96,7 +98,7 @@ public class Player
 		Shutouts = 0;
 		}
 
-	#endregion
+	#endregion Constructor
 
 	#region Methods
 
@@ -132,5 +134,5 @@ public class Player
 		PointsAwarded = 0;
 		}
 
-	#endregion
+	#endregion Methods
 	}

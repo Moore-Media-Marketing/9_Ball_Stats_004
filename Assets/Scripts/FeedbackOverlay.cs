@@ -1,6 +1,8 @@
-using UnityEngine;
-using TMPro;
 using System.Collections;
+
+using TMPro;
+
+using UnityEngine;
 
 public class FeedbackOverlay:MonoBehaviour
 	{
@@ -13,7 +15,7 @@ public class FeedbackOverlay:MonoBehaviour
 	[Tooltip("Panel that displays the feedback message.")]
 	public GameObject feedbackPanel;
 
-	#endregion
+	#endregion UI References
 
 	#region Methods
 
@@ -33,5 +35,5 @@ public class FeedbackOverlay:MonoBehaviour
 		feedbackPanel.SetActive(false);
 		}
 
-	#endregion
+	#endregion Methods
 	}

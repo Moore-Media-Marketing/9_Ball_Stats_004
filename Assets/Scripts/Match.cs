@@ -1,6 +1,6 @@
-using SQLite;
-
 using System;
+
+using SQLite;
 
 public class Match
 	{

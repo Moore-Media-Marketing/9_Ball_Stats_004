@@ -1,6 +1,8 @@
-using TMPro;
-using UnityEngine;
 using System.Collections.Generic;
+
+using TMPro;
+
+using UnityEngine;
 
 public class UIManager:MonoBehaviour
 	{
@@ -8,6 +10,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject homePanel;
+
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
@@ -19,10 +22,12 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management UI Elements")]
 	public TMP_InputField teamNameInputField;
+
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Management UI Elements")]
 	public TMP_Dropdown teamNameDropdown;
+
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 
@@ -31,7 +36,10 @@ public class UIManager:MonoBehaviour
 
 	// Example list of teams and players. Replace with actual data from your manager.
 	private List<Team> teamList = new();
+
 	private List<Player> playerList = new();
+
+	private GameObject previousPanel; // Track the previous panel for back functionality
 
 	private void Awake()
 		{
@@ -100,6 +108,7 @@ public class UIManager:MonoBehaviour
 	// --- Toggles visibility of panels --- //
 	public void ShowPanel(GameObject panel)
 		{
+		// Hide all panels first
 		homePanel.SetActive(false);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
@@ -110,6 +119,24 @@ public class UIManager:MonoBehaviour
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 
+		// Show the selected panel
 		panel.SetActive(true);
+
+		// Track the current panel to handle "back" functionality
+		previousPanel = panel;
+		}
+
+	// --- Back Button Handler --- //
+	public void OnBackButtonClicked()
+		{
+		if (previousPanel != null)
+			{
+			ShowPanel(previousPanel);  // Show the previous panel
+			}
+		else
+			{
+			// Optionally handle behavior when there is no previous panel
+			Debug.LogWarning("No previous panel to go back to.");
+			}
 		}
 	}

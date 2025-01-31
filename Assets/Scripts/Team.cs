@@ -1,7 +1,5 @@
 using SQLite;
 
-using System.Collections.Generic;
-
 public class Team
 	{
 	[PrimaryKey, AutoIncrement]
@@ -11,7 +9,8 @@ public class Team
 	public string Name { get; set; }
 
 	// Parameterless constructor for SQLite
-	public Team() { }
+	public Team()
+		{ }
 
 	// Constructor to initialize team name
 	public Team(string name)

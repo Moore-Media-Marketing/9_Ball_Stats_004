@@ -1,5 +1,6 @@
-using UnityEngine;
 using TMPro;
+
+using UnityEngine;
 
 public class MatchupManager:MonoBehaviour
 	{
@@ -21,7 +22,7 @@ public class MatchupManager:MonoBehaviour
 	[Tooltip("Text element for the best matchup header.")]
 	public TMP_Text bestMatchupHeader;
 
-	#endregion
+	#endregion UI References
 
 	#region Methods
 
@@ -52,5 +53,5 @@ public class MatchupManager:MonoBehaviour
 		matchupPanel.SetActive(false);
 		}
 
-	#endregion
+	#endregion Methods
 	}
