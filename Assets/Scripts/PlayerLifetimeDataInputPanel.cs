@@ -33,19 +33,26 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		if (Instance == null)
 			{
 			Instance = this;
+			Debug.Log("PlayerLifetimeDataInputPanel Instance set.");
 			}
 		else
 			{
 			Destroy(gameObject); // Destroy duplicates
+			Debug.LogError("Duplicate PlayerLifetimeDataInputPanel instance destroyed.");
 			}
 		}
 
 	private void Start()
 		{
+		if (Instance == null)
+			{
+			Debug.LogError("PlayerLifetimeDataInputPanel instance is still null at Start!");
+			return;
+			}
+
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		updateLifetimeButton.onClick.AddListener(OnUpdateLifetimeButtonClicked);
 
-		// Initialize Dropdowns
 		InitializeDropdowns();
 		}
 
@@ -59,6 +66,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 		// Populate player dropdown when a team is selected
 		teamNameDropdown.onValueChanged.AddListener(OnTeamSelected);
+		Debug.Log("Team dropdown initialized.");
 		}
 
 	// Method when team is selected from dropdown
@@ -74,10 +82,12 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
 
 			playerNameDropdown.onValueChanged.AddListener(OnPlayerSelected);
+			Debug.Log($"Team selected: {selectedTeam.Name}");
 			}
 		else
 			{
 			playerNameDropdown.ClearOptions(); // Clear player dropdown if no team is selected
+			Debug.Log("No team selected.");
 			}
 		}
 
@@ -91,14 +101,19 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 			if (selectedPlayer != null)
 				{
-				// Populate lifetime data if available
 				PopulateLifetimeData(selectedPlayer);
+				Debug.Log($"Player selected: {selectedPlayer.Name}");
+				}
+			else
+				{
+				Debug.LogError("Selected player not found.");
 				}
 			}
 		else
 			{
 			// Clear player data if no player is selected
 			ResetLifetimeDataFields();
+			Debug.Log("No player selected.");
 			}
 		}
 
@@ -127,12 +142,15 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		nineOnTheSnapInputField.text = "";
 		lifetimeMiniSlamsInputField.text = "";
 		lifetimeShutoutsInputField.text = "";
+
+		Debug.Log("Reset lifetime data fields.");
 		}
 
 	// On Back button clicked
 	private void OnBackButtonClicked()
 		{
-		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel); // Use UIManager to handle panel switching
+		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
+		Debug.Log("Back button clicked, showing home panel.");
 		}
 
 	// On Update Lifetime button clicked
@@ -181,13 +199,15 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		selectedPlayer = player;
 		PopulateLifetimeData(player);
 		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
+		Debug.Log($"Opened panel with player data: {player.Name}");
 		}
 
-	public void OpenWithoutData()
+	// Open the panel without player data (if no player is selected)
+	public void OpenWithNoData()
 		{
 		selectedPlayer = null;
 		ResetLifetimeDataFields();
-
 		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
+		Debug.Log("Opening without player data. Please select a player.");
 		}
 	}

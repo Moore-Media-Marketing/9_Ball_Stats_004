@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -114,6 +115,21 @@ public class DatabaseManager:MonoBehaviour
 			}
 		return team;
 		}
+
+	// Get a team by its name
+	public Team GetTeamByName(string teamName)
+		{
+		// Perform a case-insensitive search for the team
+		var team = dbConnection.Table<Team>().FirstOrDefault(t => t.Name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
+
+		if (team == null)
+			{
+			Debug.LogError($"Team with name {teamName} not found.");
+			}
+
+		return team;
+		}
+
 
 	// Get players by team ID
 	public List<Player> GetPlayersByTeam(int teamId)

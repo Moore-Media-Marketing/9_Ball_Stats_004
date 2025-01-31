@@ -17,6 +17,26 @@ public class FeedbackOverlay:MonoBehaviour
 
 	#endregion UI References
 
+	#region Singleton
+
+	// Static reference to the instance
+	public static FeedbackOverlay Instance { get; private set; }
+
+	private void Awake()
+		{
+		// Ensure that there is only one instance of FeedbackOverlay
+		if (Instance != null && Instance != this)
+			{
+			Destroy(gameObject);
+			}
+		else
+			{
+			Instance = this;
+			}
+		}
+
+	#endregion Singleton
+
 	#region Methods
 
 	// --- Displays a feedback message for a set duration --- //

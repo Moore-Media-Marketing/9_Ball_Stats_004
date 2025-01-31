@@ -19,93 +19,28 @@ public class PlayerManagementPanel:MonoBehaviour
 	public Button addPlayerDetailsButton;
 	public Button backButton;
 
-	private List<Team> teamList = new(); // Assuming a list of teams
-	private List<Player> currentTeamPlayers = new(); // Players of the selected team
+	private List<Team> teamList = new();
+	private List<Player> currentTeamPlayers = new();
 	private Team selectedTeam;
 	private Player selectedPlayer;
 
 	private void Start()
 		{
-		// Add listeners for buttons
+		// --- Button Listeners --- //
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		addPlayerButton.onClick.AddListener(OnAddPlayerClicked);
 		deletePlayerButton.onClick.AddListener(OnDeletePlayerClicked);
 		addPlayerDetailsButton.onClick.AddListener(OnAddPlayerDetailsClicked);
 
-		// Populate the team dropdown with teams
+		// --- Populate Team Dropdown --- //
 		UpdateTeamDropdown();
 		teamNameDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
 		}
 
+	// --- Button Click Handlers --- //
 	private void OnBackButtonClicked()
 		{
-		// Switch to home panel using UIManager
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
-		}
-
-	private void UpdateTeamDropdown()
-		{
-		// Get teams from the database
-		teamList = DatabaseManager.Instance.GetAllTeams(); // Replace with actual method to get teams
-
-		List<string> teamNames = teamList.Select(team => team.Name).ToList();
-		teamNames.Insert(0, "Select Team"); // Add "Select Team" option
-
-		// Clear and populate dropdown
-		teamNameDropdown.ClearOptions();
-		teamNameDropdown.AddOptions(teamNames);
-
-		// Reset player dropdown
-		playerNameDropdown.ClearOptions();
-		}
-
-	private void OnTeamDropdownValueChanged(int index)
-		{
-		// If a team is selected (index > 0), populate player dropdown
-		if (index > 0)
-			{
-			string selectedTeamName = teamNameDropdown.options[index].text;
-			selectedTeam = teamList.FirstOrDefault(team => team.Name == selectedTeamName);
-
-			if (selectedTeam != null)
-				{
-				// Use the GetPlayers() method from Team class
-				currentTeamPlayers = selectedTeam.GetPlayers();
-				UpdatePlayerDropdown(); // Update the player dropdown
-				}
-			}
-		else
-			{
-			// Clear player dropdown if no team is selected
-			playerNameDropdown.ClearOptions();
-			selectedTeam = null; // Ensure selectedTeam is null
-			}
-		}
-
-	private void UpdatePlayerDropdown()
-		{
-		List<string> playerNames = currentTeamPlayers.Select(player => player.Name).ToList();
-		playerNames.Insert(0, "Select Player"); // Add "Select Player" option
-
-		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(playerNames);
-
-		// Ensure selectedPlayer is null initially
-		selectedPlayer = null;
-		playerNameDropdown.onValueChanged.AddListener(OnPlayerDropdownValueChanged);
-		}
-
-	// When a player is selected, set selectedPlayer
-	private void OnPlayerDropdownValueChanged(int playerIndex)
-		{
-		if (playerIndex > 0) // Make sure "Select Player" is not selected
-			{
-			selectedPlayer = currentTeamPlayers.FirstOrDefault(player => player.Name == playerNameDropdown.options[playerIndex].text);
-			}
-		else
-			{
-			selectedPlayer = null;
-			}
 		}
 
 	private void OnAddPlayerClicked()
@@ -118,24 +53,20 @@ public class PlayerManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Check if player already exists (case-insensitive)
 		if (currentTeamPlayers.Any(p => string.Equals(p.Name, playerName, StringComparison.OrdinalIgnoreCase)))
 			{
 			ShowFeedback("Player already exists in the team.");
 			}
 		else
 			{
-			// Add new player
 			Player newPlayer = new() { Name = playerName };
 			currentTeamPlayers.Add(newPlayer);
 
-			// Assuming Team has an UpdatePlayer method
 			if (selectedTeam != null)
 				{
-				DatabaseManager.Instance.UpdateTeam(selectedTeam); // Update team in the database
+				DatabaseManager.Instance.UpdateTeam(selectedTeam);
 				ShowFeedback($"Player '{playerName}' added to team '{selectedTeam.Name}'.");
 
-				// Clear input field and refresh dropdowns
 				playerNameInputField.text = "";
 				UpdatePlayerDropdown();
 				}
@@ -144,7 +75,6 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private void OnDeletePlayerClicked()
 		{
-		// Ensure a player is selected
 		if (playerNameDropdown.value > 0)
 			{
 			string selectedPlayerName = playerNameDropdown.options[playerNameDropdown.value].text;
@@ -153,14 +83,11 @@ public class PlayerManagementPanel:MonoBehaviour
 			if (selectedPlayer != null)
 				{
 				currentTeamPlayers.Remove(selectedPlayer);
-
-				// Assuming Team has an UpdatePlayer method
 				if (selectedTeam != null)
 					{
-					DatabaseManager.Instance.UpdateTeam(selectedTeam); // Update team in the database
+					DatabaseManager.Instance.UpdateTeam(selectedTeam);
 					ShowFeedback($"Player '{selectedPlayer.Name}' deleted from team '{selectedTeam.Name}'.");
 
-					// Refresh player dropdown
 					UpdatePlayerDropdown();
 					}
 				}
@@ -175,6 +102,12 @@ public class PlayerManagementPanel:MonoBehaviour
 		{
 		Debug.Log("OnAddPlayerDetailsClicked called");
 
+		if (PlayerLifetimeDataInputPanel.Instance == null)
+			{
+			Debug.LogError("PlayerLifetimeDataInputPanel.Instance is null! Ensure it is in the scene.");
+			return;
+			}
+
 		if (teamNameDropdown == null)
 			{
 			Debug.LogError("teamNameDropdown is null!");
@@ -186,25 +119,116 @@ public class PlayerManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Ensure selectedTeam and selectedPlayer are set
 		if (selectedTeam == null)
 			{
-			Debug.LogError("selectedTeam is null! Please select a team.");
-			return;
-			}
-		if (selectedPlayer == null)
-			{
-			Debug.LogError("selectedPlayer is null! Please select a player.");
+			Debug.LogWarning("No team selected! Opening PlayerLifetimeDataInputPanel without player data.");
+			PlayerLifetimeDataInputPanel.Instance.OpenWithNoData();
 			return;
 			}
 
-		// Open PlayerLifetimeDataInputPanel with selected player data
+		if (selectedPlayer == null)
+			{
+			Debug.LogWarning("No player selected! Opening PlayerLifetimeDataInputPanel without player data.");
+			PlayerLifetimeDataInputPanel.Instance.OpenWithNoData();
+			return;
+			}
+
+		Debug.Log($"Opening PlayerLifetimeDataInputPanel with player: {selectedPlayer.Name}");
 		PlayerLifetimeDataInputPanel.Instance.OpenWithPlayerData(selectedPlayer);
+		}
+
+	private void OnTeamDropdownValueChanged(int index)
+		{
+		if (index > 0)
+			{
+			string selectedTeamName = teamNameDropdown.options[index].text;
+			selectedTeam = teamList.FirstOrDefault(team => team.Name == selectedTeamName);
+
+			if (selectedTeam != null)
+				{
+				Debug.Log($"Team selected: {selectedTeam.Name}");
+				currentTeamPlayers = selectedTeam.GetPlayers();
+				UpdatePlayerDropdown();
+				}
+			else
+				{
+				Debug.LogWarning("Team not found!");
+				}
+			}
+		else
+			{
+			playerNameDropdown.ClearOptions();
+			selectedTeam = null;
+			}
+		}
+
+	// --- Updates the Team Dropdown --- //
+	private void UpdateTeamDropdown()
+		{
+		// --- Check for Available Teams --- //
+		if (teamList != null && teamList.Any())
+			{
+			// Clear any existing options
+			teamNameDropdown.ClearOptions();
+
+			// Add a default "Select Team" option
+			List<string> teamNames = new() { "Select Team" };
+
+			// Add each team's name to the dropdown
+			teamNames.AddRange(teamList.Select(team => team.Name));
+
+			// Populate the dropdown with team names
+			teamNameDropdown.AddOptions(teamNames);
+			}
+		else
+			{
+			Debug.LogWarning("No teams available to populate the dropdown.");
+			}
+		}
+
+	// --- Updates the Player Dropdown --- //
+	private void UpdatePlayerDropdown()
+		{
+		List<string> playerNames = currentTeamPlayers.Select(player => player.Name).ToList();
+		playerNames.Insert(0, "Select Player");
+
+		playerNameDropdown.ClearOptions();
+		playerNameDropdown.AddOptions(playerNames);
+
+		selectedPlayer = null;
+		playerNameDropdown.onValueChanged.AddListener(OnPlayerDropdownValueChanged);
+		}
+
+	private void OnPlayerDropdownValueChanged(int playerIndex)
+		{
+		if (playerIndex > 0)
+			{
+			selectedPlayer = currentTeamPlayers.FirstOrDefault(player => player.Name == playerNameDropdown.options[playerIndex].text);
+
+			if (selectedPlayer != null)
+				{
+				Debug.Log($"Player selected: {selectedPlayer.Name}");
+				}
+			else
+				{
+				Debug.LogError("Selected player not found in the list!");
+				}
+			}
+		else
+			{
+			selectedPlayer = null;
+			}
 		}
 
 	private void ShowFeedback(string message)
 		{
-		// Show feedback (assumed to be on the overlay panel)
-		Debug.Log(message); // Replace with actual feedback display logic
+		if (FeedbackOverlay.Instance != null)
+			{
+			FeedbackOverlay.Instance.ShowFeedback(message, 2f);
+			}
+		else
+			{
+			Debug.LogError("FeedbackOverlay.Instance is null!");
+			}
 		}
 	}

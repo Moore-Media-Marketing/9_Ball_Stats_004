@@ -9208,9 +9208,9 @@ MonoBehaviour:
   settingsPanel: {fileID: 1849975074}
   overlayFeedbackPanel: {fileID: 1134816541928465951}
   teamNameInputField: {fileID: 1331286700}
-  teamDropdown: {fileID: 0}
-  teamNameDropdown: {fileID: 0}
-  playerNameDropdown: {fileID: 0}
+  teamDropdown: {fileID: 1570360087}
+  teamNameDropdown: {fileID: 99566340}
+  playerNameDropdown: {fileID: 99566340}
   playerNameInputField: {fileID: 975669118}
   feedbackText: {fileID: 7209015205795078366}
 --- !u!1 &719395526

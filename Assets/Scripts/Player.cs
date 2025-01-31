@@ -1,14 +1,12 @@
 using System;
-
+using UnityEngine;
 using SQLite;
 
-using UnityEngine;
-
-[System.Serializable]
+// --- Player Class --- //
+[Serializable]
 public class Player
 	{
 	#region Player Information
-
 	[Header("Basic Info")]
 	[Tooltip("Player's full name.")]
 	public string Name;
@@ -17,10 +15,9 @@ public class Player
 	[Range(1, 9)]
 	public int SkillLevel;
 
-	#endregion Player Information
+	#endregion
 
 	#region Season Stats
-
 	[Header("Season Stats")]
 	[Tooltip("Total matches won this season.")]
 	public int MatchesWon;
@@ -34,10 +31,9 @@ public class Player
 	[Tooltip("Total points awarded this season.")]
 	public int PointsAwarded;
 
-	#endregion Season Stats
+	#endregion
 
 	#region Lifetime Stats
-
 	[Header("Lifetime Stats")]
 	[Tooltip("Total matches won in lifetime.")]
 	public int LifetimeMatchesWon;
@@ -65,7 +61,7 @@ public class Player
 	[Tooltip("Number of Shutouts achieved.")]
 	public int Shutouts;
 
-	// Additional lifetime stats (if required)
+	// Additional lifetime stats
 	[Tooltip("Lifetime games won.")]
 	public int LifetimeGamesWon;
 
@@ -84,31 +80,131 @@ public class Player
 	[Tooltip("Lifetime shutouts achieved.")]
 	public int LifetimeShutouts;
 
-	#endregion Lifetime Stats
+	#endregion
+
+	#region Current Season Data
+	[Header("Current Season Data")]
+	[Tooltip("Matches won in the current season.")]
+	public int CurrentSeasonMatchesWon;
+
+	[Tooltip("Matches played in the current season.")]
+	public int CurrentSeasonMatchesPlayed;
+
+	[Tooltip("Points scored per match in the current season.")]
+	public int CurrentSeasonPointsPerMatch;
+
+	[Tooltip("Total points awarded in the current season.")]
+	public int CurrentSeasonPointsAwarded;
+
+	[Tooltip("Defensive shot average in the current season.")]
+	public float CurrentSeasonDefensiveShotAverage;
+
+	[Tooltip("Number of 9-on-the-Snap shots in the current season.")]
+	public int CurrentSeasonNineOnTheSnap;
+
+	[Tooltip("Number of Mini Slams achieved in the current season.")]
+	public int CurrentSeasonMiniSlams;
+
+	[Tooltip("Number of Shutouts in the current season.")]
+	public int CurrentSeasonShutouts;
+
+	#endregion
 
 	#region Database Fields
-
-	// SQLite requires a parameterless constructor
 	[PrimaryKey, AutoIncrement]
 	public int Id { get; set; }
 
-	// Add TeamId to link Player to Team
+	[Tooltip("Foreign key linking the player to a team.")]
 	public int TeamId { get; set; }
 
-	// Parameterless constructor for SQLite
+	// Required for SQLite
 	public Player() { }
 
-	#endregion Database Fields
+	#endregion
 
 	#region Constructor
 
-	// Constructor to initialize a new player
 	public Player(string name, int skillLevel, int teamId)
 		{
-		Name = name;
+		Name = name.Trim();
 		SkillLevel = Mathf.Clamp(skillLevel, 1, 9);
-		TeamId = teamId; // Link player to team
+		TeamId = teamId;
+
 		ResetSeasonStats();
+		ResetLifetimeStats();
+
+		Debug.Log($"[Player] Created: {Name}, Skill: {SkillLevel}, Team ID: {TeamId}");
+		}
+
+	#endregion
+
+	#region Methods
+
+	// --- Updates the player's stats after a match --- //
+	public void UpdateStats(int pointsScored, bool wonMatch)
+		{
+		MatchesPlayed++;
+		PointsAwarded += pointsScored;
+		PointsPerMatch = MatchesPlayed > 0 ? PointsAwarded / MatchesPlayed : 0;
+
+		if (wonMatch)
+			MatchesWon++;
+
+		// Update lifetime stats
+		LifetimeMatchesPlayed++;
+		if (wonMatch)
+			LifetimeMatchesWon++;
+
+		// Update additional lifetime stats like points average
+		LifetimeGamesPlayed++;
+		LifetimeGamesWon += wonMatch ? 1 : 0;
+
+		Debug.Log($"[Player] Updated Stats: {Name} | Matches: {MatchesPlayed} | Wins: {MatchesWon}");
+		}
+
+	// --- Updates the player's current season stats --- //
+	public void UpdateCurrentSeasonStats(int matchesWon, int matchesPlayed, int pointsPerMatch, int pointsAwarded,
+										  float defensiveShotAverage, int nineOnTheSnap, int miniSlams, int shutouts)
+		{
+		CurrentSeasonMatchesWon = matchesWon;
+		CurrentSeasonMatchesPlayed = matchesPlayed;
+		CurrentSeasonPointsPerMatch = pointsPerMatch;
+		CurrentSeasonPointsAwarded = pointsAwarded;
+		CurrentSeasonDefensiveShotAverage = defensiveShotAverage;
+		CurrentSeasonNineOnTheSnap = nineOnTheSnap;
+		CurrentSeasonMiniSlams = miniSlams;
+		CurrentSeasonShutouts = shutouts;
+
+		Debug.Log($"[Player] Current season data updated for {Name}");
+		}
+
+	// --- Transfers player to another team --- //
+	public void TransferToNewTeam(int newTeamId)
+		{
+		Team newTeam = DatabaseManager.Instance.GetTeamById(newTeamId);
+
+		if (newTeam == null)
+			{
+			Debug.LogError($"[Player] Error: Team with ID {newTeamId} does not exist!");
+			return;
+			}
+
+		TeamId = newTeamId;
+		Debug.Log($"[Player] {Name} transferred to {newTeam.Name}");
+		}
+
+	// --- Resets season stats --- //
+	public void ResetSeasonStats()
+		{
+		MatchesWon = 0;
+		MatchesPlayed = 0;
+		PointsPerMatch = 0;
+		PointsAwarded = 0;
+		}
+
+	// --- Resets lifetime stats --- //
+	public void ResetLifetimeStats()
+		{
 		LifetimeMatchesWon = 0;
 		LifetimeMatchesPlayed = 0;
 		DefensiveShotAverage = 0;
@@ -124,51 +220,20 @@ public class Player
 		LifetimeShutouts = 0;
 		}
 
-	#endregion Constructor
+	#endregion
 
-	#region Methods
+	// Total points in the current season (editable)
+	public int CurrentSeasonTotalPoints;
 
-	// Updates the player's stats after a match
-	public void UpdateStats(int pointsScored, bool wonMatch)
-		{
-		MatchesPlayed++;
-		PointsAwarded += pointsScored;
-		PointsPerMatch = PointsAwarded / MatchesPlayed;
+	// Points per match for the current season (editable)
+	public float CurrentSeasonPpm;
 
-		if (wonMatch)
-			MatchesWon++;
+	// Points awarded percentage for the current season (editable)
+	public float CurrentSeasonPaPercentage;
 
-		// Update lifetime stats
-		LifetimeMatchesPlayed++;
-		if (wonMatch)
-			LifetimeMatchesWon++;
-		}
+	// Current season break-and-run shots (editable)
+	public int CurrentSeasonBreakAndRun;
 
-	// Transfers player to another team
-	public void TransferToNewTeam(int newTeamId)
-		{
-		// Validate if the team exists
-		Team newTeam = DatabaseManager.Instance.GetTeamById(newTeamId);
-
-		if (newTeam == null)
-			{
-			Debug.LogError($"Error: Team with ID {newTeamId} does not exist!");
-			return;  // Exit if the team doesn't exist
-			}
-
-		// Proceed with transfer
-		TeamId = newTeamId;
-		Debug.Log($"{Name} has been moved to {newTeam.Name}.");
-		}
-
-	// Resets season stats at the start of a new season
-	public void ResetSeasonStats()
-		{
-		MatchesWon = 0;
-		MatchesPlayed = 0;
-		PointsPerMatch = 0;
-		PointsAwarded = 0;
-		}
-
-	#endregion Methods
+	// Current skill level for the player in the current season (editable)
+	public int CurrentSeasonSkillLevel;
 	}
