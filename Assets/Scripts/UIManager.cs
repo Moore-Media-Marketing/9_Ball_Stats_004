@@ -10,7 +10,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject homePanel;
-
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
@@ -22,23 +21,18 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management UI Elements")]
 	public TMP_InputField teamNameInputField;
-
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Management UI Elements")]
 	public TMP_Dropdown teamNameDropdown;
-
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 
 	[Header("Feedback UI Elements")]
 	public TMP_Text feedbackText;
 
-	// Example list of teams and players. Replace with actual data from your manager.
 	private List<Team> teamList = new();
-
 	private List<Player> playerList = new();
-
 	private GameObject previousPanel; // Track the previous panel for back functionality
 
 	private void Awake()
@@ -51,6 +45,9 @@ public class UIManager:MonoBehaviour
 			{
 			Destroy(gameObject);
 			}
+
+		// Show the home panel by default when the app starts
+		ShowHomePanel();
 		}
 
 	// --- Updates the UI dropdowns with teams and players --- //
@@ -62,8 +59,7 @@ public class UIManager:MonoBehaviour
 		playerNameDropdown.ClearOptions();
 
 		// --- Update Team Dropdown --- //
-		// Fetch teams from DatabaseManager
-		teamList = DatabaseManager.Instance.GetAllTeams();  // Correct method call
+		teamList = DatabaseManager.Instance.GetAllTeams();
 		List<string> teamNames = new();
 
 		foreach (var team in teamList)
@@ -75,34 +71,60 @@ public class UIManager:MonoBehaviour
 		teamNameDropdown.AddOptions(teamNames); // Update the player management dropdown too
 
 		// --- Update Player Dropdown --- //
-		// Assume player data is tied to the selected team
-		if (teamList.Count > 0)  // Only populate player dropdown if there are teams
+		if (teamList.Count > 0)
 			{
-			// Fetch players for the first team (you can modify this to support the selected team)
-			playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);  // Correct method call
+			playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);
 			List<string> playerNames = new();
 
 			foreach (var player in playerList)
 				{
-				playerNames.Add(player.Name);  // Add player names to the list
+				playerNames.Add(player.Name);
 				}
 
-			playerNameDropdown.AddOptions(playerNames);  // Populate player dropdown
+			playerNameDropdown.AddOptions(playerNames);
 			}
 
-		// Optionally, select the first team and player by default if they exist
 		if (teamList.Count > 0)
 			{
-			teamDropdown.value = 0;  // Select first team by default
-			teamDropdown.RefreshShownValue();  // Refresh the dropdown UI
+			teamDropdown.value = 0;
+			teamDropdown.RefreshShownValue();
 
-			// Update player dropdown based on the selected team
 			if (playerList.Count > 0)
 				{
-				playerNameDropdown.value = 0;  // Select first player by default if players exist
-				playerNameDropdown.RefreshShownValue();  // Refresh the dropdown UI
+				playerNameDropdown.value = 0;
+				playerNameDropdown.RefreshShownValue();
 				}
 			}
+		}
+
+	// --- Show Home Panel --- //
+	public void ShowHomePanel()
+		{
+		ShowPanel(homePanel);  // Show the home panel specifically
+		}
+
+	// --- Show Team Management Panel --- //
+	public void ShowTeamManagementPanel()
+		{
+		ShowPanel(teamManagementPanel);  // Show the team management panel
+		}
+
+	// --- Show Player Management Panel --- //
+	public void ShowPlayerManagementPanel()
+		{
+		ShowPanel(playerManagementPanel);  // Show the player management panel
+		}
+
+	// --- Show Matchup Comparison Panel --- //
+	public void ShowMatchupComparisonPanel()
+		{
+		ShowPanel(matchupComparisonPanel);  // Show the matchup comparison panel
+		}
+
+	// --- Show Settings Panel --- //
+	public void ShowSettingsPanel()
+		{
+		ShowPanel(settingsPanel);  // Show the settings panel
 		}
 
 	// --- Toggles visibility of panels --- //
@@ -135,8 +157,8 @@ public class UIManager:MonoBehaviour
 			}
 		else
 			{
-			// Optionally handle behavior when there is no previous panel
-			Debug.LogWarning("No previous panel to go back to.");
+			// If there's no previous panel, go back to the home panel
+			ShowHomePanel();
 			}
 		}
 	}

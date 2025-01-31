@@ -83,6 +83,24 @@ public class DatabaseManager:MonoBehaviour
 		dbConnection.Insert(match);
 		}
 
+
+	public void UpdateTeam(Team team)
+		{
+		// Update the team record in the database
+		var existingTeam = dbConnection.Table<Team>().FirstOrDefault(t => t.Id == team.Id);
+		if (existingTeam != null)
+			{
+			existingTeam.Name = team.Name;  // Update other fields as necessary
+			dbConnection.Update(existingTeam);  // Update the team in the database
+			Debug.Log($"Team '{team.Name}' updated.");
+			}
+		else
+			{
+			Debug.LogError("Team not found for update.");
+			}
+		}
+
+
 	// Remove a team from the database
 	public void RemoveTeam(Team team)
 		{

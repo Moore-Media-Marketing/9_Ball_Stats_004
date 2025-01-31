@@ -6,7 +6,6 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject teamManagementPanel;
-
 	public GameObject playerManagementPanel;
 	public GameObject matchupComparisonPanel;
 	public GameObject settingsPanel;
@@ -14,10 +13,10 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Buttons")]
 	public GameObject teamManagementButton;
-
 	public GameObject playerManagementButton;
 	public GameObject matchupComparisonButton;
 	public GameObject settingsButton;
+	public GameObject exitButton; // New Exit Button
 
 	#endregion UI Elements
 
@@ -37,84 +36,49 @@ public class HomePanel:MonoBehaviour
 			Destroy(gameObject);
 			}
 
-		// Make sure all panels are hidden initially
-		HideAllPanels();
+		// Ensure HomePanel is displayed when the app starts
+		UIManager.Instance.ShowHomePanel();
 		}
 
 	#endregion Singleton
-
-	#region Panel Navigation Methods
-
-	// Show Team Management Panel
-	public void ShowTeamManagementPanel()
-		{
-		HideAllPanels();  // Hide all panels
-		teamManagementPanel.SetActive(true);  // Show team management panel
-		}
-
-	// Show Player Management Panel
-	public void ShowPlayerManagementPanel()
-		{
-		HideAllPanels();
-		playerManagementPanel.SetActive(true);
-		}
-
-	// Show Matchup Comparison Panel
-	public void ShowMatchupComparisonPanel()
-		{
-		HideAllPanels();
-		matchupComparisonPanel.SetActive(true);
-		}
-
-	// Show Settings Panel
-	public void ShowSettingsPanel()
-		{
-		HideAllPanels();
-		settingsPanel.SetActive(true);
-		}
-
-	// Show Overlay Feedback Panel
-	public void ShowFeedbackPanel()
-		{
-		overlayFeedbackPanel.SetActive(true);
-		}
-
-	// Hide all panels
-	private void HideAllPanels()
-		{
-		teamManagementPanel.SetActive(false);
-		playerManagementPanel.SetActive(false);
-		matchupComparisonPanel.SetActive(false);
-		settingsPanel.SetActive(false);
-		overlayFeedbackPanel.SetActive(false);
-		}
-
-	#endregion Panel Navigation Methods
 
 	#region Button Handlers
 
 	// Handler for Team Management button
 	public void OnTeamManagementButtonClicked()
 		{
-		ShowTeamManagementPanel();
+		UIManager.Instance.ShowTeamManagementPanel();
 		}
 
 	// Handler for Player Management button
 	public void OnPlayerManagementButtonClicked()
 		{
-		ShowPlayerManagementPanel();
+		UIManager.Instance.ShowPlayerManagementPanel();
 		}
 
 	// Handler for Matchup Comparison button
 	public void OnMatchupComparisonButtonClicked()
 		{
-		ShowMatchupComparisonPanel();
+		UIManager.Instance.ShowMatchupComparisonPanel();
 		}
 
 	// Handler for Settings button
 	public void OnSettingsButtonClicked()
 		{
-		ShowSettingsPanel();
+		UIManager.Instance.ShowSettingsPanel();
+		}
+
+	// Handler for Exit button
+	public void OnExitButtonClicked()
+		{
+		// Quit the application
+		Debug.Log("Exiting application...");
+		Application.Quit();
+
+		// If running in the editor, stop playmode
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+#endif
 		}
 
 	#endregion Button Handlers

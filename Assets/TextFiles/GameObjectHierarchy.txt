@@ -13,6 +13,8 @@ Canvas
       Text (TMP)
     ComparisonButton
       Text (TMP)
+    SettingsButton
+      Text (TMP)
     ExitButton
       Text (TMP)
   TeamManagementPanel
@@ -337,5 +339,5 @@ Canvas
     HeaderText
     BackButton
       UpdateBackButtonText
-OverlayFeedbackPanel
-  FeedbackText
+  OverlayFeedbackPanel
+    FeedbackText
