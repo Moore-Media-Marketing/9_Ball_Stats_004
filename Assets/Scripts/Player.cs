@@ -1,3 +1,5 @@
+using System;
+
 using SQLite;
 
 using UnityEngine;
@@ -52,7 +54,7 @@ public class Player
 	public float DefensiveShotAverage;
 
 	[Tooltip("Matches played in the last 2 years.")]
-	public int MatchesLast2Years;
+	public int MatchesPlayedInLast2Years;
 
 	[Tooltip("Number of 9-on-the-Snap shots.")]
 	public int NineOnTheSnap;
@@ -62,6 +64,25 @@ public class Player
 
 	[Tooltip("Number of Shutouts achieved.")]
 	public int Shutouts;
+
+	// Additional lifetime stats (if required)
+	[Tooltip("Lifetime games won.")]
+	public int LifetimeGamesWon;
+
+	[Tooltip("Lifetime games played.")]
+	public int LifetimeGamesPlayed;
+
+	[Tooltip("Lifetime defensive shot average.")]
+	public float LifetimeDefensiveShotAvg;
+
+	[Tooltip("Lifetime break-and-run shots.")]
+	public int LifetimeBreakAndRun;
+
+	[Tooltip("Lifetime mini slams achieved.")]
+	public int LifetimeMiniSlams;
+
+	[Tooltip("Lifetime shutouts achieved.")]
+	public int LifetimeShutouts;
 
 	#endregion Lifetime Stats
 
@@ -75,14 +96,13 @@ public class Player
 	public int TeamId { get; set; }
 
 	// Parameterless constructor for SQLite
-	public Player()
-		{ }
+	public Player() { }
 
 	#endregion Database Fields
 
 	#region Constructor
 
-	// --- Constructor to initialize a new player --- //
+	// Constructor to initialize a new player
 	public Player(string name, int skillLevel, int teamId)
 		{
 		Name = name;
@@ -92,17 +112,23 @@ public class Player
 		LifetimeMatchesWon = 0;
 		LifetimeMatchesPlayed = 0;
 		DefensiveShotAverage = 0;
-		MatchesLast2Years = 0;
+		MatchesPlayedInLast2Years = 0;
 		NineOnTheSnap = 0;
 		MiniSlams = 0;
 		Shutouts = 0;
+		LifetimeGamesWon = 0;
+		LifetimeGamesPlayed = 0;
+		LifetimeDefensiveShotAvg = 0;
+		LifetimeBreakAndRun = 0;
+		LifetimeMiniSlams = 0;
+		LifetimeShutouts = 0;
 		}
 
 	#endregion Constructor
 
 	#region Methods
 
-	// --- Updates the player's stats after a match --- //
+	// Updates the player's stats after a match
 	public void UpdateStats(int pointsScored, bool wonMatch)
 		{
 		MatchesPlayed++;
@@ -112,20 +138,30 @@ public class Player
 		if (wonMatch)
 			MatchesWon++;
 
-		// --- Update lifetime stats --- //
+		// Update lifetime stats
 		LifetimeMatchesPlayed++;
 		if (wonMatch)
 			LifetimeMatchesWon++;
 		}
 
-	// --- Transfers player to another team --- //
+	// Transfers player to another team
 	public void TransferToNewTeam(int newTeamId)
 		{
+		// Validate if the team exists
+		Team newTeam = DatabaseManager.Instance.GetTeamById(newTeamId);
+
+		if (newTeam == null)
+			{
+			Debug.LogError($"Error: Team with ID {newTeamId} does not exist!");
+			return;  // Exit if the team doesn't exist
+			}
+
+		// Proceed with transfer
 		TeamId = newTeamId;
-		Debug.Log($"{Name} has been moved to a new team.");
+		Debug.Log($"{Name} has been moved to {newTeam.Name}.");
 		}
 
-	// --- Resets season stats at the start of a new season --- //
+	// Resets season stats at the start of a new season
 	public void ResetSeasonStats()
 		{
 		MatchesWon = 0;

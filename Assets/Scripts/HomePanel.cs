@@ -6,6 +6,7 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject teamManagementPanel;
+
 	public GameObject playerManagementPanel;
 	public GameObject matchupComparisonPanel;
 	public GameObject settingsPanel;
@@ -13,6 +14,7 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Buttons")]
 	public GameObject teamManagementButton;
+
 	public GameObject playerManagementButton;
 	public GameObject matchupComparisonButton;
 	public GameObject settingsButton;

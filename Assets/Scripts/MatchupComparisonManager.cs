@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
+
 using UnityEngine;
-using TMPro;
 
 public class MatchupComparisonManager:MonoBehaviour
 	{
@@ -35,6 +34,7 @@ public class MatchupComparisonManager:MonoBehaviour
 
 	// These represent the selected teams A and B (we'll get this data from the UI)
 	public Team selectedTeamA;
+
 	public Team selectedTeamB;
 
 	// Update these methods to get selected teams and players from UI (assumed to be set via UIManager)

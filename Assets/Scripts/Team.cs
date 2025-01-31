@@ -1,6 +1,6 @@
-using SQLite;
-
 using System.Collections.Generic;
+
+using SQLite;
 
 public class Team
 	{
@@ -20,16 +20,21 @@ public class Team
 		}
 
 	// --- Add a player to the team --- //
-	// The player class should also be defined and contain a TeamId to link to the Team.
 	public void AddPlayer(Player player)
 		{
-		// Example: Link player with this team via TeamId
+		// Link player with this team via TeamId
 		player.TeamId = this.Id;
-		DatabaseManager.Instance.SavePlayer(player); // Assuming you have a save method for players.
+		DatabaseManager.Instance.SavePlayer(player); // Save player in the database
+		}
+
+	// --- Fetch all players for this team --- //
+	public List<Player> GetPlayers()
+		{
+		// Fetch players using the DatabaseManager (which interacts with SQLite)
+		return DatabaseManager.Instance.GetPlayersByTeam(this.Id);
 		}
 
 	// --- SQLite CRUD Operations --- //
-	// Save this team to the SQLite database
 	public void SaveToDatabase(SQLiteConnection connection)
 		{
 		connection.Insert(this); // Save the team to the database

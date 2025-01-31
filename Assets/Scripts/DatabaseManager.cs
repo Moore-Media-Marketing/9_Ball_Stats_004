@@ -82,7 +82,7 @@ public class DatabaseManager:MonoBehaviour
 		Debug.Log($"Player '{player.Name}' added to the database.");
 		}
 
-	// Save a player to the database (if you want SavePlayer method)
+	// Save a player to the database (or update if already exists)
 	public void SavePlayer(Player player)
 		{
 		var existingPlayer = dbConnection.Table<Player>().FirstOrDefault(p => p.Id == player.Id);
@@ -104,11 +104,39 @@ public class DatabaseManager:MonoBehaviour
 		return dbConnection.Table<Team>().ToList();
 		}
 
+	// Get a team by its ID
+	public Team GetTeamById(int teamId)
+		{
+		var team = dbConnection.Table<Team>().FirstOrDefault(t => t.Id == teamId);
+		if (team == null)
+			{
+			Debug.LogError($"Team with ID {teamId} not found.");
+			}
+		return team;
+		}
+
 	// Get players by team ID
 	public List<Player> GetPlayersByTeam(int teamId)
 		{
 		return dbConnection.Table<Player>().Where(p => p.TeamId == teamId).ToList();
 		}
+
+
+	// In DatabaseManager.cs
+	public List<Player> GetAllPlayers()
+		{
+		// Assuming you're using SQLite to fetch players from a database
+		var players = new List<Player>();
+
+		// Example: Fetching all players from a database
+		using (var connection = new SQLiteConnection(dbPath))
+			{
+			players = connection.Table<Player>().ToList();
+			}
+
+		return players;
+		}
+
 
 	// Get all matches
 	public List<Match> GetAllMatches()

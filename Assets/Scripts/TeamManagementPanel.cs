@@ -1,9 +1,10 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using System.Linq;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using SQLite;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class TeamManagementPanel:MonoBehaviour
 	{
@@ -35,6 +36,25 @@ public class TeamManagementPanel:MonoBehaviour
 
 		// Populate the dropdown with existing teams
 		UpdateTeamDropdown();
+
+		// Add a listener for dropdown selection
+		teamDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
+		}
+
+	// --- Handle dropdown selection change --- //
+	private void OnTeamDropdownValueChanged(int value)
+		{
+		// Only populate input field if a team is selected (value > 0, because "Select Team" is at index 0)
+		if (value > 0)
+			{
+			string selectedTeamName = teamDropdown.options[value].text;
+			teamNameInputField.text = selectedTeamName;
+			}
+		else
+			{
+			// Clear input field if no valid team is selected
+			teamNameInputField.text = "";
+			}
 		}
 
 	private void UpdateTeamDropdown()
@@ -155,9 +175,29 @@ public class TeamManagementPanel:MonoBehaviour
 
 	public void OnModifyTeamNameClicked()
 		{
+		string teamName = teamNameInputField.text;
+
+		if (string.IsNullOrEmpty(teamName))
+			{
+			ShowFeedback("Please enter a team name.");
+			return;
+			}
+
 		if (teamDropdown.value > 0)
 			{
-			teamNameInputField.text = teamDropdown.options[teamDropdown.value].text;
+			string selectedTeamName = teamDropdown.options[teamDropdown.value].text;
+			Team selectedTeam = teamList.FirstOrDefault(t => t.Name == selectedTeamName);
+
+			if (selectedTeam != null)
+				{
+				selectedTeam.Name = teamName; // Modify the team name
+				DatabaseManager.Instance.UpdateTeam(selectedTeam); // Update in the database
+				ShowFeedback($"Team name updated to '{teamName}'");
+
+				// Refresh the dropdown
+				UpdateTeamDropdown();
+				teamNameInputField.text = ""; // Clear the input field after modification
+				}
 			}
 		else
 			{

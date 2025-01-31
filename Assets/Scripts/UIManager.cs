@@ -10,6 +10,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject homePanel;
+
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
@@ -21,10 +22,12 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management UI Elements")]
 	public TMP_InputField teamNameInputField;
+
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Management UI Elements")]
 	public TMP_Dropdown teamNameDropdown;
+
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 
