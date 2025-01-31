@@ -41,6 +41,7 @@ public class PlayerManagementPanel:MonoBehaviour
 	private void OnBackButtonClicked()
 		{
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
+		Debug.Log("Back button clicked, showing home panel.");
 		}
 
 	private void OnAddPlayerClicked()
@@ -70,6 +71,10 @@ public class PlayerManagementPanel:MonoBehaviour
 				playerNameInputField.text = "";
 				UpdatePlayerDropdown();
 				}
+			else
+				{
+				Debug.LogError("Selected team is null when adding player.");
+				}
 			}
 		}
 
@@ -91,6 +96,10 @@ public class PlayerManagementPanel:MonoBehaviour
 					UpdatePlayerDropdown();
 					}
 				}
+			else
+				{
+				ShowFeedback("Player not found in the current team.");
+				}
 			}
 		else
 			{
@@ -108,27 +117,15 @@ public class PlayerManagementPanel:MonoBehaviour
 			return;
 			}
 
-		if (teamNameDropdown == null)
+		if (teamNameDropdown == null || playerNameDropdown == null)
 			{
-			Debug.LogError("teamNameDropdown is null!");
-			return;
-			}
-		if (playerNameDropdown == null)
-			{
-			Debug.LogError("playerNameDropdown is null!");
+			Debug.LogError("Dropdowns are null! Please check the UI setup.");
 			return;
 			}
 
-		if (selectedTeam == null)
+		if (selectedTeam == null || selectedPlayer == null)
 			{
-			Debug.LogWarning("No team selected! Opening PlayerLifetimeDataInputPanel without player data.");
-			PlayerLifetimeDataInputPanel.Instance.OpenWithNoData();
-			return;
-			}
-
-		if (selectedPlayer == null)
-			{
-			Debug.LogWarning("No player selected! Opening PlayerLifetimeDataInputPanel without player data.");
+			Debug.LogWarning("No team or player selected! Opening PlayerLifetimeDataInputPanel without player data.");
 			PlayerLifetimeDataInputPanel.Instance.OpenWithNoData();
 			return;
 			}
@@ -152,7 +149,8 @@ public class PlayerManagementPanel:MonoBehaviour
 				}
 			else
 				{
-				Debug.LogWarning("Team not found!");
+				Debug.LogWarning("Selected team not found in the list.");
+				ShowFeedback("Selected team is not available.");
 				}
 			}
 		else
@@ -183,6 +181,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		else
 			{
 			Debug.LogWarning("No teams available to populate the dropdown.");
+			ShowFeedback("No teams available to select.");
 			}
 		}
 
