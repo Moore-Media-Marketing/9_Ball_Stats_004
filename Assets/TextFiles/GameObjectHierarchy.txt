@@ -1,15 +1,16 @@
 AdaptivePerformanceManager
 DataManager
+MatchupManager
 UIManager
 GenerateGameObjectList
 Main Camera
 EventSystem
 Canvas
-  MainMenuPanel
+  HomePanel
     HeaderText
     ManageTeamsButton
       Text (TMP)
-    ManagePlayerButton
+    CreatePlayerButton
       Text (TMP)
     ComparisonButton
       Text (TMP)
@@ -48,7 +49,6 @@ Canvas
       UpdateBackButtonText
   PlayerManagementPanel
     HeaderText
-    TeamNameText
     TeamNameDropdown
       Label
       Arrow
@@ -63,7 +63,6 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    PlayerNameText
     PlayerNameDropdown
       Label
       Arrow
@@ -82,11 +81,143 @@ Canvas
       Text Area
         Placeholder
         Text
+    AddPlayerButton
+      Text (TMP)
+    DeletePlayerButton
+      Text (TMP)
+    AddPlayerDetailsButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  PlayerLifetimeDataInputPanel
+    HeaderText
+    TeamNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    LifetimeGamesWonInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeGamesPlayedInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeDefensiveShotAvgInputField
+      Text Area
+        Placeholder
+        Text
+    MatchesPlayedInLast2YearsInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeBreakAndRunInputField
+      Text Area
+        Placeholder
+        Text
+    9OnTheSnapInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeMiniSlamsInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeShutoutsInputField
+      Text Area
+        Placeholder
+        Text
+    UpdateLifetimeButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  PlayerCurrentSeasonDataInputPanel
+    HeaderText
+    TeamNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    PlayerNameDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    GamesWonInputField
+      Text Area
+        Placeholder
+        Text
     GamesPlayedInputField
       Text Area
         Placeholder
         Text
-    GamesWonInputField
+    TotalPointsInputField
+      Text Area
+        Placeholder
+        Text
+    PPMInputField
+      Text Area
+        Placeholder
+        Text
+    PA%InputField
+      Text Area
+        Placeholder
+        Text
+    BreakAndRunInputField
+      Text Area
+        Placeholder
+        Text
+    MiniSlamsInputField
+      Text Area
+        Placeholder
+        Text
+    9OnTheSnapInputField
+      Text Area
+        Placeholder
+        Text
+    ShutoutsInputField
       Text Area
         Placeholder
         Text
@@ -110,15 +241,10 @@ Canvas
       Text (TMP)
     BackButton
       UpdateBackButtonText
-  ComparisonSetupPanel
+  MatchupComparisonPanel
     HeaderText
-    ComparePlayersToggle
-      Background
-        Checkmark
-      Label
-    SelectHomeTeamText
-    SelectHomePlayerText
-    HomeDropdown
+    SelectTeamAText
+    TeamADropdown
       Label
       Arrow
       Template
@@ -132,7 +258,7 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    HomeTeamPlayerScrollView
+    TeamAPlayerScrollView
       Viewport
         Content
           playerTogglePrefab
@@ -146,9 +272,8 @@ Canvas
       Scrollbar Vertical
         Sliding Area
           Handle
-    SelectAwayTeamText
-    SelectAwayPlayerText
-    AwayDropdown
+    TeamBTeamText
+    TeamBDropdown
       Label
       Arrow
       Template
@@ -162,7 +287,7 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    AwayTeamPlayerScrollView
+    TeamBPlayerScrollView
       Viewport
         Content
           playerTogglePrefab
@@ -180,20 +305,38 @@ Canvas
       Text (TMP)
     BackButton
       UpdateBackButtonText
-  ComparisonResultsPanel
+  MatchupResultsPanel
     HeaderText
-    homeTeamNameText
-    awayTeamNameText
-    playerComparisonContainer
-      Player1Comparison
-      Player2Comparison
-      Player3Comparison
-      Player4Comparison
-      Player5Comparison
-    winnerPredictionText
+    TeamAHeaderText
+    TeamBHeaderText
+    MatchupsScrollView
+      Viewport
+        MatchupListContent
+          MatchupEntry_Template
+            MatchupDetailsText
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    BestMatchupHeaderText
+    BestMatchupsScrollView
+      Viewport
+        BestMatchupListContent
+          MatchupEntry_Template
+            MatchupDetailsText
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    BackButton
+      UpdateBackButtonText
+  Settings Panel
+    HeaderText
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel
     FeedbackText
-    RetryButton
-      Text (TMP)

@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.gameframe.sqlite": {
+      "version": "https://github.com/coryleach/UnitySQLite.git#1.0.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d05b5c777582ae27bd33dd940952c596a57d970a"
+    },
     "com.merry-yellow.code-assist": {
       "version": "file:com.merry-yellow.code-assist",
       "depth": 0,
@@ -138,7 +145,7 @@
     },
     "com.unity.ext.nunit": {
       "version": "2.0.5",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -167,15 +174,6 @@
         "com.unity.adaptiveperformance": "5.1.0",
         "com.unity.mobile.notifications": "2.4.0"
       }
-    },
-    "com.unity.ide.rider": {
-      "version": "3.0.31",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ext.nunit": "1.0.6"
-      },
-      "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
       "version": "2.0.22",
