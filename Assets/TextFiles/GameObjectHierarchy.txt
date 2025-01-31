@@ -66,6 +66,8 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
+    AddPlayerButton
+      Text (TMP)
     PlayerNameDropdown
       Label
       Arrow
@@ -79,8 +81,6 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
-    AddPlayerButton
-      Text (TMP)
     DeletePlayerButton
       Text (TMP)
     AddPlayerDetailsButton

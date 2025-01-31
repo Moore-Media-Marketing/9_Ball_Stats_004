@@ -21,6 +21,8 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private List<Team> teamList = new(); // Assuming a list of teams
 	private List<Player> currentTeamPlayers = new(); // Players of the selected team
+	private Team selectedTeam;
+	private Player selectedPlayer;
 
 	private void Start()
 		{
@@ -63,7 +65,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		if (index > 0)
 			{
 			string selectedTeamName = teamNameDropdown.options[index].text;
-			Team selectedTeam = teamList.FirstOrDefault(team => team.Name == selectedTeamName);
+			selectedTeam = teamList.FirstOrDefault(team => team.Name == selectedTeamName);
 
 			if (selectedTeam != null)
 				{
@@ -76,6 +78,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			{
 			// Clear player dropdown if no team is selected
 			playerNameDropdown.ClearOptions();
+			selectedTeam = null; // Ensure selectedTeam is null
 			}
 		}
 
@@ -86,6 +89,23 @@ public class PlayerManagementPanel:MonoBehaviour
 
 		playerNameDropdown.ClearOptions();
 		playerNameDropdown.AddOptions(playerNames);
+
+		// Ensure selectedPlayer is null initially
+		selectedPlayer = null;
+		playerNameDropdown.onValueChanged.AddListener(OnPlayerDropdownValueChanged);
+		}
+
+	// When a player is selected, set selectedPlayer
+	private void OnPlayerDropdownValueChanged(int playerIndex)
+		{
+		if (playerIndex > 0) // Make sure "Select Player" is not selected
+			{
+			selectedPlayer = currentTeamPlayers.FirstOrDefault(player => player.Name == playerNameDropdown.options[playerIndex].text);
+			}
+		else
+			{
+			selectedPlayer = null;
+			}
 		}
 
 	private void OnAddPlayerClicked()
@@ -110,7 +130,6 @@ public class PlayerManagementPanel:MonoBehaviour
 			currentTeamPlayers.Add(newPlayer);
 
 			// Assuming Team has an UpdatePlayer method
-			Team selectedTeam = teamList.FirstOrDefault(t => t.Name == teamNameDropdown.options[teamNameDropdown.value].text);
 			if (selectedTeam != null)
 				{
 				DatabaseManager.Instance.UpdateTeam(selectedTeam); // Update team in the database
@@ -136,7 +155,6 @@ public class PlayerManagementPanel:MonoBehaviour
 				currentTeamPlayers.Remove(selectedPlayer);
 
 				// Assuming Team has an UpdatePlayer method
-				Team selectedTeam = teamList.FirstOrDefault(t => t.Name == teamNameDropdown.options[teamNameDropdown.value].text);
 				if (selectedTeam != null)
 					{
 					DatabaseManager.Instance.UpdateTeam(selectedTeam); // Update team in the database
@@ -155,22 +173,33 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private void OnAddPlayerDetailsClicked()
 		{
-		if (playerNameDropdown.value > 0) // Check if a player is selected
-			{
-			string selectedPlayerName = playerNameDropdown.options[playerNameDropdown.value].text;
-			Player selectedPlayer = currentTeamPlayers.FirstOrDefault(p => p.Name == selectedPlayerName);
+		Debug.Log("OnAddPlayerDetailsClicked called");
 
-			if (selectedPlayer != null)
-				{
-				// Open PlayerLifetimeDataInputPanel and populate with selected player data
-				PlayerLifetimeDataInputPanel.Instance.OpenWithPlayerData(selectedPlayer);
-				}
-			}
-		else
+		if (teamNameDropdown == null)
 			{
-			// Open PlayerLifetimeDataInputPanel without any player data
-			PlayerLifetimeDataInputPanel.Instance.OpenWithoutData();
+			Debug.LogError("teamNameDropdown is null!");
+			return;
 			}
+		if (playerNameDropdown == null)
+			{
+			Debug.LogError("playerNameDropdown is null!");
+			return;
+			}
+
+		// Ensure selectedTeam and selectedPlayer are set
+		if (selectedTeam == null)
+			{
+			Debug.LogError("selectedTeam is null! Please select a team.");
+			return;
+			}
+		if (selectedPlayer == null)
+			{
+			Debug.LogError("selectedPlayer is null! Please select a player.");
+			return;
+			}
+
+		// Open PlayerLifetimeDataInputPanel with selected player data
+		PlayerLifetimeDataInputPanel.Instance.OpenWithPlayerData(selectedPlayer);
 		}
 
 	private void ShowFeedback(string message)

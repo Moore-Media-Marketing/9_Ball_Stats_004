@@ -57,14 +57,32 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		teamNameDropdown.ClearOptions();
 		teamNameDropdown.AddOptions(teams.Select(t => t.Name).ToList());
 
-		// Populate player dropdown
-		var players = DatabaseManager.Instance.GetAllPlayers();
-		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+		// Populate player dropdown when a team is selected
+		teamNameDropdown.onValueChanged.AddListener(OnTeamSelected);
+		}
+
+	// Method when team is selected from dropdown
+	private void OnTeamSelected(int teamIndex)
+		{
+		if (teamIndex > 0) // Make sure "Select Team" is not selected
+			{
+			selectedTeam = DatabaseManager.Instance.GetAllTeams().ElementAt(teamIndex - 1); // Offset by 1 for "Select Team" option
+
+			// Populate player dropdown
+			var players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id);
+			playerNameDropdown.ClearOptions();
+			playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+
+			playerNameDropdown.onValueChanged.AddListener(OnPlayerSelected);
+			}
+		else
+			{
+			playerNameDropdown.ClearOptions(); // Clear player dropdown if no team is selected
+			}
 		}
 
 	// When a player is selected from PlayerNameDropdown, populate data
-	public void OnPlayerSelected(int playerIndex)
+	private void OnPlayerSelected(int playerIndex)
 		{
 		if (playerIndex > 0) // Make sure "Select Player" is not selected
 			{
@@ -76,6 +94,11 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 				// Populate lifetime data if available
 				PopulateLifetimeData(selectedPlayer);
 				}
+			}
+		else
+			{
+			// Clear player data if no player is selected
+			ResetLifetimeDataFields();
 			}
 		}
 
@@ -94,6 +117,18 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		Debug.Log($"Populated lifetime data for player {player.Name}");
 		}
 
+	private void ResetLifetimeDataFields()
+		{
+		lifetimeGamesWonInputField.text = "";
+		lifetimeGamesPlayedInputField.text = "";
+		lifetimeDefensiveShotAvgInputField.text = "";
+		matchesPlayedInLast2YearsInputField.text = "";
+		lifetimeBreakAndRunInputField.text = "";
+		nineOnTheSnapInputField.text = "";
+		lifetimeMiniSlamsInputField.text = "";
+		lifetimeShutoutsInputField.text = "";
+		}
+
 	// On Back button clicked
 	private void OnBackButtonClicked()
 		{
@@ -110,15 +145,29 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			return;
 			}
 
+		// Check if all input fields are valid
+		if (!int.TryParse(lifetimeGamesWonInputField.text, out int lifetimeGamesWon) ||
+			!int.TryParse(lifetimeGamesPlayedInputField.text, out int lifetimeGamesPlayed) ||
+			!float.TryParse(lifetimeDefensiveShotAvgInputField.text, out float lifetimeDefensiveShotAvg) ||
+			!int.TryParse(matchesPlayedInLast2YearsInputField.text, out int matchesPlayedInLast2Years) ||
+			!int.TryParse(lifetimeBreakAndRunInputField.text, out int lifetimeBreakAndRun) ||
+			!int.TryParse(nineOnTheSnapInputField.text, out int nineOnTheSnap) ||
+			!int.TryParse(lifetimeMiniSlamsInputField.text, out int lifetimeMiniSlams) ||
+			!int.TryParse(lifetimeShutoutsInputField.text, out int lifetimeShutouts))
+			{
+			Debug.LogError("Invalid input data! Please check the fields.");
+			return;
+			}
+
 		// Update player lifetime data
-		selectedPlayer.LifetimeGamesWon = int.Parse(lifetimeGamesWonInputField.text);
-		selectedPlayer.LifetimeGamesPlayed = int.Parse(lifetimeGamesPlayedInputField.text);
-		selectedPlayer.LifetimeDefensiveShotAvg = float.Parse(lifetimeDefensiveShotAvgInputField.text);
-		selectedPlayer.MatchesPlayedInLast2Years = int.Parse(matchesPlayedInLast2YearsInputField.text);
-		selectedPlayer.LifetimeBreakAndRun = int.Parse(lifetimeBreakAndRunInputField.text);
-		selectedPlayer.NineOnTheSnap = int.Parse(nineOnTheSnapInputField.text);
-		selectedPlayer.LifetimeMiniSlams = int.Parse(lifetimeMiniSlamsInputField.text);
-		selectedPlayer.LifetimeShutouts = int.Parse(lifetimeShutoutsInputField.text);
+		selectedPlayer.LifetimeGamesWon = lifetimeGamesWon;
+		selectedPlayer.LifetimeGamesPlayed = lifetimeGamesPlayed;
+		selectedPlayer.LifetimeDefensiveShotAvg = lifetimeDefensiveShotAvg;
+		selectedPlayer.MatchesPlayedInLast2Years = matchesPlayedInLast2Years;
+		selectedPlayer.LifetimeBreakAndRun = lifetimeBreakAndRun;
+		selectedPlayer.NineOnTheSnap = nineOnTheSnap;
+		selectedPlayer.LifetimeMiniSlams = lifetimeMiniSlams;
+		selectedPlayer.LifetimeShutouts = lifetimeShutouts;
 
 		// Save the updated player data to the database
 		DatabaseManager.Instance.SavePlayer(selectedPlayer);
@@ -126,39 +175,19 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		Debug.Log($"Updated lifetime data for player {selectedPlayer.Name}");
 		}
 
-	// Set selected team and player (called when player is selected)
-	public void SetSelectedTeamAndPlayer(int teamIndex, int playerIndex)
-		{
-		// Get selected team
-		selectedTeam = DatabaseManager.Instance.GetAllTeams().ElementAt(teamIndex);
-
-		// Get selected player from the player dropdown
-		if (playerIndex > 0) // Ensure a valid player is selected
-			{
-			selectedPlayer = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id)
-				.FirstOrDefault(p => p.Name == playerNameDropdown.options[playerIndex].text);
-			}
-		}
-
 	// Methods to open the panel and populate data for a specific player
 	public void OpenWithPlayerData(Player player)
 		{
 		selectedPlayer = player;
 		PopulateLifetimeData(player);
-		// Any additional setup when opening with player data
+		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
 		}
 
 	public void OpenWithoutData()
 		{
 		selectedPlayer = null;
-		// Optionally reset fields to empty or default values
-		lifetimeGamesWonInputField.text = "";
-		lifetimeGamesPlayedInputField.text = "";
-		lifetimeDefensiveShotAvgInputField.text = "";
-		matchesPlayedInLast2YearsInputField.text = "";
-		lifetimeBreakAndRunInputField.text = "";
-		nineOnTheSnapInputField.text = "";
-		lifetimeMiniSlamsInputField.text = "";
-		lifetimeShutoutsInputField.text = "";
+		ResetLifetimeDataFields();
+
+		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
 		}
 	}
