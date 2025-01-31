@@ -8,9 +8,6 @@ Canvas
     ManagePlayerButton
       Text (TMP)
       // Button for navigating to the player management panel.
-    GameAnalysisButton
-      Text (TMP)
-      // Button for navigating to the game analysis panel.
     ComparisonButton
       Text (TMP)
       // Button for navigating to the comparison panel.
@@ -151,38 +148,7 @@ Canvas
     BackButton
       Text (TMP)
       // Button to navigate back to the previous menu.
-  TeamPanel
-    HeaderText
-      // Displays the title of the team panel, e.g., "Team Overview".
-    TeamNameText
-      // Displays the selected team name.
-    GamesPlayedText
-      // Displays the total number of games played by the team.
-    GamesWonText
-      // Displays the total number of games won by the team.
-    WinPercentageText
-      // Displays the win percentage of the team.
-    TotalSkillLevelText
-      // Displays the total skill level of the team.
-    PlayerListScrollView
-      Viewport
-        Content
-          // Scrollable list of players in the team.
-        Scrollbar Horizontal
-          Sliding Area
-            Handle
-        Scrollbar Vertical
-          Sliding Area
-            Handle
-    DetailsButton
-      Text (TMP)
-      // Button for showing more detailed stats of the team.
-    CompareButton
-      Text (TMP)
-      // Button for comparing the team with another team.
-    BackButton
-      Text (TMP)
-      // Button to navigate back to the previous menu.
+  
   ComparisonSetupPanel
     HeaderText
       // Displays the title of the comparison setup panel, e.g., "Setup Comparison".
