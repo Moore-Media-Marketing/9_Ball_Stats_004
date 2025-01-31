@@ -7,14 +7,24 @@ using UnityEngine;
 
 public class DatabaseManager:MonoBehaviour
 	{
+	#region Singleton
+
 	// Singleton instance
 	public static DatabaseManager Instance { get; private set; }
+
+	#endregion Singleton
+
+	#region Fields
 
 	// Path to the SQLite database file
 	private string dbPath;
 
 	// SQLite connection
 	private SQLiteConnection dbConnection;
+
+	#endregion Fields
+
+	#region Unity Methods
 
 	private void Awake()
 		{
@@ -39,24 +49,53 @@ public class DatabaseManager:MonoBehaviour
 		CreateTables();
 		}
 
+	private void OnApplicationQuit()
+		{
+		// Close the database connection when the application quits
+		dbConnection.Close();
+		}
+
+	#endregion Unity Methods
+
+	#region Database Methods
+
 	// Create tables for Teams, Players, and Matches
 	private void CreateTables()
 		{
 		dbConnection.CreateTable<Team>();
 		dbConnection.CreateTable<Player>();
 		dbConnection.CreateTable<Match>();
+		Debug.Log("Database tables created or already exist.");
 		}
 
 	// Add a new team to the database
 	public void AddTeam(Team team)
 		{
 		dbConnection.Insert(team);
+		Debug.Log($"Team '{team.Name}' added to the database.");
 		}
 
 	// Add a new player to the database
 	public void AddPlayer(Player player)
 		{
 		dbConnection.Insert(player);
+		Debug.Log($"Player '{player.Name}' added to the database.");
+		}
+
+	// Save a player to the database (if you want SavePlayer method)
+	public void SavePlayer(Player player)
+		{
+		var existingPlayer = dbConnection.Table<Player>().FirstOrDefault(p => p.Id == player.Id);
+		if (existingPlayer != null)
+			{
+			dbConnection.Update(player); // Update player in the database
+			Debug.Log($"Player '{player.Name}' updated.");
+			}
+		else
+			{
+			dbConnection.Insert(player); // Insert new player if doesn't exist
+			Debug.Log($"Player '{player.Name}' added to the database.");
+			}
 		}
 
 	// Get all teams
@@ -81,12 +120,12 @@ public class DatabaseManager:MonoBehaviour
 	public void AddMatchResult(Match match)
 		{
 		dbConnection.Insert(match);
+		Debug.Log("Match result added to the database.");
 		}
 
-
+	// Update an existing team
 	public void UpdateTeam(Team team)
 		{
-		// Update the team record in the database
 		var existingTeam = dbConnection.Table<Team>().FirstOrDefault(t => t.Id == team.Id);
 		if (existingTeam != null)
 			{
@@ -100,11 +139,9 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-
 	// Remove a team from the database
 	public void RemoveTeam(Team team)
 		{
-		// Ensure there are no players associated with the team before deleting
 		var playersInTeam = dbConnection.Table<Player>().Where(p => p.TeamId == team.Id).ToList();
 		if (playersInTeam.Count > 0)
 			{
@@ -113,11 +150,8 @@ public class DatabaseManager:MonoBehaviour
 			}
 
 		dbConnection.Delete(team);  // Delete the team from the database
+		Debug.Log($"Team '{team.Name}' removed from the database.");
 		}
 
-	// Close the database connection when the application quits
-	private void OnApplicationQuit()
-		{
-		dbConnection.Close();
-		}
+	#endregion Database Methods
 	}

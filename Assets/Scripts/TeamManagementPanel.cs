@@ -7,7 +7,7 @@ using System.Collections;
 
 public class TeamManagementPanel:MonoBehaviour
 	{
-	// UI Elements
+	// --- UI Elements --- //
 	public TMP_Text headerText;
 	public TMP_InputField teamNameInputField;
 	public Button addUpdateTeamButton;
@@ -17,11 +17,12 @@ public class TeamManagementPanel:MonoBehaviour
 	public Button deleteButton;
 	public Button backButton;
 
-	// Overlay Feedback Panel
-	public GameObject overlayFeedbackPanel;
-	public TMP_Text feedbackText;
+	// --- Overlay Feedback Panel --- //
+	public GameObject overlayFeedbackPanel;  // Reference to the overlay feedback panel
+	public TMP_Text feedbackText;  // Feedback text component
 
 	private List<Team> teamList = new();
+	private RectTransform dropdownListRectTransform; // Cache dropdown list rect
 
 	private void Start()
 		{
@@ -38,17 +39,75 @@ public class TeamManagementPanel:MonoBehaviour
 
 	private void UpdateTeamDropdown()
 		{
+		// Get the updated team list from the database
 		teamList = DatabaseManager.Instance.GetAllTeams();
+		Debug.Log("Number of teams retrieved: " + teamList.Count);
+
+		// Remove duplicate team names
+		List<string> uniqueTeamNames = teamList.Select(t => t.Name).Distinct().ToList();
+
+		// Debug log for unique team names
+		Debug.Log("Unique team names: " + string.Join(", ", uniqueTeamNames));
+
+		// Clear previous dropdown options
 		teamDropdown.ClearOptions();
+		Debug.Log("Cleared previous dropdown options.");
 
-		List<string> options = new List<string> { "Select Team" };
-		options.AddRange(teamList.Select(team => team.Name));
+		// Add "Select Team" option
+		uniqueTeamNames.Insert(0, "Select Team");
 
-		teamDropdown.AddOptions(options);
-		teamDropdown.value = 0;
-		teamDropdown.RefreshShownValue();
+		// Add unique team names to the dropdown
+		teamDropdown.AddOptions(uniqueTeamNames);
+		Debug.Log("Added team options to dropdown.");
 
-		headerText.text = teamList.Count > 0 ? "Select a Team" : "No Teams Available";
+		// Set header text
+		headerText.text = uniqueTeamNames.Count > 1 ? uniqueTeamNames[1] : "No Teams Available";
+
+		// Adjust dropdown height
+		StartCoroutine(AdjustDropdownHeight());
+		}
+
+	private IEnumerator AdjustDropdownHeight()
+		{
+		yield return null; // Wait a frame to ensure dropdown list is generated
+
+		// Log dropdown structure
+		foreach (Transform child in teamDropdown.transform)
+			{
+			Debug.Log("Dropdown child: " + child.name);
+			}
+
+		// Find and cache the dropdown list RectTransform
+		if (dropdownListRectTransform == null)
+			{
+			Transform dropdownListTransform = teamDropdown.transform.Find("Dropdown List");
+			if (dropdownListTransform != null)
+				{
+				dropdownListRectTransform = dropdownListTransform.GetComponent<RectTransform>();
+				Debug.Log("Dropdown List found!");
+				}
+			else
+				{
+				Debug.LogWarning("Dropdown List not found! Check if the dropdown structure is correct.");
+				}
+			}
+
+		if (dropdownListRectTransform != null)
+			{
+			int itemCount = teamDropdown.options.Count;
+			float itemHeight = 30f; // Approximate height per item
+			float minHeight = 120f;
+			float maxHeight = 300f;
+
+			// Set new height
+			dropdownListRectTransform.sizeDelta = new Vector2(dropdownListRectTransform.sizeDelta.x,
+				Mathf.Clamp(itemCount * itemHeight, minHeight, maxHeight));
+			Debug.Log("Adjusted dropdown height.");
+			}
+		else
+			{
+			Debug.LogWarning("Dropdown List RectTransform is missing!");
+			}
 		}
 
 	public void OnBackButtonClicked()
@@ -58,7 +117,7 @@ public class TeamManagementPanel:MonoBehaviour
 
 	public void OnAddUpdateTeamClicked()
 		{
-		string teamName = teamNameInputField.text.Trim();
+		string teamName = teamNameInputField.text;
 
 		if (string.IsNullOrEmpty(teamName))
 			{
@@ -66,20 +125,25 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		if (teamDropdown.value > 0)
+		// Check if team exists
+		Team existingTeam = teamList.FirstOrDefault(t => t.Name == teamName);
+
+		if (existingTeam != null)
 			{
-			Team selectedTeam = teamList[teamDropdown.value - 1];
-			selectedTeam.Name = teamName;
-			DatabaseManager.Instance.UpdateTeam(selectedTeam);
+			// Update existing team
+			existingTeam.Name = teamName;
+			DatabaseManager.Instance.UpdateTeam(existingTeam);
 			ShowFeedback($"Team '{teamName}' updated.");
 			}
 		else
 			{
+			// Add a new team
 			Team newTeam = new() { Name = teamName };
 			DatabaseManager.Instance.AddTeam(newTeam);
 			ShowFeedback($"Team '{teamName}' added.");
 			}
 
+		// Clear input and refresh dropdown
 		teamNameInputField.text = "";
 		UpdateTeamDropdown();
 		}
@@ -93,7 +157,7 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		if (teamDropdown.value > 0)
 			{
-			teamNameInputField.text = teamList[teamDropdown.value - 1].Name;
+			teamNameInputField.text = teamDropdown.options[teamDropdown.value].text;
 			}
 		else
 			{
@@ -105,9 +169,14 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		if (teamDropdown.value > 0)
 			{
-			Team selectedTeam = teamList[teamDropdown.value - 1];
-			ShowFeedback($"Are you sure you want to delete '{selectedTeam.Name}'?");
-			StartCoroutine(ConfirmDeletion(selectedTeam));
+			string selectedTeamName = teamDropdown.options[teamDropdown.value].text;
+			Team selectedTeam = teamList.FirstOrDefault(t => t.Name == selectedTeamName);
+
+			if (selectedTeam != null)
+				{
+				ShowFeedback($"Are you sure you want to delete '{selectedTeam.Name}'?");
+				StartCoroutine(ConfirmDeletion(selectedTeam));
+				}
 			}
 		else
 			{
@@ -117,10 +186,12 @@ public class TeamManagementPanel:MonoBehaviour
 
 	private IEnumerator ConfirmDeletion(Team selectedTeam)
 		{
-		yield return new WaitForSeconds(3f);
-		overlayFeedbackPanel.SetActive(false);
+		yield return new WaitForSeconds(3f); // Wait before deleting
+
 		DatabaseManager.Instance.RemoveTeam(selectedTeam);
 		ShowFeedback($"Team '{selectedTeam.Name}' deleted.");
+
+		// Refresh dropdown and clear input
 		UpdateTeamDropdown();
 		teamNameInputField.text = "";
 		}
@@ -129,6 +200,8 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		feedbackText.text = message;
 		overlayFeedbackPanel.SetActive(true);
+
+		// Hide after 3 seconds
 		StartCoroutine(HideFeedbackPanel());
 		}
 
