@@ -67,7 +67,7 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
-    AddPlayerButton
+    CreatePlayerButton
       Text (TMP)
     PlayerNameDropdown
       Label
@@ -150,7 +150,9 @@ Canvas
       Text Area
         Placeholder
         Text
-    UpdateLifetimeButton
+    SaveLifetimeButton
+      Text (TMP)
+    AddPlayerCurrentSeasonButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
@@ -234,9 +236,7 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    AddPlayerButton
-      Text (TMP)
-    RemovePlayerButton
+    SaveCurrentSeasonButton
       Text (TMP)
     BackButton
       UpdateBackButtonText

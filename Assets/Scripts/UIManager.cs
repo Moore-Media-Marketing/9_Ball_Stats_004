@@ -10,6 +10,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject homePanel;
+
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
@@ -21,17 +22,19 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management UI Elements")]
 	public TMP_InputField teamNameInputField;
+
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Management UI Elements")]
 	public TMP_Dropdown teamNameDropdown;
+
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 
 	[Header("Feedback UI Elements")]
 	public TMP_Text feedbackText;
 
-	private Stack<GameObject> panelHistory = new Stack<GameObject>();
+	private Stack<GameObject> panelHistory = new();
 	private GameObject currentPanel;
 
 	private void Awake()
@@ -51,7 +54,7 @@ public class UIManager:MonoBehaviour
 		playerNameDropdown.ClearOptions();
 
 		List<Team> teamList = DatabaseManager.Instance.GetAllTeams();
-		List<string> teamNames = new List<string>();
+		List<string> teamNames = new();
 		foreach (var team in teamList)
 			teamNames.Add(team.Name);
 
@@ -61,7 +64,7 @@ public class UIManager:MonoBehaviour
 		if (teamList.Count > 0)
 			{
 			List<Player> playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);
-			List<string> playerNames = new List<string>();
+			List<string> playerNames = new();
 			foreach (var player in playerList)
 				playerNames.Add(player.Name);
 
@@ -70,9 +73,13 @@ public class UIManager:MonoBehaviour
 		}
 
 	public void ShowHomePanel() => ShowPanel(homePanel);
+
 	public void ShowTeamManagementPanel() => ShowPanel(teamManagementPanel);
+
 	public void ShowPlayerManagementPanel() => ShowPanel(playerManagementPanel);
+
 	public void ShowMatchupComparisonPanel() => ShowPanel(matchupComparisonPanel);
+
 	public void ShowSettingsPanel() => ShowPanel(settingsPanel);
 
 	public void ShowPanel(GameObject panel)
