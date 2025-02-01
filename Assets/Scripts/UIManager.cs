@@ -10,7 +10,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject homePanel;
-
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
@@ -22,12 +21,10 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management UI Elements")]
 	public TMP_InputField teamNameInputField;
-
 	public TMP_Dropdown teamDropdown;
 
 	[Header("Player Management UI Elements")]
 	public TMP_Dropdown teamNameDropdown;
-
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 
@@ -36,7 +33,8 @@ public class UIManager:MonoBehaviour
 
 	private List<Team> teamList = new();
 	private List<Player> playerList = new();
-	private GameObject previousPanel; // Track the previous panel for back functionality
+	private Stack<GameObject> panelHistory = new(); // Stack to track panel history
+	private GameObject currentPanel; // Tracks the currently active panel
 
 	private void Awake()
 		{
@@ -56,7 +54,6 @@ public class UIManager:MonoBehaviour
 	// --- Updates the UI dropdowns with teams and players --- //
 	public void UpdateDropdowns()
 		{
-		// --- Clear existing options --- //
 		teamDropdown.ClearOptions();
 		teamNameDropdown.ClearOptions();
 		playerNameDropdown.ClearOptions();
@@ -67,11 +64,11 @@ public class UIManager:MonoBehaviour
 
 		foreach (var team in teamList)
 			{
-			teamNames.Add(team.Name);  // Add the team names to the list
+			teamNames.Add(team.Name);
 			}
 
-		teamDropdown.AddOptions(teamNames);  // Add teams to the dropdown
-		teamNameDropdown.AddOptions(teamNames); // Update the player management dropdown too
+		teamDropdown.AddOptions(teamNames);
+		teamNameDropdown.AddOptions(teamNames);
 
 		// --- Update Player Dropdown --- //
 		if (teamList.Count > 0)
@@ -100,40 +97,22 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
-	// --- Show Home Panel --- //
-	public void ShowHomePanel()
-		{
-		ShowPanel(homePanel);  // Show the home panel specifically
-		}
-
-	// --- Show Team Management Panel --- //
-	public void ShowTeamManagementPanel()
-		{
-		ShowPanel(teamManagementPanel);  // Show the team management panel
-		}
-
-	// --- Show Player Management Panel --- //
-	public void ShowPlayerManagementPanel()
-		{
-		ShowPanel(playerManagementPanel);  // Show the player management panel
-		}
-
-	// --- Show Matchup Comparison Panel --- //
-	public void ShowMatchupComparisonPanel()
-		{
-		ShowPanel(matchupComparisonPanel);  // Show the matchup comparison panel
-		}
-
-	// --- Show Settings Panel --- //
-	public void ShowSettingsPanel()
-		{
-		ShowPanel(settingsPanel);  // Show the settings panel
-		}
+	// --- Show Panels --- //
+	public void ShowHomePanel() => ShowPanel(homePanel);
+	public void ShowTeamManagementPanel() => ShowPanel(teamManagementPanel);
+	public void ShowPlayerManagementPanel() => ShowPanel(playerManagementPanel);
+	public void ShowMatchupComparisonPanel() => ShowPanel(matchupComparisonPanel);
+	public void ShowSettingsPanel() => ShowPanel(settingsPanel);
 
 	// --- Toggles visibility of panels --- //
 	public void ShowPanel(GameObject panel)
 		{
-		// Hide all panels first
+		if (currentPanel != null && currentPanel != panel)
+			{
+			panelHistory.Push(currentPanel); // Store the previous panel before switching
+			}
+
+		// Hide all panels
 		homePanel.SetActive(false);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
@@ -146,22 +125,19 @@ public class UIManager:MonoBehaviour
 
 		// Show the selected panel
 		panel.SetActive(true);
-
-		// Track the current panel to handle "back" functionality
-		previousPanel = panel;
+		currentPanel = panel; // Update the currently active panel
 		}
 
 	// --- Back Button Handler --- //
 	public void OnBackButtonClicked()
 		{
-		if (previousPanel != null)
+		if (panelHistory.Count > 0)
 			{
-			ShowPanel(previousPanel);  // Show the previous panel
+			ShowPanel(panelHistory.Pop()); // Show the last panel from history
 			}
 		else
 			{
-			// If there's no previous panel, go back to the home panel
-			ShowHomePanel();
+			ShowHomePanel(); // Default back to home if no history exists
 			}
 		}
 	}

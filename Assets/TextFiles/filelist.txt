@@ -2,6 +2,7 @@ DatabaseManager.cs
 FeedbackOverlay.cs
 HomePanel.cs
 Match.cs
+MatchupComparisonManager.cs
 MatchupComparisonPanel.cs
 MatchupManager.cs
 MatchupResultsPanel.cs
