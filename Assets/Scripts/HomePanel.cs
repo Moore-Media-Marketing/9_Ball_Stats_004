@@ -6,19 +6,19 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject teamManagementPanel;
-
 	public GameObject playerManagementPanel;
 	public GameObject matchupComparisonPanel;
 	public GameObject settingsPanel;
 	public GameObject overlayFeedbackPanel;
+	public GameObject playerLifetimeDataInputPanel; // Added
+	public GameObject playerCurrentSeasonDataInputPanel; // Added
 
 	[Header("Buttons")]
 	public GameObject teamManagementButton;
-
 	public GameObject playerManagementButton;
 	public GameObject matchupComparisonButton;
 	public GameObject settingsButton;
-	public GameObject exitButton; // New Exit Button
+	public GameObject exitButton; // Exit Button
 
 	#endregion UI Elements
 
@@ -36,48 +36,52 @@ public class HomePanel:MonoBehaviour
 		else
 			{
 			Destroy(gameObject);
+			return;
 			}
+		}
 
+	private void Start()
+		{
 		// Ensure HomePanel is displayed when the app starts
-		UIManager.Instance.ShowHomePanel();
+		if (UIManager.Instance != null)
+			{
+			UIManager.Instance.ShowHomePanel();
+			}
+		else
+			{
+			Debug.LogError("UIManager Instance is null! HomePanel cannot be shown.");
+			}
 		}
 
 	#endregion Singleton
 
 	#region Button Handlers
 
-	// Handler for Team Management button
 	public void OnTeamManagementButtonClicked()
 		{
 		UIManager.Instance.ShowTeamManagementPanel();
 		}
 
-	// Handler for Player Management button
 	public void OnPlayerManagementButtonClicked()
 		{
 		UIManager.Instance.ShowPlayerManagementPanel();
 		}
 
-	// Handler for Matchup Comparison button
 	public void OnMatchupComparisonButtonClicked()
 		{
 		UIManager.Instance.ShowMatchupComparisonPanel();
 		}
 
-	// Handler for Settings button
 	public void OnSettingsButtonClicked()
 		{
 		UIManager.Instance.ShowSettingsPanel();
 		}
 
-	// Handler for Exit button
 	public void OnExitButtonClicked()
 		{
-		// Quit the application
 		Debug.Log("Exiting application...");
 		Application.Quit();
 
-		// If running in the editor, stop playmode
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #endif
