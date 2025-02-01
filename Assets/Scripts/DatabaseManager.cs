@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using SQLite;
 
@@ -9,58 +10,60 @@ using UnityEngine;
 public class DatabaseManager:MonoBehaviour
 	{
 	#region Singleton
-
-	// Singleton instance
 	public static DatabaseManager Instance { get; private set; }
+	#endregion
 
-	#endregion Singleton
+	#region Inspector Fields
 
-	#region Fields
+	[Header("Database Settings")]
+	[Tooltip("Path to the SQLite database file.")]
+	public string dbPath;
 
-	// Path to the SQLite database file
-	private string dbPath;
+	[Header("Data (Read Only)")]
+	[Tooltip("List of all teams in the database.")]
+	public List<Team> allTeams = new List<Team>();
 
-	// SQLite connection
+	[Tooltip("List of all players in the database.")]
+	public List<Player> allPlayers = new List<Player>();
+
+	#endregion
+
+	#region Private Fields
 	private SQLiteConnection dbConnection;
-
-	#endregion Fields
+	#endregion
 
 	#region Unity Methods
 
 	private void Awake()
 		{
-		// Singleton pattern to ensure only one instance of DatabaseManager exists
 		if (Instance == null)
 			{
 			Instance = this;
-			DontDestroyOnLoad(gameObject); // Optionally keep this object across scenes
+			DontDestroyOnLoad(gameObject);
 			}
 		else
 			{
 			Destroy(gameObject);
+			return;
 			}
 
-		// Set the database file path
 		dbPath = Path.Combine(Application.persistentDataPath, "game_data.db");
-
-		// Open/create the SQLite database connection
 		dbConnection = new SQLiteConnection(dbPath);
 
-		// Create tables if they don't exist
 		CreateTables();
+		LoadData();
+		EnsureDefaultTeamExists();
 		}
 
 	private void OnApplicationQuit()
 		{
-		// Close the database connection when the application quits
 		dbConnection.Close();
 		}
 
-	#endregion Unity Methods
+	#endregion
 
 	#region Database Methods
 
-	// Create tables for Teams, Players, and Matches
 	private void CreateTables()
 		{
 		dbConnection.CreateTable<Team>();
@@ -69,112 +72,110 @@ public class DatabaseManager:MonoBehaviour
 		Debug.Log("Database tables created or already exist.");
 		}
 
-	// Add a new team to the database
+	private void LoadData()
+		{
+		allTeams = dbConnection.Table<Team>().ToList();
+		allPlayers = dbConnection.Table<Player>().ToList();
+		Debug.Log($"Loaded {allTeams.Count} teams and {allPlayers.Count} players from the database.");
+		}
+
+	private void EnsureDefaultTeamExists()
+		{
+		if (allTeams.Count == 0)
+			{
+			Team defaultTeam = new Team("Default Team");
+			AddTeam(defaultTeam);
+			Debug.Log("No teams found. Default team added.");
+			}
+		}
+
 	public void AddTeam(Team team)
 		{
+		if (string.IsNullOrWhiteSpace(team.Name))
+			{
+			Debug.LogError("Team name cannot be empty!");
+			return;
+			}
 		dbConnection.Insert(team);
 		Debug.Log($"Team '{team.Name}' added to the database.");
+		LoadData();
 		}
 
-	// Add a new player to the database
 	public void AddPlayer(Player player)
 		{
+		if (string.IsNullOrWhiteSpace(player.Name))
+			{
+			Debug.LogError("Player name cannot be empty!");
+			return;
+			}
+		if (player.TeamId <= 0 || dbConnection.Find<Team>(player.TeamId) == null)
+			{
+			Debug.LogError("Player must be assigned to a valid team.");
+			return;
+			}
 		dbConnection.Insert(player);
 		Debug.Log($"Player '{player.Name}' added to the database.");
+		LoadData();
 		}
 
-	// Save a player to the database (or update if already exists)
 	public void SavePlayer(Player player)
 		{
-		var existingPlayer = dbConnection.Table<Player>().FirstOrDefault(p => p.Id == player.Id);
-		if (existingPlayer != null)
+		if (string.IsNullOrWhiteSpace(player.Name))
 			{
-			dbConnection.Update(player); // Update player in the database
+			Debug.LogError("Player name cannot be empty!");
+			return;
+			}
+		if (player.TeamId <= 0 || dbConnection.Find<Team>(player.TeamId) == null)
+			{
+			Debug.LogError("Player must be assigned to a valid team.");
+			return;
+			}
+		if (dbConnection.Table<Player>().Any(p => p.Name == player.Name))
+			{
+			dbConnection.Update(player);
 			Debug.Log($"Player '{player.Name}' updated.");
 			}
 		else
 			{
-			dbConnection.Insert(player); // Insert new player if doesn't exist
+			dbConnection.Insert(player);
 			Debug.Log($"Player '{player.Name}' added to the database.");
 			}
+		LoadData();
 		}
 
-	// Get all teams
-	public List<Team> GetAllTeams()
-		{
-		return dbConnection.Table<Team>().ToList();
-		}
+	public List<Team> GetAllTeams() => dbConnection.Table<Team>().ToList();
 
-	// Get a team by its ID
 	public Team GetTeamById(int teamId)
 		{
-		var team = dbConnection.Table<Team>().FirstOrDefault(t => t.Id == teamId);
-		if (team == null)
-			{
-			Debug.LogError($"Team with ID {teamId} not found.");
-			}
+		var team = dbConnection.Find<Team>(teamId);
+		if (team == null) Debug.LogError($"Team with ID {teamId} not found.");
 		return team;
 		}
 
-	// Get a team by its name
 	public Team GetTeamByName(string teamName)
 		{
-		// Perform a case-insensitive search for the team
-		var team = dbConnection.Table<Team>().FirstOrDefault(t => t.Name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
-
-		if (team == null)
-			{
-			Debug.LogError($"Team with name {teamName} not found.");
-			}
-
+		var team = dbConnection.Table<Team>().FirstOrDefault(t => string.Equals(t.Name, teamName, StringComparison.OrdinalIgnoreCase));
+		if (team == null) Debug.LogError($"Team '{teamName}' not found.");
 		return team;
 		}
 
+	public List<Player> GetAllPlayers() => dbConnection.Table<Player>().ToList();
 
-	// Get players by team ID
-	public List<Player> GetPlayersByTeam(int teamId)
-		{
-		return dbConnection.Table<Player>().Where(p => p.TeamId == teamId).ToList();
-		}
+	public List<Player> GetPlayersByTeam(int teamId) => dbConnection.Table<Player>().Where(p => p.TeamId == teamId).ToList();
 
+	public List<Match> GetAllMatches() => dbConnection.Table<Match>().ToList();
 
-	// In DatabaseManager.cs
-	public List<Player> GetAllPlayers()
-		{
-		// Assuming you're using SQLite to fetch players from a database
-		var players = new List<Player>();
-
-		// Example: Fetching all players from a database
-		using (var connection = new SQLiteConnection(dbPath))
-			{
-			players = connection.Table<Player>().ToList();
-			}
-
-		return players;
-		}
-
-
-	// Get all matches
-	public List<Match> GetAllMatches()
-		{
-		return dbConnection.Table<Match>().ToList();
-		}
-
-	// Insert a match result into the database
 	public void AddMatchResult(Match match)
 		{
 		dbConnection.Insert(match);
 		Debug.Log("Match result added to the database.");
 		}
 
-	// Update an existing team
 	public void UpdateTeam(Team team)
 		{
-		var existingTeam = dbConnection.Table<Team>().FirstOrDefault(t => t.Id == team.Id);
-		if (existingTeam != null)
+		if (dbConnection.Table<Team>().Any(t => t.Id == team.Id))
 			{
-			existingTeam.Name = team.Name;  // Update other fields as necessary
-			dbConnection.Update(existingTeam);  // Update the team in the database
+			dbConnection.Update(team);
 			Debug.Log($"Team '{team.Name}' updated.");
 			}
 		else
@@ -183,19 +184,50 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-	// Remove a team from the database
 	public void RemoveTeam(Team team)
 		{
-		var playersInTeam = dbConnection.Table<Player>().Where(p => p.TeamId == team.Id).ToList();
-		if (playersInTeam.Count > 0)
+		if (dbConnection.Table<Player>().Any(p => p.TeamId == team.Id))
 			{
-			Debug.LogError("Cannot remove a team with players still assigned to it.");
+			Debug.LogError("Cannot remove a team with assigned players.");
 			return;
 			}
-
-		dbConnection.Delete(team);  // Delete the team from the database
-		Debug.Log($"Team '{team.Name}' removed from the database.");
+		dbConnection.Delete(team);
+		Debug.Log($"Team '{team.Name}' removed.");
+		LoadData();
 		}
 
-	#endregion Database Methods
+	#endregion
+
+	#region Custom Methods for Inspector Display
+
+	[ContextMenu("Refresh Data")]
+	private void RefreshData()
+		{
+		LoadData();
+		}
+
+	[ContextMenu("Show Teams and Players")]
+	private void ShowTeamsAndPlayers()
+		{
+		foreach (var team in allTeams)
+			{
+			Debug.Log($"Team: {team.Name}");
+			var playersOnTeam = GetPlayersByTeam(team.Id);
+			if (playersOnTeam.Count > 0)
+				{
+				foreach (var player in playersOnTeam)
+					{
+					Debug.Log($"    Player: {player.Name} | Season: {player.MatchesPlayed}/{player.MatchesWon}");
+					Debug.Log($"    Lifetime: {player.LifetimeMatchesPlayed}/{player.LifetimeMatchesWon}");
+					Debug.Log($"    Current Season: {player.CurrentSeasonMatchesPlayed}/{player.CurrentSeasonMatchesWon}");
+					}
+				}
+			else
+				{
+				Debug.Log("    No players on this team.");
+				}
+			}
+		}
+
+	#endregion
 	}

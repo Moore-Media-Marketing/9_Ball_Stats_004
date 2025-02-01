@@ -31,87 +31,52 @@ public class UIManager:MonoBehaviour
 	[Header("Feedback UI Elements")]
 	public TMP_Text feedbackText;
 
-	private List<Team> teamList = new();
-	private List<Player> playerList = new();
-	private Stack<GameObject> panelHistory = new(); // Stack to track panel history
-	private GameObject currentPanel; // Tracks the currently active panel
+	private Stack<GameObject> panelHistory = new Stack<GameObject>();
+	private GameObject currentPanel;
 
 	private void Awake()
 		{
 		if (Instance == null)
-			{
 			Instance = this;
-			}
 		else
-			{
 			Destroy(gameObject);
-			}
 
-		// Show the home panel by default when the app starts
 		ShowHomePanel();
 		}
 
-	// --- Updates the UI dropdowns with teams and players --- //
 	public void UpdateDropdowns()
 		{
 		teamDropdown.ClearOptions();
 		teamNameDropdown.ClearOptions();
 		playerNameDropdown.ClearOptions();
 
-		// --- Update Team Dropdown --- //
-		teamList = DatabaseManager.Instance.GetAllTeams();
-		List<string> teamNames = new();
-
+		List<Team> teamList = DatabaseManager.Instance.GetAllTeams();
+		List<string> teamNames = new List<string>();
 		foreach (var team in teamList)
-			{
 			teamNames.Add(team.Name);
-			}
 
 		teamDropdown.AddOptions(teamNames);
 		teamNameDropdown.AddOptions(teamNames);
 
-		// --- Update Player Dropdown --- //
 		if (teamList.Count > 0)
 			{
-			playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);
-			List<string> playerNames = new();
-
+			List<Player> playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);
+			List<string> playerNames = new List<string>();
 			foreach (var player in playerList)
-				{
 				playerNames.Add(player.Name);
-				}
 
 			playerNameDropdown.AddOptions(playerNames);
 			}
-
-		if (teamList.Count > 0)
-			{
-			teamDropdown.value = 0;
-			teamDropdown.RefreshShownValue();
-
-			if (playerList.Count > 0)
-				{
-				playerNameDropdown.value = 0;
-				playerNameDropdown.RefreshShownValue();
-				}
-			}
 		}
 
-	// --- Show Panels --- //
 	public void ShowHomePanel() => ShowPanel(homePanel);
 	public void ShowTeamManagementPanel() => ShowPanel(teamManagementPanel);
 	public void ShowPlayerManagementPanel() => ShowPanel(playerManagementPanel);
 	public void ShowMatchupComparisonPanel() => ShowPanel(matchupComparisonPanel);
 	public void ShowSettingsPanel() => ShowPanel(settingsPanel);
 
-	// --- Toggles visibility of panels --- //
 	public void ShowPanel(GameObject panel)
 		{
-		if (currentPanel != null && currentPanel != panel)
-			{
-			panelHistory.Push(currentPanel); // Store the previous panel before switching
-			}
-
 		// Hide all panels
 		homePanel.SetActive(false);
 		teamManagementPanel.SetActive(false);
@@ -123,21 +88,21 @@ public class UIManager:MonoBehaviour
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 
-		// Show the selected panel
+		// Show selected panel and update history
 		panel.SetActive(true);
-		currentPanel = panel; // Update the currently active panel
+		if (currentPanel != panel)
+			{
+			if (currentPanel != null)
+				panelHistory.Push(currentPanel);
+			currentPanel = panel;
+			}
 		}
 
-	// --- Back Button Handler --- //
 	public void OnBackButtonClicked()
 		{
 		if (panelHistory.Count > 0)
-			{
-			ShowPanel(panelHistory.Pop()); // Show the last panel from history
-			}
+			ShowPanel(panelHistory.Pop());
 		else
-			{
-			ShowHomePanel(); // Default back to home if no history exists
-			}
+			ShowHomePanel();
 		}
 	}

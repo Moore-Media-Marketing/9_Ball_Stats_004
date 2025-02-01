@@ -1,12 +1,16 @@
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+
 using TMPro;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	{
 	// --- UI Elements --- //
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField lifetimeGamesWonInputField;
@@ -22,6 +26,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 	// Store player data
 	private Team selectedTeam;
+
 	private Player selectedPlayer;
 
 	// Singleton Instance
@@ -50,13 +55,15 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			return;
 			}
 
+		// --- Button Listeners --- //
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		updateLifetimeButton.onClick.AddListener(OnUpdateLifetimeButtonClicked);
 
+		// Initialize dropdowns
 		InitializeDropdowns();
 		}
 
-	// Method to initialize and populate dropdowns
+	// --- Method to initialize and populate dropdowns --- //
 	private void InitializeDropdowns()
 		{
 		// Populate team dropdown
@@ -69,17 +76,37 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		Debug.Log("Team dropdown initialized.");
 		}
 
-	// Method when team is selected from dropdown
+	// --- Method when team is selected from dropdown --- //
 	private void OnTeamSelected(int teamIndex)
 		{
 		if (teamIndex > 0) // Make sure "Select Team" is not selected
 			{
 			selectedTeam = DatabaseManager.Instance.GetAllTeams().ElementAt(teamIndex - 1); // Offset by 1 for "Select Team" option
 
-			// Populate player dropdown
+			// Fetch players for the selected team
 			var players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id);
+
+			// Debug the player list
+			Debug.Log($"Players for {selectedTeam.Name}: {players.Count} players found.");
+
+			// If players list is empty, log that info
+			if (players.Count == 0)
+				{
+				Debug.LogError($"No players found for team: {selectedTeam.Name}");
+				}
+
 			playerNameDropdown.ClearOptions();
-			playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+
+			// Check if players exist before adding options
+			if (players.Any())
+				{
+				playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+				}
+			else
+				{
+				playerNameDropdown.AddOptions(new List<string> { "No players available" });
+				Debug.LogWarning("No players available for the selected team.");
+				}
 
 			playerNameDropdown.onValueChanged.AddListener(OnPlayerSelected);
 			Debug.Log($"Team selected: {selectedTeam.Name}");
@@ -91,7 +118,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// When a player is selected from PlayerNameDropdown, populate data
+	// --- When a player is selected from PlayerNameDropdown, populate data --- //
 	private void OnPlayerSelected(int playerIndex)
 		{
 		if (playerIndex > 0) // Make sure "Select Player" is not selected
@@ -117,6 +144,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			}
 		}
 
+	// --- Populate lifetime data for selected player --- //
 	private void PopulateLifetimeData(Player player)
 		{
 		// Fill input fields with saved data for the selected player
@@ -125,13 +153,14 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		lifetimeDefensiveShotAvgInputField.text = player.LifetimeDefensiveShotAvg.ToString();
 		matchesPlayedInLast2YearsInputField.text = player.MatchesPlayedInLast2Years.ToString();
 		lifetimeBreakAndRunInputField.text = player.LifetimeBreakAndRun.ToString();
-		nineOnTheSnapInputField.text = player.NineOnTheSnap.ToString();
+		nineOnTheSnapInputField.text = player.LifetimeNineOnTheSnap.ToString();
 		lifetimeMiniSlamsInputField.text = player.LifetimeMiniSlams.ToString();
 		lifetimeShutoutsInputField.text = player.LifetimeShutouts.ToString();
 
 		Debug.Log($"Populated lifetime data for player {player.Name}");
 		}
 
+	// --- Reset lifetime data fields --- //
 	private void ResetLifetimeDataFields()
 		{
 		lifetimeGamesWonInputField.text = "";
@@ -146,14 +175,14 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		Debug.Log("Reset lifetime data fields.");
 		}
 
-	// On Back button clicked
+	// --- On Back button clicked --- //
 	private void OnBackButtonClicked()
 		{
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
 		Debug.Log("Back button clicked, showing home panel.");
 		}
 
-	// On Update Lifetime button clicked
+	// --- On Update Lifetime button clicked --- //
 	private void OnUpdateLifetimeButtonClicked()
 		{
 		// Check if player data exists, if not return early
@@ -183,7 +212,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		selectedPlayer.LifetimeDefensiveShotAvg = lifetimeDefensiveShotAvg;
 		selectedPlayer.MatchesPlayedInLast2Years = matchesPlayedInLast2Years;
 		selectedPlayer.LifetimeBreakAndRun = lifetimeBreakAndRun;
-		selectedPlayer.NineOnTheSnap = nineOnTheSnap;
+		selectedPlayer.LifetimeNineOnTheSnap = nineOnTheSnap;
 		selectedPlayer.LifetimeMiniSlams = lifetimeMiniSlams;
 		selectedPlayer.LifetimeShutouts = lifetimeShutouts;
 
@@ -193,7 +222,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		Debug.Log($"Updated lifetime data for player {selectedPlayer.Name}");
 		}
 
-	// Methods to open the panel and populate data for a specific player
+	// --- Methods to open the panel and populate data for a specific player --- //
 	public void OpenWithPlayerData(Player player)
 		{
 		selectedPlayer = player;

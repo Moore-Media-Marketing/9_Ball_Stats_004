@@ -1,5 +1,5 @@
 AdaptivePerformanceManager
-DataManager
+DatabaseManager
 MatchupManager
 UIManager
 GenerateGameObjectList

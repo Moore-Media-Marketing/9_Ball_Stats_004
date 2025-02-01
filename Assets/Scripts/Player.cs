@@ -2,11 +2,11 @@ using System;
 using UnityEngine;
 using SQLite;
 
-// --- Player Class --- //
 [Serializable]
 public class Player
 	{
 	#region Player Information
+
 	[Header("Basic Info")]
 	[Tooltip("Player's full name.")]
 	public string Name;
@@ -18,6 +18,7 @@ public class Player
 	#endregion
 
 	#region Season Stats
+
 	[Header("Season Stats")]
 	[Tooltip("Total matches won this season.")]
 	public int MatchesWon;
@@ -34,6 +35,7 @@ public class Player
 	#endregion
 
 	#region Lifetime Stats
+
 	[Header("Lifetime Stats")]
 	[Tooltip("Total matches won in lifetime.")]
 	public int LifetimeMatchesWon;
@@ -46,22 +48,21 @@ public class Player
 		? (float) LifetimeMatchesWon / LifetimeMatchesPlayed * 100f
 		: 0f;
 
-	[Tooltip("Defensive shot average.")]
-	public float DefensiveShotAverage;
+	[Tooltip("Defensive shot average in lifetime.")]
+	public float LifetimeDefensiveShotAverage;
 
 	[Tooltip("Matches played in the last 2 years.")]
 	public int MatchesPlayedInLast2Years;
 
-	[Tooltip("Number of 9-on-the-Snap shots.")]
-	public int NineOnTheSnap;
+	[Tooltip("Number of 9-on-the-Snap shots in lifetime.")]
+	public int LifetimeNineOnTheSnap;
 
-	[Tooltip("Number of Mini Slams achieved.")]
-	public int MiniSlams;
+	[Tooltip("Number of Mini Slams achieved in lifetime.")]
+	public int LifetimeMiniSlams;
 
-	[Tooltip("Number of Shutouts achieved.")]
-	public int Shutouts;
+	[Tooltip("Number of Shutouts achieved in lifetime.")]
+	public int LifetimeShutouts;
 
-	// Additional lifetime stats
 	[Tooltip("Lifetime games won.")]
 	public int LifetimeGamesWon;
 
@@ -74,15 +75,10 @@ public class Player
 	[Tooltip("Lifetime break-and-run shots.")]
 	public int LifetimeBreakAndRun;
 
-	[Tooltip("Lifetime mini slams achieved.")]
-	public int LifetimeMiniSlams;
-
-	[Tooltip("Lifetime shutouts achieved.")]
-	public int LifetimeShutouts;
-
 	#endregion
 
 	#region Current Season Data
+
 	[Header("Current Season Data")]
 	[Tooltip("Matches won in the current season.")]
 	public int CurrentSeasonMatchesWon;
@@ -108,9 +104,26 @@ public class Player
 	[Tooltip("Number of Shutouts in the current season.")]
 	public int CurrentSeasonShutouts;
 
+	[Header("Editable Current Season Stats")]
+	[Tooltip("Total points in the current season.")]
+	public int CurrentSeasonTotalPoints;
+
+	[Tooltip("Points per match for the current season.")]
+	public float CurrentSeasonPpm;
+
+	[Tooltip("Points awarded percentage for the current season.")]
+	public float CurrentSeasonPaPercentage;
+
+	[Tooltip("Current season break-and-run shots.")]
+	public int CurrentSeasonBreakAndRun;
+
+	[Tooltip("Current skill level for the player in the current season.")]
+	public int CurrentSeasonSkillLevel;
+
 	#endregion
 
 	#region Database Fields
+
 	[PrimaryKey, AutoIncrement]
 	public int Id { get; set; }
 
@@ -140,7 +153,6 @@ public class Player
 
 	#region Methods
 
-	// --- Updates the player's stats after a match --- //
 	public void UpdateStats(int pointsScored, bool wonMatch)
 		{
 		MatchesPlayed++;
@@ -155,16 +167,15 @@ public class Player
 		if (wonMatch)
 			LifetimeMatchesWon++;
 
-		// Update additional lifetime stats like points average
+		// Update additional lifetime stats
 		LifetimeGamesPlayed++;
 		LifetimeGamesWon += wonMatch ? 1 : 0;
 
 		Debug.Log($"[Player] Updated Stats: {Name} | Matches: {MatchesPlayed} | Wins: {MatchesWon}");
 		}
 
-	// --- Updates the player's current season stats --- //
 	public void UpdateCurrentSeasonStats(int matchesWon, int matchesPlayed, int pointsPerMatch, int pointsAwarded,
-										  float defensiveShotAverage, int nineOnTheSnap, int miniSlams, int shutouts)
+										 float defensiveShotAverage, int nineOnTheSnap, int miniSlams, int shutouts)
 		{
 		CurrentSeasonMatchesWon = matchesWon;
 		CurrentSeasonMatchesPlayed = matchesPlayed;
@@ -178,22 +189,6 @@ public class Player
 		Debug.Log($"[Player] Current season data updated for {Name}");
 		}
 
-	// --- Transfers player to another team --- //
-	public void TransferToNewTeam(int newTeamId)
-		{
-		Team newTeam = DatabaseManager.Instance.GetTeamById(newTeamId);
-
-		if (newTeam == null)
-			{
-			Debug.LogError($"[Player] Error: Team with ID {newTeamId} does not exist!");
-			return;
-			}
-
-		TeamId = newTeamId;
-		Debug.Log($"[Player] {Name} transferred to {newTeam.Name}");
-		}
-
-	// --- Resets season stats --- //
 	public void ResetSeasonStats()
 		{
 		MatchesWon = 0;
@@ -202,38 +197,20 @@ public class Player
 		PointsAwarded = 0;
 		}
 
-	// --- Resets lifetime stats --- //
 	public void ResetLifetimeStats()
 		{
 		LifetimeMatchesWon = 0;
 		LifetimeMatchesPlayed = 0;
-		DefensiveShotAverage = 0;
+		LifetimeDefensiveShotAverage = 0;
 		MatchesPlayedInLast2Years = 0;
-		NineOnTheSnap = 0;
-		MiniSlams = 0;
-		Shutouts = 0;
+		LifetimeNineOnTheSnap = 0;
+		LifetimeMiniSlams = 0;
+		LifetimeShutouts = 0;
 		LifetimeGamesWon = 0;
 		LifetimeGamesPlayed = 0;
 		LifetimeDefensiveShotAvg = 0;
 		LifetimeBreakAndRun = 0;
-		LifetimeMiniSlams = 0;
-		LifetimeShutouts = 0;
 		}
 
 	#endregion
-
-	// Total points in the current season (editable)
-	public int CurrentSeasonTotalPoints;
-
-	// Points per match for the current season (editable)
-	public float CurrentSeasonPpm;
-
-	// Points awarded percentage for the current season (editable)
-	public float CurrentSeasonPaPercentage;
-
-	// Current season break-and-run shots (editable)
-	public int CurrentSeasonBreakAndRun;
-
-	// Current skill level for the player in the current season (editable)
-	public int CurrentSeasonSkillLevel;
 	}

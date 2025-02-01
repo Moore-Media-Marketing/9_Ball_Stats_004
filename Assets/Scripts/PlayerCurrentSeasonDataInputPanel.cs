@@ -9,6 +9,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 	{
 	// --- UI Elements --- //
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField gamesWonInputField;
@@ -140,7 +141,6 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			selectedTeam = null;
 			}
 		}
-
 
 	// --- Handle Player Dropdown Selection --- //
 	private void OnPlayerDropdownValueChanged(int playerIndex)
