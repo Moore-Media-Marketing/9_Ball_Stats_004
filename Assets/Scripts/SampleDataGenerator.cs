@@ -1,10 +1,14 @@
+using TMPro;
+
 using UnityEngine;
 
 public class SampleDataGenerator:MonoBehaviour
 	{
 	public int numberOfTeams = 10; // --- Number of teams to generate --- //
-	public int numberOfPlayersPerTeam = Random.Range(5, 8); // --- Number of players per team --- //
+	public int numberOfPlayersPerTeam; // --- Number of players per team --- //
+	public float malePercentage = 0.65f; // --- Percentage of male players (65%) --- //
 
+	// --- Name arrays --- 
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Anthony", "Kevin", "Jason", "Jeff", "Ryan" };
 	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy", "Lisa", "Nancy", "Karen", "Betty", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Sarah", "Kimberly", "Jessica" };
 	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott", "Green", "Adams", "Baker", "Hall", "Nelson", "Carter", "Mitchell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Morris", "Morgan" };
@@ -12,104 +16,101 @@ public class SampleDataGenerator:MonoBehaviour
 
 	private void Start()
 		{
+		numberOfPlayersPerTeam = Random.Range(5, 9); // Set random number of players per team
 		GenerateSampleTeamsAndPlayers();
 		}
 
-	private void GenerateSampleTeamsAndPlayers()
+	public void GenerateSampleTeamsAndPlayers()
 		{
+		int numberOfTeams = Random.Range(3, 6); // Random number of teams between 3 and 5
+		int teamId = 1; // Start at team ID 1
+
 		for (int i = 0; i < numberOfTeams; i++)
 			{
-			Team newTeam = GenerateTeam();
+			Team newTeam = new Team()
+				{
+				Id = teamId++, // Increment team ID starting at 1
+				Name = teamNames[Random.Range(0, teamNames.Length)], // Random team name from the array
+				};
+
 			DatabaseManager.Instance.AddTeam(newTeam);
 
-			for (int j = 0; j < numberOfPlayersPerTeam; j++)
+			int numberOfPlayers = Random.Range(5, 9); // Random number of players between 5 and 8
+			for (int j = 0; j < numberOfPlayers; j++)
 				{
-				Player newPlayer = GeneratePlayer(newTeam.Id);
+				Player newPlayer = GeneratePlayer(newTeam.Id); // Use GeneratePlayer to create player details
 				DatabaseManager.Instance.AddPlayer(newPlayer);
 				}
 			}
 		}
 
-	private Team GenerateTeam()
-		{
-		string teamName = teamNames[Random.Range(0, teamNames.Length)];
-
-		// --- Create a Team with the name --- //
-		return new Team(teamName);
-		}
-
 	private Player GeneratePlayer(int teamId)
 		{
-		// --- Here we have a 65% chance of generating a male name //
+		// --- Determine gender based on percentage --- //
+		bool isMale = Random.Range(0f, 1f) <= malePercentage;
 
-		string firstName = firstNamesMale[Random.Range(0, firstNamesMale.Length)];
+		// --- Generate first name based on gender --- //
+		string firstName = isMale ? firstNamesMale[Random.Range(0, firstNamesMale.Length)] : firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
 
-		// --- Here we have a 35% chance of generating a female name //
-
-		string firstName = firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
-
-		// --- Here we decided to generate a random last name for the player. //
-
+		// --- Generate a random last name for the player --- //
 		string lastName = lastNames[Random.Range(0, lastNames.Length)];
 		string playerName = $"{firstName} {lastName}";
-		int skillLevel = Random.Range(1, 9); // --- Must be a whole number between 1 and 9 --- //
+
+		// --- Generate skill level as a whole number between 1 and 9 --- //
+		int skillLevel = Random.Range(1, 9); // --- Whole number between 1 and 9 --- //
 
 		// --- Generating player stats based on skill level --- //
-		int currentSeasonMatchesPlayed = Random.Range(5, 30);  // --- Must be a whole number --- //
-		int currentSeasonMatchesWon = Mathf.Clamp((int) (currentSeasonMatchesPlayed * skillLevel * 0.1f), 0, currentSeasonMatchesPlayed);  // --- Must be a whole number --- //
-		int currentSeasonBreakAndRun = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.1f)), 0, currentSeasonMatchesPlayed);  // --- Must be a whole number --- //
+		int currentSeasonMatchesPlayed = Random.Range(5, 30);
+		int currentSeasonMatchesWon = Mathf.Clamp((int) (currentSeasonMatchesPlayed * skillLevel * 0.1f), 0, currentSeasonMatchesPlayed);
+		int currentSeasonBreakAndRun = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.1f)), 0, currentSeasonMatchesPlayed);
 
 		// --- Keep these as float values --- //
-		float currentSeasonDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f); // --- Float value --- //
-		int currentSeasonMiniSlams = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.05f)), 0, currentSeasonMatchesPlayed);  // --- Must be a whole number --- //
-		int currentSeasonNineOnTheSnap = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.03f)), 0, currentSeasonMatchesPlayed);  // --- Must be a whole number --- //
+		float currentSeasonDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
+		int currentSeasonMiniSlams = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.05f)), 0, currentSeasonMatchesPlayed);
+		int currentSeasonNineOnTheSnap = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.03f)), 0, currentSeasonMatchesPlayed);
 
 		// --- Keep these as float values --- //
-		float currentSeasonPaPercentage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f); // Float value
-		int currentSeasonPointsAwarded = Mathf.Clamp(currentSeasonMatchesPlayed * skillLevel, 0, currentSeasonMatchesPlayed * 10);  // --- Must be a whole number --- //
-		int currentSeasonPointsPerMatch = Mathf.Clamp(currentSeasonPointsAwarded / currentSeasonMatchesPlayed, 0, 10);  // --- Must be a whole number --- //
-		int currentSeasonPpm = Mathf.Clamp((int) (currentSeasonPointsPerMatch), 0, 10);  // --- Must be a whole number --- //
-		int currentSeasonShutouts = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.02f)), 0, currentSeasonMatchesPlayed);   // --- Must be a whole number --- //
-		int currentSeasonTotalPoints = Mathf.Clamp(currentSeasonPointsAwarded, 0, currentSeasonMatchesPlayed * 10);  // --- Must be a whole number --- //
+		float currentSeasonPaPercentage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
+		int currentSeasonPointsAwarded = Mathf.Clamp(currentSeasonMatchesPlayed * skillLevel, 0, currentSeasonMatchesPlayed * 10);
+		int currentSeasonPointsPerMatch = Mathf.Clamp(currentSeasonPointsAwarded / currentSeasonMatchesPlayed, 0, 10);
+		int currentSeasonPpm = Mathf.Clamp((int) (currentSeasonPointsPerMatch), 0, 10);
+		int currentSeasonShutouts = Mathf.Clamp((int) (currentSeasonMatchesWon * (skillLevel * 0.02f)), 0, currentSeasonMatchesPlayed);
+		int currentSeasonTotalPoints = Mathf.Clamp(currentSeasonPointsAwarded, 0, currentSeasonMatchesPlayed * 10);
 
 		// --- Lifetime stats based on skill level --- //
-		int lifetimeMatchesPlayed = Random.Range(10, 100);  // --- Must be a whole number --- //
-		int lifetimeMatchesWon = Mathf.Clamp((int) (lifetimeMatchesPlayed * skillLevel * 0.1f), 0, lifetimeMatchesPlayed);  // --- Must be a whole number --- //
-		int lifetimeBreakAndRun = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.05f)), 0, lifetimeMatchesPlayed);  // --- Must be a whole number --- //
+		int lifetimeMatchesPlayed = Random.Range(10, 100);
+		int lifetimeMatchesWon = Mathf.Clamp((int) (lifetimeMatchesPlayed * skillLevel * 0.1f), 0, lifetimeMatchesPlayed);
+		int lifetimeBreakAndRun = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.05f)), 0, lifetimeMatchesPlayed);
 
 		// --- Keep these as float values --- //
-		float lifetimeDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f); // --- Float value --- //
-		int lifetimeMiniSlams = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.05f)), 0, lifetimeMatchesPlayed);  // --- Must be a whole number --- //
-		int lifetimeNineOnTheSnap = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.03f)), 0, lifetimeMatchesPlayed);  // --- Must be a whole number --- //
-		int lifetimeShutouts = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.02f)), 0, lifetimeMatchesPlayed);  // --- Must be a whole number --- //
+		float lifetimeDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
+		int lifetimeMiniSlams = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.05f)), 0, lifetimeMatchesPlayed);
+		int lifetimeNineOnTheSnap = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.03f)), 0, lifetimeMatchesPlayed);
+		int lifetimeShutouts = Mathf.Clamp((int) (lifetimeMatchesWon * (skillLevel * 0.02f)), 0, lifetimeMatchesPlayed);
 
 		// --- Return new player with all the stats --- //
 		return new Player(playerName, skillLevel, teamId)
 			{
-			CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed,  // --- Must be a whole number --- //
-			CurrentSeasonMatchesWon = currentSeasonMatchesWon,  // --- Must be a whole number --- //
-			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,  // --- Must be a whole number --- //
-			CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage, // Float value --- //
-			CurrentSeasonMiniSlams = currentSeasonMiniSlams,  // --- Must be a whole number --- //
-			CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap,  // --- Must be a whole number --- //
-			CurrentSeasonPaPercentage = currentSeasonPaPercentage, // --- Float value --- //
-			CurrentSeasonPointsAwarded = currentSeasonPointsAwarded,  // --- Must be a whole number --- //
-			CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch,  // --- Must be a whole number --- //
-			CurrentSeasonPpm = currentSeasonPpm,  // --- Must be a whole number --- //
-			CurrentSeasonShutouts = currentSeasonShutouts,  // --- Must be a whole number --- //
-
-			// --- Here we decided to generate a random skill level for the player. Cannot implicitly convert type 'int' to 'string' //
-			CurrentSeasonSkillLevel = skillLevel,  // --- Must be a whole number --- //
-
-
-			CurrentSeasonTotalPoints = currentSeasonTotalPoints,  // --- Must be a whole number --- //
-			LifetimeMatchesPlayed = lifetimeMatchesPlayed,  // --- Must be a whole number --- //
-			LifetimeMatchesWon = lifetimeMatchesWon,  // --- Must be a whole number --- //
-			LifetimeBreakAndRun = lifetimeBreakAndRun,  // --- Must be a whole number --- //
-			LifetimeDefensiveShotAverage = lifetimeDefensiveShotAverage, // --- Float value --- //
-			LifetimeMiniSlams = lifetimeMiniSlams,  // --- Must be a whole number --- //
-			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,  // --- Must be a whole number --- //
-			LifetimeShutouts = lifetimeShutouts  // --- Must be a whole number --- //
+			CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed,
+			CurrentSeasonMatchesWon = currentSeasonMatchesWon,
+			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,
+			CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage,
+			CurrentSeasonMiniSlams = currentSeasonMiniSlams,
+			CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap,
+			CurrentSeasonPaPercentage = currentSeasonPaPercentage,
+			CurrentSeasonPointsAwarded = currentSeasonPointsAwarded,
+			CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch,
+			CurrentSeasonPpm = currentSeasonPpm,
+			CurrentSeasonShutouts = currentSeasonShutouts,
+			CurrentSeasonSkillLevel = skillLevel,
+			CurrentSeasonTotalPoints = currentSeasonTotalPoints,
+			LifetimeMatchesPlayed = lifetimeMatchesPlayed,
+			LifetimeMatchesWon = lifetimeMatchesWon,
+			LifetimeBreakAndRun = lifetimeBreakAndRun,
+			LifetimeDefensiveShotAverage = lifetimeDefensiveShotAverage,
+			LifetimeMiniSlams = lifetimeMiniSlams,
+			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,
+			LifetimeShutouts = lifetimeShutouts
 			};
 		}
 	}

@@ -61,7 +61,7 @@ public class Player
 	public int CurrentSeasonBreakAndRun { get; set; }  // --- Break and run stat for this season --- //
 
 	[Tooltip("Skill level for the current season (e.g., Beginner, Intermediate).")]
-	public string CurrentSeasonSkillLevel { get; set; }  // --- Descriptive skill level for this season --- //
+	public int CurrentSeasonSkillLevel { get; set; }  // --- Descriptive skill level for this season --- //
 
 	#endregion Season Stats
 
@@ -143,7 +143,7 @@ public class Player
 		if (pointsScored < 0)
 			{
 			Debug.LogWarning($"Invalid points scored for {Name}: {pointsScored}");  // --- Log warning --- //
-			return;  // --- Exit if invalid ---
+			return;  // --- Exit if invalid --- //
 			}
 
 		// --- Update current season stats --- //
@@ -187,7 +187,7 @@ public class Player
 		CurrentSeasonPpm = 0f;
 		CurrentSeasonPaPercentage = 0f;
 		CurrentSeasonBreakAndRun = 0;
-		CurrentSeasonSkillLevel = "Beginner";
+		CurrentSeasonSkillLevel = 1;
 		Debug.Log($"[Player] Season stats reset for {Name}");
 		}
 
@@ -219,73 +219,11 @@ public class Player
 			{
 			if (string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase))
 				{
-				Debug.LogWarning($"Player name '{name}' already exists!");
-				return false;  // --- Duplicate player name found --- //
+				Debug.LogWarning($"Player name '{name}' is already taken!");
+				return false;  // --- Return false if the name already exists --- //
 				}
 			}
-		return true;  // --- Player name is valid --- //
-		}
-
-	// --- Save player's data to PlayerPrefs --- //
-	public void SavePlayerData()
-		{
-		try
-			{
-			// --- Using PlayerPrefs to save player data --- //
-			PlayerPrefs.SetInt($"Player_{Id}_MatchesWon", LifetimeMatchesWon);
-			PlayerPrefs.SetInt($"Player_{Id}_MatchesPlayed", LifetimeMatchesPlayed);
-			PlayerPrefs.SetFloat($"Player_{Id}_DefensiveShotAvg", LifetimeDefensiveShotAverage);
-			PlayerPrefs.Save();
-			Debug.Log($"[Player] Data saved for {Name}");  // --- Log data saved --- //
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"[Player] Error saving data for {Name}: {ex.Message}");
-			}
-		}
-
-	// --- Load player data from PlayerPrefs --- //
-	public void LoadPlayerData()
-		{
-		try
-			{
-			LifetimeMatchesWon = PlayerPrefs.GetInt($"Player_{Id}_MatchesWon", 0);
-			LifetimeMatchesPlayed = PlayerPrefs.GetInt($"Player_{Id}_MatchesPlayed", 0);
-			LifetimeDefensiveShotAverage = PlayerPrefs.GetFloat($"Player_{Id}_DefensiveShotAvg", 0f);
-			Debug.Log($"[Player] Data loaded for {Name}");  // --- Log data loaded --- //
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"[Player] Error loading data for {Name}: {ex.Message}");
-			}
-		}
-
-	// --- Serialize the player data to JSON --- //
-	public string SerializeToJson()
-		{
-		try
-			{
-			return JsonUtility.ToJson(this);  // --- Convert to JSON --- //
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"[Player] Error serializing {Name}: {ex.Message}");
-			return null;
-			}
-		}
-
-	// --- Deserialize JSON to populate player data --- //
-	public static Player DeserializeFromJson(string json)
-		{
-		try
-			{
-			return JsonUtility.FromJson<Player>(json);  // --- Convert from JSON --- //
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"[Player] Error deserializing player data: {ex.Message}");
-			return null;
-			}
+		return true;  // --- Return true if the name is valid --- //
 		}
 
 	#endregion Static Methods

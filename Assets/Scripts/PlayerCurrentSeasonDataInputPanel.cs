@@ -1,4 +1,3 @@
-// --- Region: Player Current Season Data Input Panel --- //
 using TMPro;
 
 using UnityEngine;
@@ -50,7 +49,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			currentSeasonPpmText.text = selectedPlayer.CurrentSeasonPpm.ToString();
 			currentSeasonPaPercentageText.text = selectedPlayer.CurrentSeasonPaPercentage.ToString();
 			currentSeasonBreakAndRunText.text = selectedPlayer.CurrentSeasonBreakAndRun.ToString();
-			currentSeasonSkillLevelText.text = selectedPlayer.CurrentSeasonSkillLevel;
+			currentSeasonSkillLevelText.text = selectedPlayer.CurrentSeasonSkillLevel.ToString(); // Fixed line
 			}
 		else
 			{

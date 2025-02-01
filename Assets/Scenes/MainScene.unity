@@ -9113,7 +9113,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b720771a96978ef4b9a169176bd5f52b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbPath: 
   allTeams: []
   allPlayers: []
 --- !u!1 &687259210
@@ -15640,6 +15639,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1100524181}
   m_CullTransparentMesh: 1
+--- !u!1 &1111509124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1111509125}
+  - component: {fileID: 1111509126}
+  m_Layer: 0
+  m_Name: SampleDataGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1111509125
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111509124}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 182.06525, y: 323.32175, z: -2.0942016}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1111509126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111509124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f00a75a4664ac63449ea77df8354b4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfTeams: 10
+  numberOfPlayersPerTeam: 5
+  malePercentage: 0.65
 --- !u!1 &1122446398
 GameObject:
   m_ObjectHideFlags: 0
@@ -36271,6 +36317,7 @@ SceneRoots:
   - {fileID: 1285032812}
   - {fileID: 711083288}
   - {fileID: 385777182}
+  - {fileID: 1111509125}
   - {fileID: 1239565784}
   - {fileID: 351565525}
   - {fileID: 1170561912}
