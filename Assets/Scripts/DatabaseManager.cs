@@ -1,255 +1,264 @@
-// --- Region: Database Manager --- //
+// --- Region: Using Directives --- //
 using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
+// --- End Region: Using Directives --- //
+
+// --- Region: Class Definition --- //
 public class DatabaseManager:MonoBehaviour
 	{
-	#region Singleton
+	// --- Region: Singleton Setup --- //
 
+	// --- Comment: Singleton instance of the DatabaseManager --- //
 	public static DatabaseManager Instance { get; private set; }
 
-	#endregion Singleton
-
-	#region Inspector Fields
-
-	[Header("Data")]
-	[Tooltip("List of all teams in the database.")]
-	public List<Team> allTeams = new();  // List of teams loaded from PlayerPrefs
-
-	[Tooltip("List of all players in the database.")]
-	public List<Player> allPlayers = new();  // List of players loaded from PlayerPrefs
-
-	#endregion Inspector Fields
-
-	#region Unity Methods
-
+	// --- Comment: Awake method to enforce the singleton pattern --- //
 	private void Awake()
 		{
-		// Ensure only one instance of DatabaseManager exists
 		if (Instance == null)
 			{
 			Instance = this;
-			DontDestroyOnLoad(gameObject);  // Persist this object across scenes
+			// --- Comment: Persist this object between scenes --- //
+			DontDestroyOnLoad(gameObject);
 			}
 		else
 			{
+			Debug.LogError("Duplicate DatabaseManager instance detected. Destroying duplicate.");
 			Destroy(gameObject);
-			return;
 			}
-
-		LoadData();  // Load teams and players from PlayerPrefs
 		}
 
-	private void OnApplicationQuit()
+	// --- End Region: Singleton Setup --- //
+
+	// --- Region: Private Data Storage --- //
+
+	// --- Comment: Placeholder keys for PlayerPrefs storage --- //
+	private const string TeamsKey = "teams_key";      // Placeholder key for teams
+
+	private const string PlayersKey = "players_key";    // Placeholder key for players
+
+	// --- Comment: In-memory lists for current session use (loaded from PlayerPrefs) --- //
+	private List<Team> teams = new();
+
+	private List<Player> players = new();
+
+	// --- End Region: Private Data Storage --- //
+
+	// --- Region: Team Methods --- //
+
+	// --- Comment: Returns the list of all teams --- //
+	public List<Team> GetAllTeams()
 		{
-		SaveData();  // Save data to PlayerPrefs before quitting
-		}
-
-	#endregion Unity Methods
-
-	#region Database Methods
-
-	public void LoadData()
-		{
-		// Load teams and players from PlayerPrefs
-		allTeams.Clear();
-		allPlayers.Clear();
-
-		int teamCount = PlayerPrefs.GetInt("TeamCount", 0);
-		for (int i = 0; i < teamCount; i++)
+		// --- Comment: Load teams from PlayerPrefs if not already loaded --- //
+		if (teams == null || teams.Count == 0)
 			{
-			string teamData = PlayerPrefs.GetString("Team_" + i);
-			if (!string.IsNullOrEmpty(teamData))
-				{
-				Team team = JsonUtility.FromJson<Team>(teamData);
-				allTeams.Add(team);
-
-				// Load players for the team
-				int playerCount = PlayerPrefs.GetInt($"PlayerCount_{team.Id}", 0);
-				for (int j = 0; j < playerCount; j++)
-					{
-					string playerData = PlayerPrefs.GetString($"Player_{team.Id}_{j}");
-					if (!string.IsNullOrEmpty(playerData))
-						{
-						Player player = JsonUtility.FromJson<Player>(playerData);
-						allPlayers.Add(player);
-						}
-					}
-				}
+			LoadTeams();
 			}
-
-		Debug.Log($"Loaded {allTeams.Count} teams and {allPlayers.Count} players from PlayerPrefs.");
+		return teams;
 		}
 
-	public void SaveData()
-		{
-		// Save teams and players to PlayerPrefs
-		PlayerPrefs.SetInt("TeamCount", allTeams.Count);
-		for (int i = 0; i < allTeams.Count; i++)
-			{
-			string teamData = JsonUtility.ToJson(allTeams[i]);
-			PlayerPrefs.SetString("Team_" + i, teamData);
-
-			// Save players for the team
-			int playerCount = 0;
-			foreach (var player in allPlayers)
-				{
-				if (player.TeamId == allTeams[i].Id)
-					{
-					string playerData = JsonUtility.ToJson(player);
-					PlayerPrefs.SetString($"Player_{allTeams[i].Id}_{playerCount}", playerData);
-					playerCount++;
-					}
-				}
-			PlayerPrefs.SetInt($"PlayerCount_{allTeams[i].Id}", playerCount);
-			}
-		PlayerPrefs.Save();  // Save the changes to PlayerPrefs
-		Debug.Log("Data saved to PlayerPrefs.");
-		}
-
+	// --- Comment: Adds a new team, assigns a unique ID, and saves to PlayerPrefs --- //
 	public void AddTeam(Team team)
 		{
-		// Add a new team to PlayerPrefs
-		if (string.IsNullOrWhiteSpace(team.Name))
+		if (team == null)
 			{
-			Debug.LogError("Team name cannot be empty!");
+			Debug.LogError("AddTeam failed: team is null.");
 			return;
 			}
-
-		allTeams.Add(team);
-		SaveData();  // Save data after adding the team
-		Debug.Log($"Team '{team.Name}' added to PlayerPrefs.");
+		team.id = teams.Count + 1; // Placeholder for unique ID generation
+		teams.Add(team);
+		SaveTeams();
+		Debug.Log("Team added: " + team.name);
 		}
 
-	public void AddPlayer(Player player)
-		{
-		// Add a new player to PlayerPrefs
-		if (string.IsNullOrWhiteSpace(player.Name))
-			{
-			Debug.LogError("Player name cannot be empty!");
-			return;
-			}
-
-		if (player.TeamId <= 0 || allTeams.Find(t => t.Id == player.TeamId) == null)
-			{
-			Debug.LogError("Player must be assigned to a valid team.");
-			return;
-			}
-
-		allPlayers.Add(player);
-		SaveData();  // Save data after adding the player
-		Debug.Log($"Player '{player.Name}' added to PlayerPrefs.");
-		}
-
-	public void UpdateTeam(Team team)
-		{
-		// Update an existing team's data
-		var existingTeam = allTeams.Find(t => t.Id == team.Id);
-		if (existingTeam == null)
-			{
-			Debug.LogError("Team not found.");
-			return;
-			}
-
-		// Update team data (example: update team name)
-		existingTeam.Name = team.Name;
-		SaveData();  // Save data after updating the team
-		Debug.Log($"Team '{team.Name}' updated.");
-		}
-
-	public void SavePlayer(Player player)
-		{
-		// Save player to PlayerPrefs
-		var existingPlayer = allPlayers.Find(p => p.Id == player.Id);
-		if (existingPlayer == null)
-			{
-			Debug.LogError("Player not found.");
-			return;
-			}
-
-		// Update player data (example: update player's stats)
-		existingPlayer.Name = player.Name;
-		existingPlayer.TeamId = player.TeamId;
-		existingPlayer.CurrentSeasonMatchesPlayed = player.CurrentSeasonMatchesPlayed;
-		existingPlayer.CurrentSeasonMatchesWon = player.CurrentSeasonMatchesWon;
-
-		SaveData();  // Save data after updating the player
-		Debug.Log($"Player '{player.Name}' updated.");
-		}
-
-	public List<Team> GetAllTeams() => allTeams;
-
-	public Team GetTeamById(int teamId)
-		{
-		// Retrieve a team by its ID
-		var team = allTeams.Find(t => t.Id == teamId);
-		if (team == null) Debug.LogError($"Team with ID {teamId} not found.");
-		return team;
-		}
-
-	public Team GetTeamByName(string teamName)
-		{
-		// Retrieve a team by its name (case-insensitive)
-		var team = allTeams.Find(t => string.Equals(t.Name, teamName, StringComparison.OrdinalIgnoreCase));
-		if (team == null) Debug.LogError($"Team '{teamName}' not found.");
-		return team;
-		}
-
-	public List<Player> GetAllPlayers() => allPlayers;
-
-	public List<Player> GetPlayersByTeam(int teamId) => allPlayers.FindAll(p => p.TeamId == teamId);
-
+	// --- Comment: Removes a team and any associated players, then updates PlayerPrefs --- //
 	public void RemoveTeam(Team team)
 		{
-		// Remove a team from PlayerPrefs
-		allTeams.Remove(team);
-		allPlayers.RemoveAll(p => p.TeamId == team.Id);
-		SaveData();  // Save data after removing the team
-		Debug.Log($"Team '{team.Name}' removed from PlayerPrefs.");
-		}
-
-	public void RemovePlayer(Player player)
-		{
-		// Remove a player from PlayerPrefs
-		allPlayers.Remove(player);
-		SaveData();  // Save data after removing the player
-		Debug.Log($"Player '{player.Name}' removed from PlayerPrefs.");
-		}
-
-	#endregion Database Methods
-
-	#region Custom Methods for Inspector Display
-
-	[ContextMenu("Refresh Data")]
-	public void RefreshData()
-		{
-		// Manually refresh data from PlayerPrefs
-		LoadData();
-		}
-
-	[ContextMenu("Show Teams and Players")]
-	public void ShowTeamsAndPlayers()
-		{
-		// Log teams and their associated players
-		foreach (var team in allTeams)
+		if (team == null)
 			{
-			Debug.Log($"Team: {team.Name}");
-			var playersOnTeam = GetPlayersByTeam(team.Id);
-			if (playersOnTeam.Count > 0)
+			Debug.LogError("RemoveTeam failed: team is null.");
+			return;
+			}
+		teams.Remove(team);
+		// --- Comment: Remove any players associated with this team --- //
+		players.RemoveAll(p => p.teamId == team.id);
+		SaveTeams();
+		SavePlayers();
+		Debug.Log("Team removed: " + team.name);
+		}
+
+	// --- Comment: Saves the teams list to PlayerPrefs using JSON serialization --- //
+	public void SaveTeams()
+		{
+		try
+			{
+			// --- Comment: Convert teams list to JSON --- //
+			string json = JsonUtility.ToJson(new SerializationWrapper<Team>(teams));
+			PlayerPrefs.SetString(TeamsKey, json);
+			PlayerPrefs.Save();
+			Debug.Log("Teams saved to PlayerPrefs.");
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError("Error saving teams: " + ex.Message);
+			}
+		}
+
+	// --- Comment: Loads the teams list from PlayerPrefs --- //
+	public void LoadTeams()
+		{
+		try
+			{
+			if (PlayerPrefs.HasKey(TeamsKey))
 				{
-				foreach (var player in playersOnTeam)
-					{
-					Debug.Log($"    Player: {player.Name} | Season: {player.CurrentSeasonMatchesPlayed}/{player.CurrentSeasonMatchesWon}");
-					}
+				string json = PlayerPrefs.GetString(TeamsKey);
+				SerializationWrapper<Team> wrapper = JsonUtility.FromJson<SerializationWrapper<Team>>(json);
+				teams = wrapper.Items;
 				}
 			else
 				{
-				Debug.Log("No players on this team.");
+				teams = new List<Team>();
 				}
+			Debug.Log("Teams loaded from PlayerPrefs.");
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError("Error loading teams: " + ex.Message);
+			teams = new List<Team>();
 			}
 		}
 
-	#endregion Custom Methods for Inspector Display
+	// --- End Region: Team Methods --- //
+
+	// --- Region: Player Methods --- //
+
+	// --- Comment: Adds a new player, assigns a unique ID, and saves to PlayerPrefs --- //
+	public void AddPlayer(Player player)
+		{
+		if (player == null)
+			{
+			Debug.LogError("AddPlayer failed: player is null.");
+			return;
+			}
+		player.id = players.Count + 1; // Placeholder for unique ID generation
+		players.Add(player);
+		SavePlayers();
+
+		// --- Comment: Optionally add the player to the team's internal list --- //
+		Team team = teams.Find(t => t.id == player.teamId);
+		team?.players.Add(player);
+		Debug.Log("Player added: " + player.name);
+		}
+
+	// --- Comment: Saves or updates a player's data in PlayerPrefs --- //
+	public void SavePlayer(Player player)
+		{
+		if (player == null)
+			{
+			Debug.LogError("SavePlayer failed: player is null.");
+			return;
+			}
+		int index = players.FindIndex(p => p.id == player.id);
+		if (index >= 0)
+			{
+			players[index] = player;
+			}
+		else
+			{
+			players.Add(player);
+			}
+		SavePlayers();
+		Debug.Log("Player data saved: " + player.name);
+		}
+
+	// --- Comment: Returns a list of players for a given team ID --- //
+	public List<Player> GetPlayersByTeam(int teamId)
+		{
+		// --- Comment: Ensure players are loaded --- //
+		if (players == null || players.Count == 0)
+			{
+			LoadPlayers();
+			}
+		return players.FindAll(p => p.teamId == teamId);
+		}
+
+	// --- Comment: Saves the players list to PlayerPrefs using JSON serialization --- //
+	public void SavePlayers()
+		{
+		try
+			{
+			string json = JsonUtility.ToJson(new SerializationWrapper<Player>(players));
+			PlayerPrefs.SetString(PlayersKey, json);
+			PlayerPrefs.Save();
+			Debug.Log("Players saved to PlayerPrefs.");
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError("Error saving players: " + ex.Message);
+			}
+		}
+
+	// --- Comment: Loads the players list from PlayerPrefs --- //
+	public void LoadPlayers()
+		{
+		try
+			{
+			if (PlayerPrefs.HasKey(PlayersKey))
+				{
+				string json = PlayerPrefs.GetString(PlayersKey);
+				SerializationWrapper<Player> wrapper = JsonUtility.FromJson<SerializationWrapper<Player>>(json);
+				players = wrapper.Items;
+				}
+			else
+				{
+				players = new List<Player>();
+				}
+			Debug.Log("Players loaded from PlayerPrefs.");
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError("Error loading players: " + ex.Message);
+			players = new List<Player>();
+			}
+		}
+
+	// --- End Region: Player Methods --- //
+
+	// --- Region: Additional Functions --- //
+
+	// --- Comment: Saves all data (teams and players) to PlayerPrefs --- //
+	public void SaveData()
+		{
+		SaveTeams();
+		SavePlayers();
+		Debug.Log("All data saved to PlayerPrefs.");
+		}
+
+	// --- End Region: Additional Functions --- //
 	}
+
+// --- End Region: Class Definition --- //
+
+// --- Region: Serialization Wrapper Class --- //
+[Serializable]
+public class SerializationWrapper<T>
+	{
+	// --- Region: Wrapper Data --- //
+	// --- Comment: List of items to be serialized --- //
+	public List<T> Items;
+
+	// --- End Region: Wrapper Data --- //
+
+	// --- Region: Constructor --- //
+	// --- Comment: Constructor that wraps the provided list (placeholder: target_variable) --- //
+	public SerializationWrapper(List<T> items)
+		{
+		Items = items;
+		}
+
+	// --- End Region: Constructor --- //
+	}
+
+// --- End Region: Serialization Wrapper Class --- //

@@ -3,7 +3,6 @@ DatabaseManager
 MatchupManager
 UIManager
 GenerateGameObjectList
-SampleDataGenerator
 Main Camera
 EventSystem
 Canvas

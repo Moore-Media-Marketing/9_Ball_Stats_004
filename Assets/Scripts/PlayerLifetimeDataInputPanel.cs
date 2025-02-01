@@ -21,6 +21,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	public TMP_InputField nineOnTheSnapInputField;
 	public TMP_InputField lifetimeMiniSlamsInputField;
 	public TMP_InputField lifetimeShutoutsInputField;
+
 	public Button updateLifetimeButton;
 	public Button backButton;
 
@@ -69,12 +70,38 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		// Populate team dropdown
 		var teams = DatabaseManager.Instance.GetAllTeams();
 		teamNameDropdown.ClearOptions();
-		teamNameDropdown.AddOptions(teams.Select(t => t.Name).ToList());
+		teamNameDropdown.AddOptions(teams.Select(t => t.name).ToList());
 
 		// Populate player dropdown when a team is selected
 		teamNameDropdown.onValueChanged.AddListener(OnTeamSelected);
 		Debug.Log("Team dropdown initialized.");
 		}
+
+
+	private Player currentPlayer;
+
+	// --- Set the player data for the panel --- //
+	public void SetPlayerData(Player player)
+		{
+		selectedPlayer = player;
+
+		// --- Update UI elements with player's data --- //
+
+		// Populate the input fields with player's lifetime data
+		lifetimeGamesWonInputField.text = selectedPlayer.lifetimeGamesWon.ToString();
+		lifetimeGamesPlayedInputField.text = selectedPlayer.lifetimeGamesPlayed.ToString();
+		lifetimeDefensiveShotAvgInputField.text = selectedPlayer.lifetimeDefensiveShotAvg.ToString();
+		matchesPlayedInLast2YearsInputField.text = selectedPlayer.matchesPlayedInLast2Years.ToString();
+		lifetimeBreakAndRunInputField.text = selectedPlayer.lifetimeBreakAndRun.ToString();
+		nineOnTheSnapInputField.text = selectedPlayer.lifetimeNineOnTheSnap.ToString();
+		lifetimeMiniSlamsInputField.text = selectedPlayer.lifetimeMiniSlams.ToString();
+		lifetimeShutoutsInputField.text = selectedPlayer.lifetimeShutouts.ToString();
+
+		Debug.Log($"Populated lifetime data for player {selectedPlayer.name}");
+		}
+
+
+
 
 	// --- Method when team is selected from dropdown --- //
 	private void OnTeamSelected(int teamIndex)
@@ -84,15 +111,15 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			selectedTeam = DatabaseManager.Instance.GetAllTeams().ElementAt(teamIndex - 1); // Offset by 1 for "Select Team" option
 
 			// Fetch players for the selected team
-			var players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id);
+			var players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id);
 
 			// Debug the player list
-			Debug.Log($"Players for {selectedTeam.Name}: {players.Count} players found.");
+			Debug.Log($"Players for {selectedTeam.name}: {players.Count} players found.");
 
 			// If players list is empty, log that info
 			if (players.Count == 0)
 				{
-				Debug.LogError($"No players found for team: {selectedTeam.Name}");
+				Debug.LogError($"No players found for team: {selectedTeam.name}");
 				}
 
 			playerNameDropdown.ClearOptions();
@@ -100,7 +127,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			// Check if players exist before adding options
 			if (players.Any())
 				{
-				playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+				playerNameDropdown.AddOptions(players.Select(p => p.name).ToList());
 				}
 			else
 				{
@@ -109,7 +136,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 				}
 
 			playerNameDropdown.onValueChanged.AddListener(OnPlayerSelected);
-			Debug.Log($"Team selected: {selectedTeam.Name}");
+			Debug.Log($"Team selected: {selectedTeam.name}");
 			}
 		else
 			{
@@ -123,13 +150,13 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		{
 		if (playerIndex > 0) // Make sure "Select Player" is not selected
 			{
-			selectedPlayer = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id)
-				.FirstOrDefault(p => p.Name == playerNameDropdown.options[playerIndex].text);
+			selectedPlayer = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id)
+				.FirstOrDefault(p => p.name == playerNameDropdown.options[playerIndex].text);
 
 			if (selectedPlayer != null)
 				{
 				PopulateLifetimeData(selectedPlayer);
-				Debug.Log($"Player selected: {selectedPlayer.Name}");
+				Debug.Log($"Player selected: {selectedPlayer.name}");
 				}
 			else
 				{
@@ -148,16 +175,16 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	private void PopulateLifetimeData(Player player)
 		{
 		// Fill input fields with saved data for the selected player
-		lifetimeGamesWonInputField.text = player.LifetimeGamesWon.ToString();
-		lifetimeGamesPlayedInputField.text = player.LifetimeGamesPlayed.ToString();
-		lifetimeDefensiveShotAvgInputField.text = player.LifetimeDefensiveShotAvg.ToString();
-		matchesPlayedInLast2YearsInputField.text = player.MatchesPlayedInLast2Years.ToString();
-		lifetimeBreakAndRunInputField.text = player.LifetimeBreakAndRun.ToString();
-		nineOnTheSnapInputField.text = player.LifetimeNineOnTheSnap.ToString();
-		lifetimeMiniSlamsInputField.text = player.LifetimeMiniSlams.ToString();
-		lifetimeShutoutsInputField.text = player.LifetimeShutouts.ToString();
+		lifetimeGamesWonInputField.text = player.lifetimeGamesWon.ToString();
+		lifetimeGamesPlayedInputField.text = player.lifetimeGamesPlayed.ToString();
+		lifetimeDefensiveShotAvgInputField.text = player.lifetimeDefensiveShotAvg.ToString();
+		matchesPlayedInLast2YearsInputField.text = player.matchesPlayedInLast2Years.ToString();
+		lifetimeBreakAndRunInputField.text = player.lifetimeBreakAndRun.ToString();
+		nineOnTheSnapInputField.text = player.lifetimeNineOnTheSnap.ToString();
+		lifetimeMiniSlamsInputField.text = player.lifetimeMiniSlams.ToString();
+		lifetimeShutoutsInputField.text = player.lifetimeShutouts.ToString();
 
-		Debug.Log($"Populated lifetime data for player {player.Name}");
+		Debug.Log($"Populated lifetime data for player {player.name}");
 		}
 
 	// --- Reset lifetime data fields --- //
@@ -207,35 +234,36 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			}
 
 		// Update player lifetime data
-		selectedPlayer.LifetimeGamesWon = lifetimeGamesWon;
-		selectedPlayer.LifetimeGamesPlayed = lifetimeGamesPlayed;
-		selectedPlayer.LifetimeDefensiveShotAvg = lifetimeDefensiveShotAvg;
-		selectedPlayer.MatchesPlayedInLast2Years = matchesPlayedInLast2Years;
-		selectedPlayer.LifetimeBreakAndRun = lifetimeBreakAndRun;
-		selectedPlayer.LifetimeNineOnTheSnap = nineOnTheSnap;
-		selectedPlayer.LifetimeMiniSlams = lifetimeMiniSlams;
-		selectedPlayer.LifetimeShutouts = lifetimeShutouts;
+		selectedPlayer.lifetimeGamesWon = lifetimeGamesWon;
+		selectedPlayer.lifetimeGamesPlayed = lifetimeGamesPlayed;
+		selectedPlayer.lifetimeDefensiveShotAvg = lifetimeDefensiveShotAvg;
+		selectedPlayer.matchesPlayedInLast2Years = matchesPlayedInLast2Years;
+		selectedPlayer.lifetimeBreakAndRun = lifetimeBreakAndRun;
+		selectedPlayer.lifetimeNineOnTheSnap = nineOnTheSnap;
+		selectedPlayer.lifetimeMiniSlams = lifetimeMiniSlams;
+		selectedPlayer.lifetimeShutouts = lifetimeShutouts;
 
 		// Save the updated player data to the database
 		DatabaseManager.Instance.SavePlayer(selectedPlayer);
 
-		Debug.Log($"Updated lifetime data for player {selectedPlayer.Name}");
+		Debug.Log($"Updated lifetime data for player {selectedPlayer.name}");
 		}
 
 	// --- Methods to open the panel and populate data for a specific player --- //
+	// --- Open the panel and populate data for a specific player --- //
 	public void OpenWithPlayerData(Player player)
 		{
-		selectedPlayer = player;
-		PopulateLifetimeData(player);
+		SetPlayerData(player); // Populate data before showing the panel
 		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
-		Debug.Log($"Opened panel with player data: {player.Name}");
+		Debug.Log($"Opened panel with player data: {player.name}");
 		}
 
 	// Open the panel without player data (if no player is selected)
+	// --- Open the panel without player data --- //
 	public void OpenWithNoData()
 		{
-		selectedPlayer = null;
-		ResetLifetimeDataFields();
+		selectedPlayer = null; // No player selected
+		ResetLifetimeDataFields(); // Clear all data fields
 		UIManager.Instance.ShowPanel(this.gameObject); // Ensure the panel is shown
 		Debug.Log("Opening without player data. Please select a player.");
 		}

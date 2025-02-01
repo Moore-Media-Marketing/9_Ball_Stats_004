@@ -87,7 +87,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		List<string> teamNames = new() { "Select Team" };
 		if (teamList != null && teamList.Any())
 			{
-			teamNames.AddRange(teamList.Select(team => team.Name));
+			teamNames.AddRange(teamList.Select(team => team.name));
 			}
 		else
 			{
@@ -102,7 +102,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		List<string> playerNames = new() { "Select Player" };
 		if (currentTeamPlayers != null && currentTeamPlayers.Any())
 			{
-			playerNames.AddRange(currentTeamPlayers.Select(player => player.Name));
+			playerNames.AddRange(currentTeamPlayers.Select(player => player.name));
 			}
 		else
 			{
@@ -142,19 +142,19 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 
 		// --- Check if the player already exists in the team --- //
-		if (currentTeamPlayers.Any(p => string.Equals(p.Name, playerName, System.StringComparison.OrdinalIgnoreCase)))
+		if (currentTeamPlayers.Any(p => string.Equals(p.name, playerName, System.StringComparison.OrdinalIgnoreCase)))
 			{
 			ShowFeedback("Player already exists in the team.");
 			return;
 			}
 
 		// --- Create a new player with a placeholder skill level (5) --- //
-		Player newPlayer = new(playerName, 5, selectedTeam.Id);
+		Player newPlayer = new(playerName, 5, selectedTeam.id);
 		currentTeamPlayers.Add(newPlayer);
 		DatabaseManager.Instance.AddPlayer(newPlayer);
 
 		// --- Show feedback and clear the input field --- //
-		ShowFeedback($"Player '{playerName}' added to team '{selectedTeam.Name}'.");
+		ShowFeedback($"Player '{playerName}' added to team '{selectedTeam.name}'.");
 		playerNameInputField.text = "";
 
 		// --- Update the player dropdown --- //
@@ -166,12 +166,12 @@ public class PlayerManagementPanel:MonoBehaviour
 		if (playerNameDropdown.value > 0)
 			{
 			string selectedPlayerName = playerNameDropdown.options[playerNameDropdown.value].text;
-			Player playerToDelete = currentTeamPlayers.FirstOrDefault(p => p.Name == selectedPlayerName);
+			Player playerToDelete = currentTeamPlayers.FirstOrDefault(p => p.name == selectedPlayerName);
 			if (playerToDelete != null)
 				{
 				currentTeamPlayers.Remove(playerToDelete);
 				// --- (Optional) Remove player from database if needed --- //
-				ShowFeedback($"Player '{playerToDelete.Name}' removed from team '{selectedTeam.Name}'.");
+				ShowFeedback($"Player '{playerToDelete.name}' removed from team '{selectedTeam.name}'.");
 				UpdatePlayerDropdown();
 				}
 			else
@@ -190,10 +190,10 @@ public class PlayerManagementPanel:MonoBehaviour
 		if (index > 0)
 			{
 			string selectedPlayerName = playerNameDropdown.options[index].text;
-			selectedPlayer = currentTeamPlayers.FirstOrDefault(player => player.Name == selectedPlayerName);
+			selectedPlayer = currentTeamPlayers.FirstOrDefault(player => player.name == selectedPlayerName);
 			if (selectedPlayer != null)
 				{
-				Debug.Log($"Player selected: {selectedPlayer.Name}");
+				Debug.Log($"Player selected: {selectedPlayer.name}");
 				}
 			else
 				{
@@ -211,12 +211,12 @@ public class PlayerManagementPanel:MonoBehaviour
 		if (index > 0)
 			{
 			string selectedTeamName = teamNameDropdown.options[index].text;
-			selectedTeam = teamList.FirstOrDefault(team => team.Name == selectedTeamName);
+			selectedTeam = teamList.FirstOrDefault(team => team.name == selectedTeamName);
 			if (selectedTeam != null)
 				{
-				currentTeamPlayers = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.Id);
+				currentTeamPlayers = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id);
 				UpdatePlayerDropdown();
-				Debug.Log($"Team selected: {selectedTeam.Name}");
+				Debug.Log($"Team selected: {selectedTeam.name}");
 				}
 			else
 				{
@@ -241,11 +241,26 @@ public class PlayerManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// --- Link to PlayerLifetimeDataInputPanel via UIManager ---
+		// --- Link to PlayerLifetimeDataInputPanel via UIManager --- //
 		if (UIManager.Instance.playerLifetimeDataInputPanel != null)
 			{
-			UIManager.Instance.ShowPanel(UIManager.Instance.playerLifetimeDataInputPanel);
-			Debug.Log($"Opening Lifetime Data panel for player: {selectedPlayer.Name}");
+			// --- Get the PlayerLifetimeDataInputPanel component attached to the GameObject --- //
+			
+			if (UIManager.Instance.playerLifetimeDataInputPanel.TryGetComponent<PlayerLifetimeDataInputPanel>(out var lifetimeDataPanel))
+				{
+				// --- Pass the selected player data to the PlayerLifetimeDataInputPanel --- //
+				lifetimeDataPanel.SetPlayerData(selectedPlayer);
+
+				// --- Show the PlayerLifetimeDataInputPanel --- //
+				UIManager.Instance.ShowPanel(UIManager.Instance.playerLifetimeDataInputPanel);
+
+				Debug.Log($"Opening Lifetime Data panel for player: {selectedPlayer.name}");
+				}
+			else
+				{
+				Debug.LogError("PlayerLifetimeDataInputPanel component not found!");
+				ShowFeedback("Lifetime Data panel is not available.");
+				}
 			}
 		else
 			{
@@ -253,6 +268,8 @@ public class PlayerManagementPanel:MonoBehaviour
 			ShowFeedback("Lifetime Data panel is not available.");
 			}
 		}
+
+
 
 	#endregion Button Event Handlers
 

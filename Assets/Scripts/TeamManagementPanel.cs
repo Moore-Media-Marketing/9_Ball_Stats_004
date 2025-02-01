@@ -64,11 +64,11 @@ public class TeamManagementPanel:MonoBehaviour
 		Debug.Log($"Number of teams retrieved: {teamList.Count}");
 		foreach (var team in teamList)
 			{
-			Debug.Log($"Team: {team.Name}");
+			Debug.Log($"Team: {team.name}");
 			}
 
 		// Extract unique team names
-		List<string> uniqueTeamNames = teamList.Select(t => t.Name).Distinct().ToList();
+		List<string> uniqueTeamNames = teamList.Select(t => t.name).Distinct().ToList();
 		Debug.Log($"Unique team names: {string.Join(", ", uniqueTeamNames)}");
 
 		// Update dropdown options
@@ -93,10 +93,10 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		Team existingTeam = teamList.FirstOrDefault(t => t.Name == teamName);
+		Team existingTeam = teamList.FirstOrDefault(t => t.name == teamName);
 		if (existingTeam != null)
 			{
-			existingTeam.Name = teamName;
+			existingTeam.name = teamName;
 			DatabaseManager.Instance.SaveData();
 			ShowFeedback($"Team '{teamName}' updated.");
 			}
@@ -128,10 +128,10 @@ public class TeamManagementPanel:MonoBehaviour
 		if (teamDropdown.value > 0)
 			{
 			string selectedTeamName = teamDropdown.options[teamDropdown.value].text;
-			Team selectedTeam = teamList.FirstOrDefault(t => t.Name == selectedTeamName);
+			Team selectedTeam = teamList.FirstOrDefault(t => t.name == selectedTeamName);
 			if (selectedTeam != null)
 				{
-				selectedTeam.Name = teamName;
+				selectedTeam.name = teamName;
 				DatabaseManager.Instance.SaveData();
 				ShowFeedback($"Team name updated to '{teamName}'.");
 				UpdateTeamDropdown();
@@ -149,10 +149,10 @@ public class TeamManagementPanel:MonoBehaviour
 		if (teamDropdown.value > 0)
 			{
 			string selectedTeamName = teamDropdown.options[teamDropdown.value].text;
-			Team selectedTeam = teamList.FirstOrDefault(t => t.Name == selectedTeamName);
+			Team selectedTeam = teamList.FirstOrDefault(t => t.name == selectedTeamName);
 			if (selectedTeam != null)
 				{
-				ShowFeedback($"Are you sure you want to delete '{selectedTeam.Name}'?");
+				ShowFeedback($"Are you sure you want to delete '{selectedTeam.name}'?");
 				StartCoroutine(ConfirmDeletion(selectedTeam));
 				}
 			}
@@ -166,7 +166,7 @@ public class TeamManagementPanel:MonoBehaviour
 		{
 		yield return new WaitForSeconds(3f);
 		DatabaseManager.Instance.RemoveTeam(selectedTeam);
-		ShowFeedback($"Team '{selectedTeam.Name}' deleted.");
+		ShowFeedback($"Team '{selectedTeam.name}' deleted.");
 		UpdateTeamDropdown();
 		teamNameInputField.text = "";
 		}

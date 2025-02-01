@@ -56,17 +56,17 @@ public class UIManager:MonoBehaviour
 		List<Team> teamList = DatabaseManager.Instance.GetAllTeams();
 		List<string> teamNames = new();
 		foreach (var team in teamList)
-			teamNames.Add(team.Name);
+			teamNames.Add(team.name);
 
 		teamDropdown.AddOptions(teamNames);
 		teamNameDropdown.AddOptions(teamNames);
 
 		if (teamList.Count > 0)
 			{
-			List<Player> playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].Id);
+			List<Player> playerList = DatabaseManager.Instance.GetPlayersByTeam(teamList[0].id);
 			List<string> playerNames = new();
 			foreach (var player in playerList)
-				playerNames.Add(player.Name);
+				playerNames.Add(player.name);
 
 			playerNameDropdown.AddOptions(playerNames);
 			}

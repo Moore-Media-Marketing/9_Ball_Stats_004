@@ -1,61 +1,48 @@
+// --- Region: Using Directives --- //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using SQLite;
 
 using UnityEngine;
 
-[System.Serializable]
+// --- End Region: Using Directives --- //
+
+// --- Region: Class Definition --- //
+[Serializable]
 public class Team
 	{
-	[PrimaryKey, AutoIncrement]
-	public int Id { get; set; }  // Must be a property
+	// --- Region: Team Information --- //
 
-	[NotNull]
-	public string Name { get; set; }  // Must be a property
+	// --- Comment: Unique identifier for the team (assigned by DatabaseManager) --- //
+	public int id; // Placeholder: target_variable
 
-	[Ignore] // Prevents it from being stored in SQLite
-	public List<Player> Players { get; private set; } = new();  // Now the team has a list of players
+	// --- Comment: Name of the team --- //
+	[Tooltip("Enter the team's name.")] // --- Tooltip: Enter the team's name (placeholder: target_variable) --- //
+	public string name; // Placeholder: target_variable
 
-	public Team()
-		{ }
+	// --- End Region: Team Information --- //
 
+	// --- Region: Players List --- //
+
+	// --- Comment: List of players belonging to this team --- //
+	[Tooltip("List of players in the team.")]
+	public List<Player> players;
+
+	// --- End Region: Players List --- //
+
+	// --- Region: Constructor --- //
+
+	// --- Comment: Constructor for creating a new team --- //
 	public Team(string name)
 		{
-		Name = name;
+		this.name = name; // --- Comment: Assign the team's name (placeholder: target_variable) --- //
+		players = new List<Player>(); // --- Comment: Initialize the players list --- //
 		}
 
-	// --- Add Player to Team ---
-	public void AddPlayer(Player player)
-		{
-		if (player.TeamId != 0)
-			{
-			Debug.LogWarning($"Player {player.Name} is already part of a team!");
-			return;
-			}
+	// --- End Region: Constructor --- //
 
-		if (Players.Any(p => string.Equals(p.Name, player.Name, StringComparison.OrdinalIgnoreCase)))
-			{
-			Debug.LogWarning($"Player {player.Name} already exists in team {Name}.");
-			return;
-			}
-
-		// Link the player to this team
-		player.TeamId = this.Id;
-		Players.Add(player);  // Add player to the team's list
-
-		DatabaseManager.Instance.SaveData();
-		Debug.Log($"Player {player.Name} added to team {Name}.");
-		}
-
-	// --- Get Players from Team ---
-	public List<Player> GetPlayers()
-		{
-		if (Players.Count == 0) // Only fetch if not already loaded
-			{
-			Players = DatabaseManager.Instance.GetPlayersByTeam(this.Id);
-			}
-		return Players;
-		}
+	// --- Region: Additional Functions --- //
+	// --- Comment: Add any extra helper methods for the Team class here --- //
+	// --- End Region: Additional Functions --- //
 	}
+
+// --- End Region: Class Definition --- //
