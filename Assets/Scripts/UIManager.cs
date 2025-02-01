@@ -78,6 +78,9 @@ public class UIManager:MonoBehaviour
 
 	public void ShowPlayerManagementPanel() => ShowPanel(playerManagementPanel);
 
+	public void ShowPlayerLifetimeDataInputPanel() => ShowPanel(playerLifetimeDataInputPanel);
+
+	public void ShowPlayerCurrentSeasonDataInputPanel() => ShowPanel(playerCurrentSeasonDataInputPanel);
 	public void ShowMatchupComparisonPanel() => ShowPanel(matchupComparisonPanel);
 
 	public void ShowSettingsPanel() => ShowPanel(settingsPanel);

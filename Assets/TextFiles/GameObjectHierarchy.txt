@@ -12,6 +12,10 @@ Canvas
       Text (TMP)
     CreatePlayerButton
       Text (TMP)
+    CreateLifetimePlayerButton
+      Text (TMP)
+    CreateCurrentPlayerButton
+      Text (TMP)
     ComparisonButton
       Text (TMP)
     SettingsButton

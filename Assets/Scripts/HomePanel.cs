@@ -67,6 +67,16 @@ public class HomePanel:MonoBehaviour
 		UIManager.Instance.ShowPlayerManagementPanel();
 		}
 
+	public void OnPlayerLifetimeDataInputPanelClicked()
+		{
+		UIManager.Instance.ShowPlayerLifetimeDataInputPanel();
+		}
+
+	public void OnPlayerCurrentSeasonDataInputPanel()
+		{
+		UIManager.Instance.ShowPlayerCurrentSeasonDataInputPanel();
+		}
+
 	public void OnMatchupComparisonButtonClicked()
 		{
 		UIManager.Instance.ShowMatchupComparisonPanel();
