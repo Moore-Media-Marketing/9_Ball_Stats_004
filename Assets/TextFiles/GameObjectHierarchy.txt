@@ -58,7 +58,7 @@ Canvas
       Text Area
         Placeholder
         Text
-    TeamNameDropdown
+    TeamDropdown
       Label
       Arrow
       Template
@@ -94,7 +94,7 @@ Canvas
       UpdateBackButtonText
   PlayerLifetimeDataInputPanel
     HeaderText
-    TeamNameDropdown
+    TeamDropdown
       Label
       Arrow
       Template
@@ -162,7 +162,7 @@ Canvas
       UpdateBackButtonText
   PlayerCurrentSeasonDataInputPanel
     HeaderText
-    TeamNameDropdown
+    TeamDropdown
       Label
       Arrow
       Template

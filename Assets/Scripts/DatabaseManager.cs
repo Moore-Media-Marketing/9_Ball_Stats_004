@@ -1,10 +1,11 @@
 // --- Region: Using Directives --- //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
-
 // --- End Region: Using Directives --- //
+
 
 // --- Region: Class Definition --- //
 public class DatabaseManager:MonoBehaviour
@@ -32,19 +33,19 @@ public class DatabaseManager:MonoBehaviour
 
 	// --- End Region: Singleton Setup --- //
 
+
 	// --- Region: Private Data Storage --- //
 
 	// --- Comment: Placeholder keys for PlayerPrefs storage --- //
 	private const string TeamsKey = "teams_key";      // Placeholder key for teams
-
 	private const string PlayersKey = "players_key";    // Placeholder key for players
 
 	// --- Comment: In-memory lists for current session use (loaded from PlayerPrefs) --- //
-	private List<Team> teams = new();
-
-	private List<Player> players = new();
+	private List<Team> teams = new List<Team>();  // List of teams
+	private List<Player> players = new List<Player>();  // List of players
 
 	// --- End Region: Private Data Storage --- //
+
 
 	// --- Region: Team Methods --- //
 
@@ -59,6 +60,34 @@ public class DatabaseManager:MonoBehaviour
 		return teams;
 		}
 
+	// --- Comment: Returns the list of all team names --- //
+	public List<string> GetAllTeamNames()
+		{
+		return teams.Select(t => t.name).Distinct().ToList();
+		}
+
+	// --- Comment: Checks if a team with the given name exists (case-insensitive) --- //
+	public bool TeamExists(string teamName)
+		{
+		return teams.Any(t => t.name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
+		}
+
+	// --- Comment: Updates the team name given the old name and the new name --- //
+	public void UpdateTeamName(string oldName, string newName)
+		{
+		Team team = teams.FirstOrDefault(t => t.name.Equals(oldName, StringComparison.OrdinalIgnoreCase));
+		if (team != null)
+			{
+			team.name = newName;
+			SaveData();
+			Debug.Log("Team name updated to: " + newName);
+			}
+		else
+			{
+			Debug.LogWarning("Team not found for update: " + oldName);
+			}
+		}
+
 	// --- Comment: Adds a new team, assigns a unique ID, and saves to PlayerPrefs --- //
 	public void AddTeam(Team team)
 		{
@@ -67,72 +96,48 @@ public class DatabaseManager:MonoBehaviour
 			Debug.LogError("AddTeam failed: team is null.");
 			return;
 			}
-		team.id = teams.Count + 1; // Placeholder for unique ID generation
+
+		// --- Comment: Generate a unique ID; simple placeholder logic --- //
+		team.id = teams.Count > 0 ? teams.Max(t => t.id) + 1 : 1;
 		teams.Add(team);
-		SaveTeams();
+		SaveData();
 		Debug.Log("Team added: " + team.name);
 		}
 
-	// --- Comment: Removes a team and any associated players, then updates PlayerPrefs --- //
-	public void RemoveTeam(Team team)
+	// --- Comment: Removes a team (by name) and any associated players, then updates PlayerPrefs --- //
+	public void RemoveTeam(string teamName)
 		{
-		if (team == null)
+		Team team = teams.FirstOrDefault(t => t.name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
+		if (team != null)
 			{
-			Debug.LogError("RemoveTeam failed: team is null.");
-			return;
+			teams.Remove(team);
+			// --- Comment: Remove any players associated with this team --- //
+			players.RemoveAll(p => p.teamId == team.id);
+			SaveData();
+			Debug.Log("Team removed: " + team.name);
 			}
-		teams.Remove(team);
-		// --- Comment: Remove any players associated with this team --- //
-		players.RemoveAll(p => p.teamId == team.id);
-		SaveTeams();
-		SavePlayers();
-		Debug.Log("Team removed: " + team.name);
-		}
-
-	// --- Comment: Saves the teams list to PlayerPrefs using JSON serialization --- //
-	public void SaveTeams()
-		{
-		try
+		else
 			{
-			// --- Comment: Convert teams list to JSON --- //
-			string json = JsonUtility.ToJson(new SerializationWrapper<Team>(teams));
-			PlayerPrefs.SetString(TeamsKey, json);
-			PlayerPrefs.Save();
-			Debug.Log("Teams saved to PlayerPrefs.");
-			}
-		catch (System.Exception ex)
-			{
-			Debug.LogError("Error saving teams: " + ex.Message);
-			}
-		}
-
-	// --- Comment: Loads the teams list from PlayerPrefs --- //
-	public void LoadTeams()
-		{
-		try
-			{
-			if (PlayerPrefs.HasKey(TeamsKey))
-				{
-				string json = PlayerPrefs.GetString(TeamsKey);
-				SerializationWrapper<Team> wrapper = JsonUtility.FromJson<SerializationWrapper<Team>>(json);
-				teams = wrapper.Items;
-				}
-			else
-				{
-				teams = new List<Team>();
-				}
-			Debug.Log("Teams loaded from PlayerPrefs.");
-			}
-		catch (System.Exception ex)
-			{
-			Debug.LogError("Error loading teams: " + ex.Message);
-			teams = new List<Team>();
+			Debug.LogError("RemoveTeam failed: team not found - " + teamName);
 			}
 		}
 
 	// --- End Region: Team Methods --- //
 
+
 	// --- Region: Player Methods --- //
+
+	// --- Comment: Returns the list of all player names --- //
+	public List<string> GetAllPlayerNames()
+		{
+		return players.Select(p => p.name).Distinct().ToList();
+		}
+
+	// --- Comment: Returns a list of players for a given team ID --- //
+	public List<Player> GetPlayersByTeam(int teamId)
+		{
+		return players.FindAll(p => p.teamId == teamId);
+		}
 
 	// --- Comment: Adds a new player, assigns a unique ID, and saves to PlayerPrefs --- //
 	public void AddPlayer(Player player)
@@ -142,13 +147,11 @@ public class DatabaseManager:MonoBehaviour
 			Debug.LogError("AddPlayer failed: player is null.");
 			return;
 			}
-		player.id = players.Count + 1; // Placeholder for unique ID generation
-		players.Add(player);
-		SavePlayers();
 
-		// --- Comment: Optionally add the player to the team's internal list --- //
-		Team team = teams.Find(t => t.id == player.teamId);
-		team?.players.Add(player);
+		// --- Comment: Generate a unique ID; simple placeholder logic --- //
+		player.id = players.Count > 0 ? players.Max(p => p.id) + 1 : 1;
+		players.Add(player);
+		SaveData();
 		Debug.Log("Player added: " + player.name);
 		}
 
@@ -169,39 +172,41 @@ public class DatabaseManager:MonoBehaviour
 			{
 			players.Add(player);
 			}
-		SavePlayers();
+		SaveData();
 		Debug.Log("Player data saved: " + player.name);
 		}
 
-	// --- Comment: Returns a list of players for a given team ID --- //
-	public List<Player> GetPlayersByTeam(int teamId)
-		{
-		// --- Comment: Ensure players are loaded --- //
-		if (players == null || players.Count == 0)
-			{
-			LoadPlayers();
-			}
-		return players.FindAll(p => p.teamId == teamId);
-		}
+	// --- End Region: Player Methods --- //
 
-	// --- Comment: Saves the players list to PlayerPrefs using JSON serialization --- //
-	public void SavePlayers()
+
+	// --- Region: Data Loading and Saving --- //
+
+	// --- Comment: Loads the teams list from PlayerPrefs --- //
+	private void LoadTeams()
 		{
 		try
 			{
-			string json = JsonUtility.ToJson(new SerializationWrapper<Player>(players));
-			PlayerPrefs.SetString(PlayersKey, json);
-			PlayerPrefs.Save();
-			Debug.Log("Players saved to PlayerPrefs.");
+			if (PlayerPrefs.HasKey(TeamsKey))
+				{
+				string json = PlayerPrefs.GetString(TeamsKey);
+				SerializationWrapper<Team> wrapper = JsonUtility.FromJson<SerializationWrapper<Team>>(json);
+				teams = wrapper.Items ?? new List<Team>();
+				}
+			else
+				{
+				teams = new List<Team>();
+				}
+			Debug.Log("Teams loaded from PlayerPrefs.");
 			}
-		catch (System.Exception ex)
+		catch (Exception ex)
 			{
-			Debug.LogError("Error saving players: " + ex.Message);
+			Debug.LogError("Error loading teams: " + ex.Message);
+			teams = new List<Team>();
 			}
 		}
 
 	// --- Comment: Loads the players list from PlayerPrefs --- //
-	public void LoadPlayers()
+	private void LoadPlayers()
 		{
 		try
 			{
@@ -209,7 +214,7 @@ public class DatabaseManager:MonoBehaviour
 				{
 				string json = PlayerPrefs.GetString(PlayersKey);
 				SerializationWrapper<Player> wrapper = JsonUtility.FromJson<SerializationWrapper<Player>>(json);
-				players = wrapper.Items;
+				players = wrapper.Items ?? new List<Player>();
 				}
 			else
 				{
@@ -217,48 +222,54 @@ public class DatabaseManager:MonoBehaviour
 				}
 			Debug.Log("Players loaded from PlayerPrefs.");
 			}
-		catch (System.Exception ex)
+		catch (Exception ex)
 			{
 			Debug.LogError("Error loading players: " + ex.Message);
 			players = new List<Player>();
 			}
 		}
 
-	// --- End Region: Player Methods --- //
+	// --- End Region: Data Loading and Saving --- //
+
 
 	// --- Region: Additional Functions --- //
 
-	// --- Comment: Saves all data (teams and players) to PlayerPrefs --- //
+	// --- Comment: Saves all data (teams and players) to PlayerPrefs using JSON serialization --- //
 	public void SaveData()
 		{
-		SaveTeams();
-		SavePlayers();
-		Debug.Log("All data saved to PlayerPrefs.");
+		try
+			{
+			string teamsJson = JsonUtility.ToJson(new SerializationWrapper<Team>(teams));
+			PlayerPrefs.SetString(TeamsKey, teamsJson);
+
+			string playersJson = JsonUtility.ToJson(new SerializationWrapper<Player>(players));
+			PlayerPrefs.SetString(PlayersKey, playersJson);
+
+			PlayerPrefs.Save();
+			Debug.Log("All data saved to PlayerPrefs.");
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error saving data: " + ex.Message);
+			}
 		}
 
 	// --- End Region: Additional Functions --- //
 	}
-
 // --- End Region: Class Definition --- //
+
 
 // --- Region: Serialization Wrapper Class --- //
 [Serializable]
 public class SerializationWrapper<T>
 	{
-	// --- Region: Wrapper Data --- //
-	// --- Comment: List of items to be serialized --- //
+	// --- Comment: List of items to be serialized (placeholder: target_variable) --- //
 	public List<T> Items;
 
-	// --- End Region: Wrapper Data --- //
-
-	// --- Region: Constructor --- //
-	// --- Comment: Constructor that wraps the provided list (placeholder: target_variable) --- //
+	// --- Comment: Constructor that wraps the provided list --- //
 	public SerializationWrapper(List<T> items)
 		{
 		Items = items;
 		}
-
-	// --- End Region: Constructor --- //
 	}
-
 // --- End Region: Serialization Wrapper Class --- //

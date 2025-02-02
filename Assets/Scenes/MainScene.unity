@@ -1813,7 +1813,7 @@ GameObject:
   - component: {fileID: 99566341}
   - component: {fileID: 99566340}
   m_Layer: 5
-  m_Name: TeamNameDropdown
+  m_Name: TeamDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7832,7 +7832,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Option A
+  m_text: Select Team
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -18549,7 +18549,7 @@ GameObject:
   - component: {fileID: 1258114307}
   - component: {fileID: 1258114306}
   m_Layer: 5
-  m_Name: TeamNameDropdown
+  m_Name: TeamDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19816,13 +19816,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   headerText: {fileID: 1651958952}
-  teamNameDropdown: {fileID: 99566340}
-  playerNameDropdown: {fileID: 719395528}
-  playerNameInputField: {fileID: 975669118}
   addPlayerButton: {fileID: 1286751244}
   deletePlayerButton: {fileID: 1236643909}
   addPlayerDetailsButton: {fileID: 1825992370}
   backButton: {fileID: 215483377}
+  playerNameInputField: {fileID: 975669118}
 --- !u!1001 &1309106236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34449,7 +34447,7 @@ GameObject:
   - component: {fileID: 580160577286788399}
   - component: {fileID: 647432626433678614}
   m_Layer: 5
-  m_Name: TeamNameDropdown
+  m_Name: TeamDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
