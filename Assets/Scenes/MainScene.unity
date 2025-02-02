@@ -9592,7 +9592,7 @@ MonoBehaviour:
   teamManagementPanel: {fileID: 1070975108}
   playerManagementPanel: {fileID: 1300993008}
   playerLifetimeDataInputPanel: {fileID: 811180194}
-  playerCurrentSeasonDataInputPanel: {fileID: 2103155833}
+  playercurrentSeasonDataInputPanel: {fileID: 2103155833}
   matchupComparisonPanel: {fileID: 1581723996}
   matchupResultsPanel: {fileID: 948563813}
   settingsPanel: {fileID: 1849975074}
@@ -13868,6 +13868,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 993022969}
   m_CullTransparentMesh: 1
+--- !u!1 &994914302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 994914304}
+  - component: {fileID: 994914305}
+  m_Layer: 0
+  m_Name: MatchupComparisonManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &994914304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994914302}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &994914305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994914302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cad04218c7e43c42bf3f08a35ffb7ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matchupResultsPanel: {fileID: 948563817}
 --- !u!1 &995327017
 GameObject:
   m_ObjectHideFlags: 0
@@ -19253,6 +19298,7 @@ MonoBehaviour:
   matchupListContent: {fileID: 111132015}
   bestMatchupListContent: {fileID: 505016976}
   bestMatchupHeader: {fileID: 1531301374}
+  matchupComparisonManager: {fileID: 994914305}
 --- !u!1 &1286618528
 GameObject:
   m_ObjectHideFlags: 0
@@ -25737,7 +25783,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 1849975074}
   overlayFeedbackPanel: {fileID: 1134816541928465951}
   playerLifetimeDataInputPanel: {fileID: 811180194}
-  playerCurrentSeasonDataInputPanel: {fileID: 2103155833}
+  playercurrentSeasonDataInputPanel: {fileID: 2103155833}
   teamManagementButton: {fileID: 1127503129}
   playerManagementButton: {fileID: 1373157140}
   matchupComparisonButton: {fileID: 613782017}
@@ -30766,25 +30812,35 @@ MonoBehaviour:
   selectedPlayer:
     id: 0
     name: 
+    skillLevel: 0
     teamId: 0
-    currentSeasonTotalPoints: 0
-    currentSeasonPpm: 0
-    currentSeasonPaPercentage: 0
+    lifetimeMatchesPlayed: 0
+    lifetimeMatchesWon: 0
+    lifetimeDefensiveShotAvg: 0
+    lifetimeGamesPlayed: 0
+    lifetimeGamesWon: 0
+    lifetimeMiniSlams: 0
+    lifetimeNineOnTheSnap: 0
+    lifetimeShutouts: 0
+    lifetimeBreakAndRun: 0
+    lifetimeTotalPoints: 0
+    matchesPlayedInLast2Years: 0
     currentSeasonBreakAndRun: 0
-    currentSeasonSkillLevel: 0
-    currentSeasonGamesPlayed: 0
-    currentSeasonGamesWon: 0
+    currentSeasonDefensiveShotAverage: 0
+    currentSeasonMatchesPlayed: 0
+    currentSeasonMatchesWon: 0
     currentSeasonMiniSlams: 0
     currentSeasonNineOnTheSnap: 0
+    currentSeasonPaPercentage: 0
+    currentSeasonPointsAwarded: 0
+    currentSeasonPointsPerMatch: 0
     currentSeasonShutouts: 0
-    lifetimeGamesWon: 0
-    lifetimeGamesPlayed: 0
-    lifetimeDefensiveShotAvg: 0
-    matchesPlayedInLast2Years: 0
-    lifetimeBreakAndRun: 0
-    lifetimeNineOnTheSnap: 0
-    lifetimeMiniSlams: 0
-    lifetimeShutouts: 0
+    currentSeasonSkillLevel: 0
+    currentSeasonTotalPoints: 0
+    currentSeasonGamesPlayed: 0
+    currentSeasonGamesWon: 0
+    currentSeasonPpm: 0
+    PointsRequiredToWin: 0
   GamesWonInputField: {fileID: 1668742384}
   GamesPlayedInputField: {fileID: 1161955007}
   TotalPointsInputField: {fileID: 1083603789}
@@ -36851,6 +36907,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 648930128}
   - {fileID: 1285032812}
+  - {fileID: 994914304}
   - {fileID: 711083288}
   - {fileID: 385777182}
   - {fileID: 1239565784}

@@ -1,8 +1,11 @@
+// --- Region: Using Directives --- //
 using TMPro;
-
 using UnityEngine;
+using System.Collections.Generic;
+// --- End Region: Using Directives --- //
 
-public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
+// --- Region: Class Definition --- //
+public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 	{
 	#region Fields and UI Elements
 
@@ -50,7 +53,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		// --- Initialize the UI with the player's current season data on start ---
 		UpdatePlayerData();
 
-		// --- Set up listeners to update player data when fields change --- //
+		// --- Set up listeners to update player data when fields change ---
 		GamesWonInputField.onValueChanged.AddListener(OnGamesWonChanged);
 		GamesPlayedInputField.onValueChanged.AddListener(OnGamesPlayedChanged);
 		TotalPointsInputField.onValueChanged.AddListener(OnTotalPointsChanged);
@@ -61,13 +64,16 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		NineOnTheSnapInputField.onValueChanged.AddListener(OnNineOnTheSnapChanged);
 		ShutoutsInputField.onValueChanged.AddListener(OnShutoutsChanged);
 		SkillLevelDropdown.onValueChanged.AddListener(OnSkillLevelChanged);
+
+		// --- Refresh dropdowns using DropdownManager ---
+		DropdownManager.Instance.RefreshAllDropdowns();
 		}
 
 	#endregion Unity Methods
 
 	#region Data Update Methods
 
-	// --- Update the UI with the selected player's current season data --- //
+	// --- Update the UI with the selected player's current season data ---
 	private void UpdatePlayerData()
 		{
 		if (selectedPlayer != null)
@@ -95,7 +101,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 
 	#region Input Field Change Handlers
 
-	// --- Handle the change in the "Games Won" input field --- //
+	// --- Handle the change in the "Games Won" input field ---
 	private void OnGamesWonChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int gamesWon))
@@ -104,7 +110,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Games Played" input field --- //
+	// --- Handle the change in the "Games Played" input field ---
 	private void OnGamesPlayedChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int gamesPlayed))
@@ -113,7 +119,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Total Points" input field --- //
+	// --- Handle the change in the "Total Points" input field ---
 	private void OnTotalPointsChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int totalPoints))
@@ -122,16 +128,16 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Points Per Match" input field --- //
+	// --- Handle the change in the "Points Per Match" input field ---
 	private void OnPPMChanged(string value)
 		{
 		if (selectedPlayer != null && float.TryParse(value, out float ppm))
 			{
-			selectedPlayer.currentSeasonPpm = ppm;
+			selectedPlayer.currentSeasonPpm = (int) ppm;
 			}
 		}
 
-	// --- Handle the change in the "PA Percentage" input field --- //
+	// --- Handle the change in the "PA Percentage" input field ---
 	private void OnPAPercentageChanged(string value)
 		{
 		if (selectedPlayer != null && float.TryParse(value, out float paPercentage))
@@ -140,7 +146,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Break and Run" input field --- //
+	// --- Handle the change in the "Break and Run" input field ---
 	private void OnBreakAndRunChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int breakAndRun))
@@ -149,7 +155,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Mini Slams" input field --- //
+	// --- Handle the change in the "Mini Slams" input field ---
 	private void OnMiniSlamsChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int miniSlams))
@@ -158,7 +164,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "9 on the Snap" input field --- //
+	// --- Handle the change in the "9 on the Snap" input field ---
 	private void OnNineOnTheSnapChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int nineOnTheSnap))
@@ -167,7 +173,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Shutouts" input field --- //
+	// --- Handle the change in the "Shutouts" input field ---
 	private void OnShutoutsChanged(string value)
 		{
 		if (selectedPlayer != null && int.TryParse(value, out int shutouts))
@@ -176,7 +182,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 			}
 		}
 
-	// --- Handle the change in the "Skill Level" dropdown --- //
+	// --- Handle the change in the "Skill Level" dropdown ---
 	private void OnSkillLevelChanged(int index)
 		{
 		if (selectedPlayer != null)
@@ -189,7 +195,9 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 
 	#region Additional Functions
 
-	// --- Additional custom functions for data input can be added here --- //
+	// --- Additional custom functions for data input can be added here ---
 
 	#endregion Additional Functions
 	}
+
+// --- End Region: Class Definition --- //

@@ -206,16 +206,23 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private void ShowFeedback(string message)
 		{
-		FeedbackOverlay.Instance?.ShowFeedback(message, 2f);
+		if (FeedbackOverlay.Instance != null)
+			{
+			FeedbackOverlay.Instance.ShowFeedback(message, 2f);
+			}
+		else
+			{
+			Debug.LogWarning("FeedbackOverlay.Instance is null, cannot show feedback.");
+			}
 		}
+
 
 	#endregion Feedback Functions
 	}
 
 
-	#region Additional Functions
+#region Additional Functions
 
-	// --- Additional custom functions can be added here --- //
+// --- Additional custom functions can be added here --- //
 
-	#endregion Additional Functions
-	
+#endregion Additional Functions

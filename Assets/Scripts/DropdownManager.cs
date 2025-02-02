@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 
 using UnityEngine;
-// --- End Region: Using Directives --- //
 
+// --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
 public class DropdownManager:MonoBehaviour
@@ -20,6 +20,7 @@ public class DropdownManager:MonoBehaviour
 		else
 			Destroy(gameObject);
 		}
+
 	// --- End Region: Singleton Setup --- //
 
 	// --- Region: Public Dropdown References --- //
@@ -40,6 +41,7 @@ public class DropdownManager:MonoBehaviour
 	[Header("Skill Level Dropdown")]
 	[Tooltip("Dropdown for selecting skill level from 1 to 9.")]
 	public TMP_Dropdown skillLevelDropdown;
+
 	// --- End Region: Public Dropdown References --- //
 
 	// --- Region: Unity Methods --- //
@@ -47,6 +49,7 @@ public class DropdownManager:MonoBehaviour
 		{
 		RefreshAllDropdowns();
 		}
+
 	// --- End Region: Unity Methods --- //
 
 	// --- Region: Dropdown Population Methods --- //
@@ -85,7 +88,7 @@ public class DropdownManager:MonoBehaviour
 	// --- Comment: Populates the skill level dropdown with levels 1 through 9 --- //
 	public void PopulateSkillLevelDropdown()
 		{
-		List<string> skillLevels = new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+		List<string> skillLevels = new() { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 		UpdateDropdown(skillLevelDropdown, skillLevels);
 		}
 
@@ -99,4 +102,5 @@ public class DropdownManager:MonoBehaviour
 
 	// --- End Region: Dropdown Population Methods --- //
 	}
+
 // --- End Region: Class Definition --- //

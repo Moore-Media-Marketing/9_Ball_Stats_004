@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class MatchupComparisonManager:MonoBehaviour
 	{
-	// Example structures for player data (simplified for illustration)
+	// --- Region: Player and Team Data --- //
+	// Updated Player structure to match the data fields used in the SampleDataGenerator
 	public class Player
 		{
 		public string name;
@@ -20,7 +21,8 @@ public class MatchupComparisonManager:MonoBehaviour
 		public float currentSeasonTotalPoints;
 		public float currentSeasonPPM;
 		public float currentSeasonSkillLevel;
-		// More stats can be added as needed
+		public float currentSeasonPointsAwarded;
+		public int pointsRequiredToWin;
 		}
 
 	public class Team
@@ -29,46 +31,51 @@ public class MatchupComparisonManager:MonoBehaviour
 		public List<Player> players;
 		}
 
-	// Example teams (to be populated with actual data)
-	private List<Team> teams = new();
+	// --- End Region --- //
 
+	// --- Region: UI Elements --- //
+	public MatchupResultsPanel matchupResultsPanel;  // Reference to the MatchupResultsPanel for displaying results
+
+	// --- End Region --- //
+
+	// --- Region: Team Selection --- //
 	// These represent the selected teams A and B (we'll get this data from the UI)
 	public Team selectedTeamA;
 
 	public Team selectedTeamB;
 
-	// Update these methods to get selected teams and players from UI (assumed to be set via UIManager)
+	// For demonstration, the following methods return dummy data.
+	// Replace them with actual UIManager data fetching.
+
 	private Team GetSelectedTeamA()
 		{
-		// For demonstration, return dummy data
-		// Replace with actual logic to get the selected team
 		return new Team
 			{
 			teamName = "Team A",
 			players = new List<Player>
 			{
-				new() { name = "Player A1", lifetimeGamesWon = 50, lifetimeGamesPlayed = 100, lifetimeBreakAndRun = 1.5f, lifetimeMiniSlams = 10, lifetimeShutouts = 5, currentSeasonGamesWon = 10, currentSeasonGamesPlayed = 20, currentSeasonPPM = 2.3f, currentSeasonSkillLevel = 4.2f },
-				new() { name = "Player A2", lifetimeGamesWon = 40, lifetimeGamesPlayed = 90, lifetimeBreakAndRun = 1.3f, lifetimeMiniSlams = 8, lifetimeShutouts = 6, currentSeasonGamesWon = 8, currentSeasonGamesPlayed = 18, currentSeasonPPM = 1.9f, currentSeasonSkillLevel = 4.0f }
+				new() { name = "Player A1", lifetimeGamesWon = 50, lifetimeGamesPlayed = 100, lifetimeBreakAndRun = 1.5f, lifetimeMiniSlams = 10, lifetimeShutouts = 5, currentSeasonGamesWon = 10, currentSeasonGamesPlayed = 20, currentSeasonPPM = 2.3f, currentSeasonSkillLevel = 4.2f, pointsRequiredToWin = 7 },
+				new() { name = "Player A2", lifetimeGamesWon = 40, lifetimeGamesPlayed = 90, lifetimeBreakAndRun = 1.3f, lifetimeMiniSlams = 8, lifetimeShutouts = 6, currentSeasonGamesWon = 8, currentSeasonGamesPlayed = 18, currentSeasonPPM = 1.9f, currentSeasonSkillLevel = 4.0f, pointsRequiredToWin = 7 }
 			}
 			};
 		}
 
 	private Team GetSelectedTeamB()
 		{
-		// For demonstration, return dummy data
-		// Replace with actual logic to get the selected team
 		return new Team
 			{
 			teamName = "Team B",
 			players = new List<Player>
 			{
-				new() { name = "Player B1", lifetimeGamesWon = 60, lifetimeGamesPlayed = 120, lifetimeBreakAndRun = 1.8f, lifetimeMiniSlams = 15, lifetimeShutouts = 7, currentSeasonGamesWon = 12, currentSeasonGamesPlayed = 22, currentSeasonPPM = 2.5f, currentSeasonSkillLevel = 4.5f },
-				new() { name = "Player B2", lifetimeGamesWon = 55, lifetimeGamesPlayed = 110, lifetimeBreakAndRun = 1.6f, lifetimeMiniSlams = 14, lifetimeShutouts = 9, currentSeasonGamesWon = 11, currentSeasonGamesPlayed = 20, currentSeasonPPM = 2.1f, currentSeasonSkillLevel = 4.3f }
+				new() { name = "Player B1", lifetimeGamesWon = 60, lifetimeGamesPlayed = 120, lifetimeBreakAndRun = 1.8f, lifetimeMiniSlams = 15, lifetimeShutouts = 7, currentSeasonGamesWon = 12, currentSeasonGamesPlayed = 22, currentSeasonPPM = 2.5f, currentSeasonSkillLevel = 4.5f, pointsRequiredToWin = 7 },
+				new() { name = "Player B2", lifetimeGamesWon = 55, lifetimeGamesPlayed = 110, lifetimeBreakAndRun = 1.6f, lifetimeMiniSlams = 14, lifetimeShutouts = 9, currentSeasonGamesWon = 11, currentSeasonGamesPlayed = 20, currentSeasonPPM = 2.1f, currentSeasonSkillLevel = 4.3f, pointsRequiredToWin = 7 }
 			}
 			};
 		}
 
-	// Compare matchups method
+	// --- End Region --- //
+
+	// --- Region: Compare Matchups --- //
 	public void CompareMatchups()
 		{
 		selectedTeamA = GetSelectedTeamA();
@@ -90,11 +97,13 @@ public class MatchupComparisonManager:MonoBehaviour
 				}
 			}
 
-		// Display results
+		// Display results in the UI
 		DisplayMatchupResults(matchupResults);
 		}
 
-	// Comparing players based on lifetime and current season stats
+	// --- End Region --- //
+
+	// --- Region: Player Comparison --- //
 	private string ComparePlayers(Player playerA, Player playerB)
 		{
 		// Calculate comparison scores based on lifetime and current season stats
@@ -122,18 +131,20 @@ public class MatchupComparisonManager:MonoBehaviour
 								   player.currentSeasonPPM * 0.3f +
 								   player.currentSeasonSkillLevel * 0.3f;
 
-		return lifetimeScore + currentSeasonScore;
+		// Add PointsRequiredToWin to the calculation if needed (you can adjust the weight here)
+		float pointsAdjustment = player.pointsRequiredToWin * 0.1f;
+
+		return lifetimeScore + currentSeasonScore + pointsAdjustment;
 		}
 
-	// Display the results of the comparison (e.g., output to UI or console)
+	// --- End Region --- //
+
+	// --- Region: UI Update --- //
 	private void DisplayMatchupResults(List<string> results)
 		{
-		foreach (var result in results)
-			{
-			Debug.Log(result);  // For now, output results to console
-			}
-
-		// Optionally, update the UI with the results
-		// Example: resultsPanel.UpdateResults(results);
+		// Update the MatchupResultsPanel UI with the results
+		matchupResultsPanel.UpdateMatchupResults("Matchup Results", selectedTeamA.teamName, selectedTeamB.teamName, string.Join("\n", results));
 		}
+
+	// --- End Region --- //
 	}

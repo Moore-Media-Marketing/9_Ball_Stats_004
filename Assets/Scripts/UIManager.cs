@@ -14,7 +14,7 @@ public class UIManager:MonoBehaviour
 	public GameObject teamManagementPanel;
 	public GameObject playerManagementPanel;
 	public GameObject playerLifetimeDataInputPanel;
-	public GameObject playerCurrentSeasonDataInputPanel;
+	public GameObject playercurrentSeasonDataInputPanel;
 	public GameObject matchupComparisonPanel;
 	public GameObject matchupResultsPanel;
 	public GameObject settingsPanel;
@@ -80,7 +80,8 @@ public class UIManager:MonoBehaviour
 
 	public void ShowPlayerLifetimeDataInputPanel() => ShowPanel(playerLifetimeDataInputPanel);
 
-	public void ShowPlayerCurrentSeasonDataInputPanel() => ShowPanel(playerCurrentSeasonDataInputPanel);
+	public void ShowPlayercurrentSeasonDataInputPanel() => ShowPanel(playercurrentSeasonDataInputPanel);
+
 	public void ShowMatchupComparisonPanel() => ShowPanel(matchupComparisonPanel);
 
 	public void ShowSettingsPanel() => ShowPanel(settingsPanel);
@@ -92,7 +93,7 @@ public class UIManager:MonoBehaviour
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
 		playerLifetimeDataInputPanel.SetActive(false);
-		playerCurrentSeasonDataInputPanel.SetActive(false);
+		playercurrentSeasonDataInputPanel.SetActive(false);
 		matchupComparisonPanel.SetActive(false);
 		matchupResultsPanel.SetActive(false);
 		settingsPanel.SetActive(false);

@@ -7,8 +7,8 @@ using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
-// --- End Region: Using Directives --- //
 
+// --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
 public class TeamManagementPanel:MonoBehaviour
@@ -42,13 +42,14 @@ public class TeamManagementPanel:MonoBehaviour
 
 	[Header("Overlay Feedback")]
 	public GameObject overlayFeedbackPanel;
+
 	public TMP_Text feedbackText;
 
 	#endregion UI Elements
 
 	#region Private Fields
 
-	private List<Team> teamList = new List<Team>();
+	private List<Team> teamList = new();
 
 	#endregion Private Fields
 
@@ -104,7 +105,7 @@ public class TeamManagementPanel:MonoBehaviour
 			}
 		else
 			{
-			Team newTeam = new Team(teamName);
+			Team newTeam = new(teamName);
 			DatabaseManager.Instance.AddTeam(newTeam);
 			ShowFeedback($"Team '{teamName}' added.");
 			}
@@ -196,4 +197,5 @@ public class TeamManagementPanel:MonoBehaviour
 
 	#endregion Additional Functions
 	}
+
 // --- End Region: Class Definition --- //

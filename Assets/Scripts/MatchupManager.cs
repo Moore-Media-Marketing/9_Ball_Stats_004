@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using TMPro;
 
 using UnityEngine;
@@ -22,6 +24,9 @@ public class MatchupManager:MonoBehaviour
 	[Tooltip("Text element for the best matchup header.")]
 	public TMP_Text bestMatchupHeader;
 
+	[Tooltip("Reference to the MatchupComparisonManager.")]
+	public MatchupComparisonManager matchupComparisonManager;  // Reference to the MatchupComparisonManager
+
 	#endregion UI References
 
 	#region Methods
@@ -43,8 +48,96 @@ public class MatchupManager:MonoBehaviour
 			Destroy(child.gameObject);
 			}
 
+		// --- Get the teams' data from the MatchupComparisonManager --- //
+		MatchupComparisonManager.Team selectedTeamA = matchupComparisonManager.selectedTeamA;
+		MatchupComparisonManager.Team selectedTeamB = matchupComparisonManager.selectedTeamB;
+
 		// --- Generate matchups (Placeholder for actual logic) --- //
-		Debug.Log("Comparing teams and generating matchups...");
+		List<string> matchupResults = new();
+
+		// Compare players from both teams
+		for (int i = 0; i < selectedTeamA.players.Count; i++)
+			{
+			for (int j = 0; j < selectedTeamB.players.Count; j++)
+				{
+				var playerA = selectedTeamA.players[i];
+				var playerB = selectedTeamB.players[j];
+
+				// Compare players and add result
+				string result = ComparePlayers(playerA, playerB);
+				matchupResults.Add(result);
+
+				// --- Instantiate matchup entries and display them in the scroll view --- //
+				CreateMatchupEntry(result);
+				}
+			}
+
+		// --- Display the best matchup --- //
+		DisplayBestMatchup(matchupResults);
+		}
+
+	// --- Compare players based on selected stats --- //
+	private string ComparePlayers(MatchupComparisonManager.Player playerA, MatchupComparisonManager.Player playerB)
+		{
+		// Calculate player scores (for example purposes, using a simple comparison)
+		float playerAScore = CalculatePlayerScore(playerA);
+		float playerBScore = CalculatePlayerScore(playerB);
+
+		if (playerAScore > playerBScore)
+			{
+			return $"{playerA.name} wins vs {playerB.name}";
+			}
+		else if (playerBScore > playerAScore)
+			{
+			return $"{playerB.name} wins vs {playerA.name}";
+			}
+		else
+			{
+			return $"{playerA.name} vs {playerB.name} is a tie";
+			}
+		}
+
+	// --- Calculate a score for a player based on stats --- //
+	private float CalculatePlayerScore(MatchupComparisonManager.Player player)
+		{
+		// Example: Calculate score based on lifetime and current season data (simplified)
+		float lifetimeScore = (player.lifetimeGamesWon / player.lifetimeGamesPlayed) * 0.3f +
+							  player.lifetimeBreakAndRun * 0.2f +
+							  player.lifetimeMiniSlams * 0.2f +
+							  player.lifetimeShutouts * 0.3f;
+
+		float currentSeasonScore = (player.currentSeasonGamesWon / player.currentSeasonGamesPlayed) * 0.4f +
+								   player.currentSeasonPPM * 0.3f +
+								   player.currentSeasonSkillLevel * 0.3f;
+
+		return lifetimeScore + currentSeasonScore;
+		}
+
+	// --- Create a UI entry for the matchup result --- //
+	private void CreateMatchupEntry(string result)
+		{
+		GameObject newEntry = Instantiate(matchupEntryTemplate, matchupListContent);
+		TMP_Text entryText = newEntry.GetComponentInChildren<TMP_Text>();
+		entryText.text = result;
+		}
+
+	// --- Display the best matchup based on scores --- //
+	private void DisplayBestMatchup(List<string> matchupResults)
+		{
+		// Example logic: Display the first matchup as the "best" matchup
+		if (matchupResults.Count > 0)
+			{
+			bestMatchupHeader.text = "Best Matchup";
+			CreateBestMatchupEntry(matchupResults[0]);
+			}
+		}
+
+	// --- Create the best matchup entry --- //
+	private void CreateBestMatchupEntry(string bestMatchup)
+		{
+		GameObject newBestEntry = Instantiate(matchupEntryTemplate, bestMatchupListContent);
+		TMP_Text entryText = newBestEntry.GetComponentInChildren<TMP_Text>();
+		entryText.text = bestMatchup;
 		}
 
 	// --- Closes the matchup results panel --- //

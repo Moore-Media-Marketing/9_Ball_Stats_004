@@ -6,15 +6,17 @@ public class HomePanel:MonoBehaviour
 
 	[Header("Panels")]
 	public GameObject teamManagementPanel;
+
 	public GameObject playerManagementPanel;
 	public GameObject matchupComparisonPanel;
 	public GameObject settingsPanel;
 	public GameObject overlayFeedbackPanel;
 	public GameObject playerLifetimeDataInputPanel; // Added
-	public GameObject playerCurrentSeasonDataInputPanel; // Added
+	public GameObject playercurrentSeasonDataInputPanel; // Added
 
 	[Header("Buttons")]
 	public GameObject teamManagementButton;
+
 	public GameObject playerManagementButton;
 	public GameObject matchupComparisonButton;
 	public GameObject settingsButton;
@@ -72,9 +74,9 @@ public class HomePanel:MonoBehaviour
 		UIManager.Instance.ShowPlayerLifetimeDataInputPanel();
 		}
 
-	public void OnPlayerCurrentSeasonDataInputPanel()
+	public void OnPlayercurrentSeasonDataInputPanel()
 		{
-		UIManager.Instance.ShowPlayerCurrentSeasonDataInputPanel();
+		UIManager.Instance.ShowPlayercurrentSeasonDataInputPanel();
 		}
 
 	public void OnMatchupComparisonButtonClicked()

@@ -6,6 +6,7 @@ using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
+
 // --- End Region: Using Directives --- //
 
 public class PlayerLifetimeDataInputPanel:MonoBehaviour
