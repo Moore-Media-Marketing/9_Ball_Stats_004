@@ -75,12 +75,34 @@ public class MatchupResultsPanel:MonoBehaviour
 		teamAHeaderText.text = teamAName;
 		teamBHeaderText.text = teamBName;
 
-		// Update the results with the data passed from the comparison
-		string matchupResults = $"Team A Wins: {resultData.teamAWins}%\nTeam B Wins: {resultData.teamBWins}%";
+		// Safely calculate the win percentages
+		float teamAWins = resultData.teamAWins;
+		float teamBWins = resultData.teamBWins;
+
+		if (teamAWins < 0 || teamBWins < 0)
+			{
+			Debug.LogError("Invalid win percentages: teamAWins or teamBWins are less than zero.");
+			}
+
+		// Check if the win percentages are valid before calculating the results
+		string matchupResults = string.Empty;
+
+		if (teamAWins >= 0 && teamBWins >= 0)
+			{
+			// Safely calculate and format the results
+			matchupResults = $"Team A Wins: {teamAWins}%\nTeam B Wins: {teamBWins}%";
+			}
+		else
+			{
+			// Log error if calculations are invalid
+			Debug.LogError("Invalid win percentage calculation.");
+			matchupResults = "Invalid matchup results.";
+			}
 
 		// Update the results in the UI
 		UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
 		}
+
 	// --- End Region ---
 
 	// --- Region: Prefab References ---
