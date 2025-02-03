@@ -1,4 +1,4 @@
-using TMPro;  // Import TMP namespace
+using TMPro;  // Import TextMeshPro namespace
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,20 +6,44 @@ using UnityEngine.UI;
 public class MatchupResultsPanel:MonoBehaviour
 	{
 	// --- Region: UI Elements ---
-	public TMP_Text headerText;  // The header text at the top of the panel
-	public TMP_Text teamAHeaderText;  // Header text for Team A
-	public TMP_Text teamBHeaderText;  // Header text for Team B
-	public ScrollRect matchupsScrollView;  // Scrollable area for matchup results
-	public TMP_Text bestMatchupHeaderText;  // Header text for best matchups
-	public ScrollRect bestMatchupsScrollView;  // Scrollable area for best matchups
-	public Button backButton;  // Button to navigate back to the home panel
-							   // --- End Region ---
+	[Header("UI Elements")]
+	[Tooltip("The header text at the top of the panel")]
+	public TMP_Text headerText;
+
+	[Tooltip("Header text for Team A")]
+	public TMP_Text teamAHeaderText;
+
+	[Tooltip("Header text for Team B")]
+	public TMP_Text teamBHeaderText;
+
+	[Tooltip("Scrollable area for matchup results")]
+	public ScrollRect matchupsScrollView;
+
+	[Tooltip("Header text for best matchups")]
+	public TMP_Text bestMatchupHeaderText;
+
+	[Tooltip("Scrollable area for best matchups")]
+	public ScrollRect bestMatchupsScrollView;
+
+	[Tooltip("Button to navigate back to the home panel")]
+	public Button backButton;
+
+	[Tooltip("Prefab for displaying matchup results")]
+	public TMP_Text matchupResultsTextPrefab;  // Ensure this is assigned in the Inspector!
+
+	// --- End Region ---
 
 	// --- Region: Initialization ---
 	private void Start()
 		{
-		// Add listener for the back button click
-		backButton.onClick.AddListener(OnBackButtonClicked);
+		if (backButton != null)
+			{
+			backButton.onClick.AddListener(OnBackButtonClicked);
+			}
+		else
+			{
+			Debug.LogError("BackButton is not assigned in the Inspector!");
+			}
 		}
 	// --- End Region ---
 
@@ -27,12 +51,18 @@ public class MatchupResultsPanel:MonoBehaviour
 	private void OnBackButtonClicked()
 		{
 		// Use UIManager to switch back to the home panel
-		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
+		if (UIManager.Instance != null)
+			{
+			UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
+			}
+		else
+			{
+			Debug.LogError("UIManager instance is null! Cannot navigate back.");
+			}
 		}
 	// --- End Region ---
 
 	// --- Region: Update UI ---
-	// This method will be called to update the matchup results
 	public void UpdateMatchupResults(string header, string teamAName, string teamBName, string matchupResults)
 		{
 		// Update the header text
@@ -42,7 +72,7 @@ public class MatchupResultsPanel:MonoBehaviour
 		teamAHeaderText.text = teamAName;
 		teamBHeaderText.text = teamBName;
 
-		// Safely update the results in the scroll view
+		// Ensure content exists before attempting to update
 		if (matchupsScrollView.content != null)
 			{
 			// Clear previous matchup results before adding new ones
@@ -51,61 +81,73 @@ public class MatchupResultsPanel:MonoBehaviour
 				Destroy(child.gameObject);
 				}
 
-			// Instantiate a new entry from the prefab and set its text
-			TMP_Text resultTextInstance = Instantiate(matchupResultsTextPrefab, matchupsScrollView.content);
-			resultTextInstance.text = matchupResults;
+			// Ensure prefab is assigned before instantiating
+			if (matchupResultsTextPrefab != null)
+				{
+				TMP_Text resultTextInstance = Instantiate(matchupResultsTextPrefab, matchupsScrollView.content);
+				resultTextInstance.text = matchupResults;
+				}
+			else
+				{
+				Debug.LogError("matchupResultsTextPrefab is not assigned in the Inspector!");
+				}
 			}
 		else
 			{
 			Debug.LogError("No content found in matchupsScrollView.");
 			}
-
-		// You can also add other relevant UI updates for best matchups, etc.
 		}
 	// --- End Region ---
 
 	// --- Region: Set Matchup Data ---
-	// This method is added to match the expected call in MatchupComparisonPanel
 	public void SetMatchupData(MatchupResultData resultData, string teamAName, string teamBName)
 		{
-		// Use the data from the resultData to update the UI as needed
+		if (resultData == null)
+			{
+			Debug.LogError("Received null MatchupResultData!");
+			return;
+			}
+
+		// Set dynamic header
 		string header = "Matchup Results";
 
-		// Update the team names dynamically based on the selected teams
+		// Update team names
 		teamAHeaderText.text = teamAName;
 		teamBHeaderText.text = teamBName;
 
-		// Safely calculate the win percentages
+		// Validate matchup data
 		float teamAWins = resultData.teamAWins;
 		float teamBWins = resultData.teamBWins;
+		float totalMatches = teamAWins + teamBWins;
+
+		if (float.IsNaN(teamAWins) || float.IsNaN(teamBWins))
+			{
+			Debug.LogError("Win percentage contains NaN values. Check data source.");
+			return;
+			}
 
 		if (teamAWins < 0 || teamBWins < 0)
 			{
-			Debug.LogError("Invalid win percentages: teamAWins or teamBWins are less than zero.");
+			Debug.LogError("Win counts cannot be negative.");
+			return;
 			}
 
-		// Check if the win percentages are valid before calculating the results
-		string matchupResults = string.Empty;
-
-		if (teamAWins >= 0 && teamBWins >= 0)
+		// Calculate and display win percentages safely
+		string matchupResults;
+		if (totalMatches > 0)
 			{
-			// Safely calculate and format the results
-			matchupResults = $"Team A Wins: {teamAWins}%\nTeam B Wins: {teamBWins}%";
+			float teamAWinPercentage = (teamAWins / totalMatches) * 100f;
+			float teamBWinPercentage = (teamBWins / totalMatches) * 100f;
+			matchupResults = $"Team A Wins: {teamAWinPercentage:F2}%\nTeam B Wins: {teamBWinPercentage:F2}%";
 			}
 		else
 			{
-			// Log error if calculations are invalid
-			Debug.LogError("Invalid win percentage calculation.");
-			matchupResults = "Invalid matchup results.";
+			matchupResults = "No valid matches played.";
+			Debug.LogWarning("Total matches played is zero. Win percentages cannot be calculated.");
 			}
 
-		// Update the results in the UI
+		// Update the UI with calculated results
 		UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
 		}
-
 	// --- End Region ---
-
-	// --- Region: Prefab References ---
-	public TMP_Text matchupResultsTextPrefab;  // The prefab for the result text (assign this in the Inspector)
-											   // --- End Region ---
 	}
