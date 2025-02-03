@@ -38,6 +38,12 @@ public class MatchupComparisonPanel:MonoBehaviour
 	[Tooltip("Button to go back to the previous panel.")]
 	public Button backButton;  // --- Back button for panel navigation ---
 
+	[Tooltip("Matchup comparison panel for toggling visibility.")]
+	public GameObject matchupComparisonPanel;  // --- Panel for matchup comparison ---
+
+	[Tooltip("Matchup results panel for toggling visibility.")]
+	public GameObject matchupResultsPanel;  // --- Panel for matchup results ---
+
 	#endregion UI Elements
 
 	#region Unity Methods
@@ -83,23 +89,32 @@ public class MatchupComparisonPanel:MonoBehaviour
 		}
 
 	// --- Handle the compare button click --- //
-	private void OnCompareButtonClicked()
+	public void OnCompareButtonClicked()
 		{
-		// --- Get selected teams and their players from dropdowns --- //
+		// --- Debugging visibility --- //
+		Debug.Log("Teams are valid, proceeding with comparison.");
+
+		// Hide the MatchupComparisonPanel
+		matchupComparisonPanel.SetActive(false);
+
+		// Show the MatchupResultsPanel
+		matchupResultsPanel.SetActive(true);
+
+		// --- Get the selected teams from the dropdowns --- //
 		Team selectedTeamA = GetTeamFromDropdown(teamADropdown);
 		Team selectedTeamB = GetTeamFromDropdown(teamBDropdown);
 
-		// --- Validate team compositions before proceeding --- //
-		if (ValidateTeamComposition(selectedTeamA) && ValidateTeamComposition(selectedTeamB))
-			{
-			Debug.Log("Teams are valid, proceeding with comparison.");
-			CompareMatchups(selectedTeamA, selectedTeamB);
-			}
-		else
-			{
-			Debug.LogWarning("One or both teams have invalid compositions based on the 23-Rule.");
-			// Optionally, show an error message to the user.
-			}
+		// --- Ensure data is passed to the results panel --- //
+		MatchupResultData resultData = PerformMatchupComparison(selectedTeamA, selectedTeamB);
+
+		// Get the selected team names from the dropdowns
+		string teamAName = teamADropdown.options[teamADropdown.value].text;
+		string teamBName = teamBDropdown.options[teamBDropdown.value].text;
+
+		// Update the MatchupResultsPanel with the result data and selected team names
+		matchupResultsPanel.SetMatchupData(resultData, teamAName, teamBName);
+
+		Debug.Log("Matchup results set and panel switched.");
 		}
 
 	#endregion Button Event Handlers
@@ -212,4 +227,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Add any extra custom functions for processing matchup comparisons here --- //
 
 	#endregion Additional Functions
+	}
+
+// MatchupResultData class definition
+public class MatchupResultData
+	{
+	public float teamAWins;
+	public float teamBWins;
 	}

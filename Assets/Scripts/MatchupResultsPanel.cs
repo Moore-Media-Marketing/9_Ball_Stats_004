@@ -7,7 +7,6 @@ public class MatchupResultsPanel:MonoBehaviour
 	{
 	// --- Region: UI Elements ---
 	public TMP_Text headerText;  // The header text at the top of the panel
-
 	public TMP_Text teamAHeaderText;  // Header text for Team A
 	public TMP_Text teamBHeaderText;  // Header text for Team B
 	public ScrollRect matchupsScrollView;  // Scrollable area for matchup results
@@ -22,7 +21,6 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Add listener for the back button click
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		}
-
 	// --- End Region ---
 
 	// --- Region: Button Logic ---
@@ -31,7 +29,6 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Use UIManager to switch back to the home panel
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
 		}
-
 	// --- End Region ---
 
 	// --- Region: Update UI ---
@@ -50,6 +47,24 @@ public class MatchupResultsPanel:MonoBehaviour
 
 		// You can also add other relevant UI updates for best matchups, etc.
 		}
+	// --- End Region ---
 
+	// --- Region: Set Matchup Data ---
+	// This method is added to match the expected call in MatchupComparisonPanel
+	public void SetMatchupData(MatchupResultData resultData, string teamAName, string teamBName)
+		{
+		// Use the data from the resultData to update the UI as needed
+		string header = "Matchup Results";
+
+		// Update the team names dynamically based on the selected teams
+		teamAHeaderText.text = teamAName;
+		teamBHeaderText.text = teamBName;
+
+		// Update the results with the data passed from the comparison
+		string matchupResults = $"Team A Wins: {resultData.teamAWins}%\nTeam B Wins: {resultData.teamBWins}%";
+
+		// Update the results in the UI
+		UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
+		}
 	// --- End Region ---
 	}

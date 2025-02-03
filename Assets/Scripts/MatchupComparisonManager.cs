@@ -30,18 +30,16 @@ public class MatchupComparisonManager:MonoBehaviour
 		public string teamName;
 		public List<Player> players;
 		}
-
 	// --- End Region --- //
 
 	// --- Region: UI Elements --- //
-	public MatchupResultsPanel matchupResultsPanel;  // Reference to the MatchupResultsPanel for displaying results
-
+	// Reference to the MatchupResultsPanel for displaying results
+	public MatchupResultsPanel matchupResultsPanel;
 	// --- End Region --- //
 
 	// --- Region: Team Selection --- //
 	// These represent the selected teams A and B (we'll get this data from the UI)
 	public Team selectedTeamA;
-
 	public Team selectedTeamB;
 
 	// For demonstration, the following methods return dummy data.
@@ -72,7 +70,6 @@ public class MatchupComparisonManager:MonoBehaviour
 			}
 			};
 		}
-
 	// --- End Region --- //
 
 	// --- Region: Compare Matchups --- //
@@ -100,7 +97,6 @@ public class MatchupComparisonManager:MonoBehaviour
 		// Display results in the UI
 		DisplayMatchupResults(matchupResults);
 		}
-
 	// --- End Region --- //
 
 	// --- Region: Player Comparison --- //
@@ -136,7 +132,6 @@ public class MatchupComparisonManager:MonoBehaviour
 
 		return lifetimeScore + currentSeasonScore + pointsAdjustment;
 		}
-
 	// --- End Region --- //
 
 	// --- Region: UI Update --- //
@@ -145,6 +140,5 @@ public class MatchupComparisonManager:MonoBehaviour
 		// Update the MatchupResultsPanel UI with the results
 		matchupResultsPanel.UpdateMatchupResults("Matchup Results", selectedTeamA.teamName, selectedTeamB.teamName, string.Join("\n", results));
 		}
-
 	// --- End Region --- //
 	}

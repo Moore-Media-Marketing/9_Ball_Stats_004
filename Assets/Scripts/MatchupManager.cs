@@ -10,22 +10,22 @@ public class MatchupManager:MonoBehaviour
 
 	[Header("Matchup UI Elements")]
 	[Tooltip("Panel that displays matchup results.")]
-	public GameObject matchupPanel;
+	public GameObject matchupPanel;  // --- Panel for displaying matchup results ---
 
 	[Tooltip("Template for matchup entries in the scroll view.")]
-	public GameObject matchupEntryTemplate;
+	public GameObject matchupEntryTemplate;  // --- Template for creating matchup entries ---
 
 	[Tooltip("Parent object for matchup entries.")]
-	public Transform matchupListContent;
+	public Transform matchupListContent;  // --- Parent transform for all matchup entries ---
 
 	[Tooltip("Parent object for best matchup entries.")]
-	public Transform bestMatchupListContent;
+	public Transform bestMatchupListContent;  // --- Parent transform for best matchup entries ---
 
 	[Tooltip("Text element for the best matchup header.")]
-	public TMP_Text bestMatchupHeader;
+	public TMP_Text bestMatchupHeader;  // --- Header text for the best matchup section ---
 
 	[Tooltip("Reference to the MatchupComparisonManager.")]
-	public MatchupComparisonManager matchupComparisonManager;  // Reference to the MatchupComparisonManager
+	public MatchupComparisonManager matchupComparisonManager;  // --- Reference to MatchupComparisonManager ---
 
 	#endregion UI References
 
@@ -34,7 +34,7 @@ public class MatchupManager:MonoBehaviour
 	// --- Compares two selected teams and generates matchup results --- //
 	public void CompareTeams()
 		{
-		// --- Ensure panel is active --- //
+		// --- Ensure the matchup panel is active --- //
 		matchupPanel.SetActive(true);
 
 		// --- Clear previous matchup results --- //
@@ -48,12 +48,12 @@ public class MatchupManager:MonoBehaviour
 			Destroy(child.gameObject);
 			}
 
-		// --- Get the teams' data from the MatchupComparisonManager --- //
+		// --- Get the selected teams' data from the MatchupComparisonManager --- //
 		MatchupComparisonManager.Team selectedTeamA = matchupComparisonManager.selectedTeamA;
 		MatchupComparisonManager.Team selectedTeamB = matchupComparisonManager.selectedTeamB;
 
 		// --- Generate matchups (Placeholder for actual logic) --- //
-		List<string> matchupResults = new();
+		List<string> matchupResults = new List<string>();
 
 		// Compare players from both teams
 		for (int i = 0; i < selectedTeamA.players.Count; i++)
@@ -63,7 +63,7 @@ public class MatchupManager:MonoBehaviour
 				var playerA = selectedTeamA.players[i];
 				var playerB = selectedTeamB.players[j];
 
-				// Compare players and add result
+				// Compare players and add the result
 				string result = ComparePlayers(playerA, playerB);
 				matchupResults.Add(result);
 
@@ -116,6 +116,7 @@ public class MatchupManager:MonoBehaviour
 	// --- Create a UI entry for the matchup result --- //
 	private void CreateMatchupEntry(string result)
 		{
+		// --- Instantiate a new matchup entry and set the result text --- //
 		GameObject newEntry = Instantiate(matchupEntryTemplate, matchupListContent);
 		TMP_Text entryText = newEntry.GetComponentInChildren<TMP_Text>();
 		entryText.text = result;
@@ -135,6 +136,7 @@ public class MatchupManager:MonoBehaviour
 	// --- Create the best matchup entry --- //
 	private void CreateBestMatchupEntry(string bestMatchup)
 		{
+		// --- Instantiate and display the best matchup result --- //
 		GameObject newBestEntry = Instantiate(matchupEntryTemplate, bestMatchupListContent);
 		TMP_Text entryText = newBestEntry.GetComponentInChildren<TMP_Text>();
 		entryText.text = bestMatchup;
