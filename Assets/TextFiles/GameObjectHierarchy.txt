@@ -1,6 +1,8 @@
 AdaptivePerformanceManager
 DatabaseManager
+DropdownManager
 MatchupManager
+MatchupComparisonManager
 UIManager
 GenerateGameObjectList
 Main Camera
