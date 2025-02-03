@@ -42,8 +42,23 @@ public class MatchupResultsPanel:MonoBehaviour
 		teamAHeaderText.text = teamAName;
 		teamBHeaderText.text = teamBName;
 
-		// Update the results in the scroll views (example of text setting)
-		matchupsScrollView.content.GetComponentInChildren<TMP_Text>().text = matchupResults;
+		// Safely update the results in the scroll view
+		if (matchupsScrollView.content != null)
+			{
+			// Clear previous matchup results before adding new ones
+			foreach (Transform child in matchupsScrollView.content)
+				{
+				Destroy(child.gameObject);
+				}
+
+			// Instantiate a new entry from the prefab and set its text
+			TMP_Text resultTextInstance = Instantiate(matchupResultsTextPrefab, matchupsScrollView.content);
+			resultTextInstance.text = matchupResults;
+			}
+		else
+			{
+			Debug.LogError("No content found in matchupsScrollView.");
+			}
 
 		// You can also add other relevant UI updates for best matchups, etc.
 		}
@@ -67,4 +82,8 @@ public class MatchupResultsPanel:MonoBehaviour
 		UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
 		}
 	// --- End Region ---
+
+	// --- Region: Prefab References ---
+	public TMP_Text matchupResultsTextPrefab;  // The prefab for the result text (assign this in the Inspector)
+											   // --- End Region ---
 	}

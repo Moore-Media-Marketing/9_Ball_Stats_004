@@ -1,7 +1,7 @@
 DatabaseManager.cs
+DropdownManager.cs
 FeedbackOverlay.cs
 HomePanel.cs
-Match.cs
 MatchupComparisonManager.cs
 MatchupComparisonPanel.cs
 MatchupManager.cs
@@ -10,8 +10,9 @@ Player.cs
 PlayerCurrentSeasonDataInputPanel.cs
 PlayerLifetimeDataInputPanel.cs
 PlayerManagementPanel.cs
+PlayerPrefsEditorWindow.cs
+SampleDataGenerator.cs
 SettingsPanel.cs
-SQLite.cs
 Team.cs
 TeamManagementPanel.cs
 UIManager.cs

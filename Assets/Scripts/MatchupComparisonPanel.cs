@@ -1,16 +1,13 @@
-// --- Region: Using Directives --- //
 using System.Collections.Generic;
 
 using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
-// --- End Region: Using Directives --- //
 
 public class MatchupComparisonPanel:MonoBehaviour
 	{
 	#region UI Elements
-
 	[Tooltip("Header text for the matchup comparison panel.")]
 	public TMP_Text headerText;  // --- Displays the panel header ---
 
@@ -48,17 +45,15 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 	#region Unity Methods
 
-	// --- Start method to initialize the panel --- //
 	private void Start()
 		{
-		// --- Set up button listeners --- //
+		// Set up button listeners
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		compareButton.onClick.AddListener(OnCompareButtonClicked);
 
-		// --- Refresh dropdowns using DropdownManager (if available) --- //
+		// Refresh dropdowns
 		if (DropdownManager.Instance != null)
 			{
-			// --- Populate both team dropdowns with team names from the DatabaseManager --- //
 			List<string> teamNames = DatabaseManager.Instance.GetAllTeamNames();
 			if (teamNames != null && teamNames.Count > 0)
 				{
@@ -80,18 +75,15 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 	#region Button Event Handlers
 
-	// --- Handle the back button click --- //
 	private void OnBackButtonClicked()
 		{
-		// --- Return to the home panel using UIManager --- //
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
 		Debug.Log("MatchupComparisonPanel: Back button clicked, returning to home panel.");
 		}
 
-	// --- Handle the compare button click --- //
 	public void OnCompareButtonClicked()
 		{
-		// --- Debugging visibility --- //
+		// Debugging visibility
 		Debug.Log("Teams are valid, proceeding with comparison.");
 
 		// Hide the MatchupComparisonPanel
@@ -100,19 +92,24 @@ public class MatchupComparisonPanel:MonoBehaviour
 		// Show the MatchupResultsPanel
 		matchupResultsPanel.SetActive(true);
 
-		// --- Get the selected teams from the dropdowns --- //
+		// Perform the matchup comparison
 		Team selectedTeamA = GetTeamFromDropdown(teamADropdown);
 		Team selectedTeamB = GetTeamFromDropdown(teamBDropdown);
-
-		// --- Ensure data is passed to the results panel --- //
 		MatchupResultData resultData = PerformMatchupComparison(selectedTeamA, selectedTeamB);
 
 		// Get the selected team names from the dropdowns
 		string teamAName = teamADropdown.options[teamADropdown.value].text;
 		string teamBName = teamBDropdown.options[teamBDropdown.value].text;
 
-		// Update the MatchupResultsPanel with the result data and selected team names
-		matchupResultsPanel.SetMatchupData(resultData, teamAName, teamBName);
+		// Get the MatchupResultsPanel component using TryGetComponent
+		if (matchupResultsPanel.TryGetComponent(out MatchupResultsPanel resultsPanel))
+			{
+			resultsPanel.SetMatchupData(resultData, teamAName, teamBName);
+			}
+		else
+			{
+			Debug.LogError("MatchupResultsPanel component not found on the results panel.");
+			}
 
 		Debug.Log("Matchup results set and panel switched.");
 		}
@@ -121,7 +118,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 	#region Matchup Comparison Logic
 
-	// --- Get team data from the selected dropdown --- //
 	private Team GetTeamFromDropdown(TMP_Dropdown dropdown)
 		{
 		string selectedTeamName = dropdown.options[dropdown.value].text;
@@ -129,7 +125,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 		return selectedTeam;
 		}
 
-	// --- Get points required to win based on Skill Level --- //
 	private float GetPointsRequiredToWin(float skillLevel)
 		{
 		return (int) skillLevel switch
@@ -143,17 +138,16 @@ public class MatchupComparisonPanel:MonoBehaviour
 				7 => 55,
 				8 => 65,
 				9 => 75,
-				_ => (float) 0,
+				_ => 0f,
 				};
 		}
 
-	// --- Compare matchups between players of Team A and Team B --- //
-	private void CompareMatchups(Team teamA, Team teamB)
+	private MatchupResultData PerformMatchupComparison(Team teamA, Team teamB)
 		{
-		// --- Placeholder list to store results --- //
-		List<string> results = new();
+		// Example logic to compare teams based on total skill level (or any other criteria)
+		float teamAWinsCount = 0;
+		float teamBWinsCount = 0;
 
-		// --- Compare each player from Team A with each player from Team B --- //
 		foreach (var playerA in teamA.players)
 			{
 			foreach (var playerB in teamB.players)
@@ -161,77 +155,19 @@ public class MatchupComparisonPanel:MonoBehaviour
 				float pointsRequiredA = GetPointsRequiredToWin(playerA.currentSeasonSkillLevel);
 				float pointsRequiredB = GetPointsRequiredToWin(playerB.currentSeasonSkillLevel);
 
-				// --- Compare the players based on the points required to win --- //
-				if (pointsRequiredA > pointsRequiredB)
-					{
-					results.Add($"{playerA.name} wins vs {playerB.name}");
-					}
-				else if (pointsRequiredA < pointsRequiredB)
-					{
-					results.Add($"{playerB.name} wins vs {playerA.name}");
-					}
-				else
-					{
-					results.Add($"{playerA.name} vs {playerB.name} is a tie");
-					}
+				if (pointsRequiredA > pointsRequiredB) teamAWinsCount++;
+				else if (pointsRequiredA < pointsRequiredB) teamBWinsCount++;
 				}
 			}
 
-		// --- Display the results in the UI --- //
-		DisplayMatchupResults(results);
+		// Returning the result as percentage of wins for each team
+		float totalComparisons = teamA.players.Count * teamB.players.Count;
+		return new MatchupResultData
+			{
+			teamAWins = (teamAWinsCount / totalComparisons) * 100,
+			teamBWins = (teamBWinsCount / totalComparisons) * 100
+			};
 		}
 
 	#endregion Matchup Comparison Logic
-
-	#region Validation Logic
-
-	// --- Validate team composition based on the 23-Rule --- //
-	private bool ValidateTeamComposition(Team team)
-		{
-		int totalSkillLevel = 0;
-		int seniorPlayersCount = 0;
-
-		foreach (var player in team.players)
-			{
-			totalSkillLevel += (int) player.currentSeasonSkillLevel;
-			if (player.currentSeasonSkillLevel >= 6) // Senior players (S/L 6, 7, 8, 9)
-				{
-				seniorPlayersCount++;
-				}
-			}
-
-		return totalSkillLevel <= 23 && seniorPlayersCount <= 2;
-		}
-
-	#endregion Validation Logic
-
-	#region Display Logic
-
-	// --- Display the results of the matchup comparison --- //
-	private void DisplayMatchupResults(List<string> results)
-		{
-		// --- Update the header --- //
-		headerText.text = "Matchup Results";
-
-		// --- Display the comparison results in the UI --- //
-		string resultText = string.Join("\n", results);
-		// Assuming you have a TextMeshPro text component to display results
-		TMP_Text resultsText = teamAPlayerScrollView.content.GetComponentInChildren<TMP_Text>();
-		resultsText.text = resultText;
-		}
-
-	#endregion Display Logic
-
-	#region Additional Functions
-
-	// --- Add any extra custom functions for processing matchup comparisons here --- //
-
-	#endregion Additional Functions
-	}
-
-// MatchupResultData class definition
-public class MatchupResultData
-	{
-	public float teamAWins;
-	public float teamBWins;
 	}
