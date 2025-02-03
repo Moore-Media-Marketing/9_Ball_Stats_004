@@ -96,11 +96,19 @@ public class TeamManagementPanel:MonoBehaviour
 
 		teamList = DatabaseManager.Instance.GetAllTeams();
 		Team existingTeam = teamList.FirstOrDefault(t => t.name.Equals(teamName, System.StringComparison.OrdinalIgnoreCase));
+
 		if (existingTeam != null)
 			{
-			// For update, we assume the team to update is the currently selected team in the dropdown.
-			string oldName = teamDropdown.options[teamDropdown.value].text;
-			DatabaseManager.Instance.UpdateTeamName(oldName, teamName);
+			// Find the team ID based on the selected dropdown team
+			int selectedTeamId = teamList.FirstOrDefault(t => t.name == teamDropdown.options[teamDropdown.value].text)?.id ?? -1;
+			if (selectedTeamId == -1)
+				{
+				ShowFeedback("Error: Selected team ID not found.");
+				return;
+				}
+
+			// Update team name using team ID instead of name
+			DatabaseManager.Instance.UpdateTeamName(selectedTeamId, teamName);
 			ShowFeedback($"Team '{teamName}' updated.");
 			}
 		else
@@ -111,13 +119,7 @@ public class TeamManagementPanel:MonoBehaviour
 			}
 
 		teamNameInputField.text = "";
-		// Refresh the dropdown via DropdownManager
 		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
-		}
-
-	public void OnClearTeamNameClicked()
-		{
-		teamNameInputField.text = "";
 		}
 
 	public void OnModifyTeamNameClicked()
@@ -131,10 +133,17 @@ public class TeamManagementPanel:MonoBehaviour
 
 		if (teamDropdown.value > 0)
 			{
-			string selectedTeamName = teamDropdown.options[teamDropdown.value].text;
-			// Update using both the old team name and the new team name
-			DatabaseManager.Instance.UpdateTeamName(selectedTeamName, teamName);
+			int selectedTeamId = teamList.FirstOrDefault(t => t.name == teamDropdown.options[teamDropdown.value].text)?.id ?? -1;
+			if (selectedTeamId == -1)
+				{
+				ShowFeedback("Error: Selected team ID not found.");
+				return;
+				}
+
+			// Update using the correct team ID
+			DatabaseManager.Instance.UpdateTeamName(selectedTeamId, teamName);
 			ShowFeedback($"Team name updated to '{teamName}'.");
+
 			DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
 			teamNameInputField.text = "";
 			}
@@ -142,6 +151,12 @@ public class TeamManagementPanel:MonoBehaviour
 			{
 			ShowFeedback("Please select a team to modify.");
 			}
+		}
+
+
+	public void OnClearTeamNameClicked()
+		{
+		teamNameInputField.text = "";
 		}
 
 	public void OnDeleteButtonClicked()

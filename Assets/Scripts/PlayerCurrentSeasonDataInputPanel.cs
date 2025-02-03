@@ -1,7 +1,10 @@
 // --- Region: Using Directives --- //
-using TMPro;
-using UnityEngine;
 using System.Collections.Generic;
+
+using TMPro;
+
+using UnityEngine;
+using UnityEngine.UI;
 // --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
@@ -44,12 +47,17 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 	[Tooltip("Dropdown for selecting the player's current skill level.")]
 	public TMP_Dropdown SkillLevelDropdown;  // --- Dropdown for skill level ---
 
+	[Tooltip("Button to go back to the previous panel.")]
+	public Button backButton;  // --- Back button for panel navigation ---
+
 	#endregion Fields and UI Elements
 
 	#region Unity Methods
 
 	private void Start()
 		{
+
+		backButton.onClick.AddListener(OnBackButtonClicked);
 		// --- Initialize the UI with the player's current season data on start ---
 		UpdatePlayerData();
 
@@ -67,6 +75,14 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 
 		// --- Refresh dropdowns using DropdownManager ---
 		DropdownManager.Instance.RefreshAllDropdowns();
+		}
+
+
+	private void OnBackButtonClicked()
+		{
+		// --- Return to the home panel using UIManager --- //
+		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
+		Debug.Log("MatchupComparisonPanel: Back button clicked, returning to home panel.");
 		}
 
 	#endregion Unity Methods

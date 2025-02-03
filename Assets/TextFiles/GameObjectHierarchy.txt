@@ -1,4 +1,5 @@
 AdaptivePerformanceManager
+SampleDataGenerator
 DatabaseManager
 DropdownManager
 MatchupManager
