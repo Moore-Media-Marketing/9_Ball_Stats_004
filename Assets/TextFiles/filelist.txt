@@ -5,6 +5,7 @@ HomePanel.cs
 MatchupComparisonManager.cs
 MatchupComparisonPanel.cs
 MatchupManager.cs
+MatchupResultData.cs
 MatchupResultsPanel.cs
 Player.cs
 PlayerCurrentSeasonDataInputPanel.cs

@@ -53,7 +53,7 @@ public class MatchupManager:MonoBehaviour
 		MatchupComparisonManager.Team selectedTeamB = matchupComparisonManager.selectedTeamB;
 
 		// --- Generate matchups (Placeholder for actual logic) --- //
-		List<string> matchupResults = new List<string>();
+		List<string> matchupResults = new();
 
 		// Compare players from both teams
 		for (int i = 0; i < selectedTeamA.players.Count; i++)
