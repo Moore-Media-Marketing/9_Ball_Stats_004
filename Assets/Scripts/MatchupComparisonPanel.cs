@@ -151,7 +151,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 	private MatchupResultData PerformMatchupComparison(Team teamA, Team teamB)
 		{
-		// Example logic to compare teams based on total skill level (or any other criteria)
 		float teamAWinsCount = 0;
 		float teamBWinsCount = 0;
 
@@ -162,21 +161,39 @@ public class MatchupComparisonPanel:MonoBehaviour
 				float pointsRequiredA = GetPointsRequiredToWin(playerA.currentSeasonSkillLevel);
 				float pointsRequiredB = GetPointsRequiredToWin(playerB.currentSeasonSkillLevel);
 
-				if (pointsRequiredA > pointsRequiredB) teamAWinsCount++;
-				else if (pointsRequiredA < pointsRequiredB) teamBWinsCount++;
+				// Debugging calculation values
+				Debug.Log($"Player A: {playerA.name}, Skill Level: {playerA.currentSeasonSkillLevel}, Points Required: {pointsRequiredA}");
+				Debug.Log($"Player B: {playerB.name}, Skill Level: {playerB.currentSeasonSkillLevel}, Points Required: {pointsRequiredB}");
+
+				if (pointsRequiredA > pointsRequiredB)
+					teamAWinsCount++;
+				else if (pointsRequiredA < pointsRequiredB)
+					teamBWinsCount++;
 				}
 			}
 
-		// Calculate the total comparisons and the winning percentages
+		// Debug the results before division
+		Debug.Log($"Team A Wins Count: {teamAWinsCount}, Team B Wins Count: {teamBWinsCount}");
+
 		float totalComparisons = teamA.players.Count * teamB.players.Count;
 
-		// Round the winning percentages to the nearest whole number
-		int roundedTeamAWins = Mathf.RoundToInt((teamAWinsCount / totalComparisons) * 100);
-		int roundedTeamBWins = Mathf.RoundToInt((teamBWinsCount / totalComparisons) * 100);
+		// Avoid division by zero and validate total comparisons
+		if (totalComparisons == 0)
+			{
+			Debug.LogError("Total comparisons count is zero! Returning default values.");
+			return new MatchupResultData(0, 0);  // Prevent division by zero
+			}
 
-		// Return the result with rounded percentages
-		return new MatchupResultData(roundedTeamAWins, roundedTeamBWins);  // Pass both values to the constructor
+		// Calculate percentages safely
+		float teamAWinsPercentage = (teamAWinsCount / totalComparisons) * 100;
+		float teamBWinsPercentage = (teamBWinsCount / totalComparisons) * 100;
+
+		// Validate percentages and debug log them
+		Debug.Log($"Team A Win Percentage: {teamAWinsPercentage}, Team B Win Percentage: {teamBWinsPercentage}");
+
+		return new MatchupResultData(Mathf.RoundToInt(teamAWinsPercentage), Mathf.RoundToInt(teamBWinsPercentage));
 		}
+
 
 	// New method to calculate the average skill level of a team
 	private float CalculateTeamSkillLevel(Team team)

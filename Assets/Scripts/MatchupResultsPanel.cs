@@ -44,6 +44,13 @@ public class MatchupResultsPanel:MonoBehaviour
 			{
 			Debug.LogError("BackButton is not assigned in the Inspector!");
 			}
+
+		// Ensure MatchupDetailsText uses no text wrapping
+		if (matchupResultsTextPrefab != null)
+			{
+			matchupResultsTextPrefab.textWrappingMode = TextWrappingModes.NoWrap; // Set to "No Wrap"
+			matchupResultsTextPrefab.overflowMode = TextOverflowModes.Overflow; // Ensure no wrapping
+			}
 		}
 	// --- End Region --- //
 
@@ -86,6 +93,8 @@ public class MatchupResultsPanel:MonoBehaviour
 				{
 				TMP_Text resultTextInstance = Instantiate(matchupResultsTextPrefab, matchupsScrollView.content);
 				resultTextInstance.text = matchupResults;
+				resultTextInstance.textWrappingMode = TextWrappingModes.NoWrap; // Ensure "No Wrap"
+				resultTextInstance.overflowMode = TextOverflowModes.Overflow; // Prevent wrapping
 				}
 			else
 				{

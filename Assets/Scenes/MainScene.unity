@@ -2258,9 +2258,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 125
     m_Right: 0
-    m_Top: 0
+    m_Top: 20
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 10
@@ -31045,7 +31045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedPlayer:
-    id: 0
+    id: 
     name: 
     skillLevel: 0
     teamId: 0
@@ -31060,21 +31060,21 @@ MonoBehaviour:
     lifetimeBreakAndRun: 0
     lifetimeTotalPoints: 0
     matchesPlayedInLast2Years: 0
+    currentSeasonGamesWon: 0
+    currentSeasonGamesPlayed: 0
+    currentSeasonPpm: 0
     currentSeasonBreakAndRun: 0
     currentSeasonDefensiveShotAverage: 0
     currentSeasonMatchesPlayed: 0
     currentSeasonMatchesWon: 0
     currentSeasonMiniSlams: 0
     currentSeasonNineOnTheSnap: 0
-    currentSeasonPaPercentage: 0
-    currentSeasonPointsAwarded: 0
-    currentSeasonPointsPerMatch: 0
     currentSeasonShutouts: 0
+    currentSeasonPaPercentage: 0
     currentSeasonSkillLevel: 0
     currentSeasonTotalPoints: 0
-    currentSeasonGamesPlayed: 0
-    currentSeasonGamesWon: 0
-    currentSeasonPpm: 0
+    currentSeasonPointsAwarded: 0
+    currentSeasonPointsPerMatch: 0
     PointsRequiredToWin: 0
   GamesWonInputField: {fileID: 1668742384}
   GamesPlayedInputField: {fileID: 1161955007}
@@ -34233,6 +34233,10 @@ PrefabInstance:
     - target: {fileID: 2679356845554272957, guid: ae3bf4ef1d7c45a43b9ae5a1e49a090a, type: 3}
       propertyPath: m_Name
       value: MatchupDetailsText
+      objectReference: {fileID: 0}
+    - target: {fileID: 2745481344350921619, guid: ae3bf4ef1d7c45a43b9ae5a1e49a090a, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5604150024325616888, guid: ae3bf4ef1d7c45a43b9ae5a1e49a090a, type: 3}
       propertyPath: m_Pivot.x

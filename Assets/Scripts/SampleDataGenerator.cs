@@ -9,10 +9,12 @@ public class SampleDataGenerator:MonoBehaviour
 	// --- Region: Public Variables --- //
 	[Tooltip("The number of teams to generate.")]
 	public int numberOfTeams = 10; // --- Number of teams to generate ---
-								   // --- End Region --- //
+
+	// --- End Region --- //
 
 	// --- Region: Sample Data --- //
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas" };
+
 	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy" };
 	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez" };
 	private static readonly string[] teamNames = { "Atomic Squirrels", "Crimson Cobras", "Electric Eels", "Phantom Phantoms", "Mystic Moose" };
@@ -20,13 +22,15 @@ public class SampleDataGenerator:MonoBehaviour
 
 	// --- Region: Handicap Points for Each Skill Level --- //
 	private readonly int[] pointsRequiredToWin = { 14, 19, 25, 31, 38, 46, 55, 65, 75 }; // --- Points required based on skill level (1 to 9) ---
-																						 // --- End Region --- //
+
+	// --- End Region --- //
 
 	// --- Region: Start Method --- //
 	private void Start()
 		{
 		GenerateSampleTeamsAndPlayers(); // --- Generate sample data on start ---
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Generate Sample Data --- //
@@ -61,6 +65,7 @@ public class SampleDataGenerator:MonoBehaviour
 
 		Debug.Log("Sample teams and players generated successfully.");
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Clear Sample Data --- //
@@ -70,6 +75,7 @@ public class SampleDataGenerator:MonoBehaviour
 		// Example: File.Delete(pathToJsonData);
 		Debug.Log("Sample Data cleared.");
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Generate Team Method --- //
@@ -86,6 +92,7 @@ public class SampleDataGenerator:MonoBehaviour
 
 		return newTeam;
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Generate Player Method --- //
@@ -133,6 +140,7 @@ public class SampleDataGenerator:MonoBehaviour
 
 		return newPlayer;
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Save to JSON --- //
@@ -154,10 +162,12 @@ public class SampleDataGenerator:MonoBehaviour
 
 		Debug.Log("Data saved to JSON.");
 		}
+
 	// --- End Region --- //
 
 	// --- Region: Additional Functions --- //
 	// Additional utility functions can be added here if needed
 	// --- End Region --- //
 	}
+
 // --- End Region: Sample Data Generator Class Definition --- //
