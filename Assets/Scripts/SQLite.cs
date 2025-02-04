@@ -133,7 +133,7 @@ namespace SQLite4Unity3d
 		private TimeSpan _elapsed = default(TimeSpan);
 
 		private int _transactionDepth = 0;
-		private Random _rand = new Random ();
+		private Random _rand = new();
 
 		public Sqlite3DatabaseHandle Handle { get; private set; }
 		internal static readonly Sqlite3DatabaseHandle NullHandle = default(Sqlite3DatabaseHandle);
@@ -153,7 +153,7 @@ namespace SQLite4Unity3d
 		// - To prepend deadlock, application may lock a database file explicity by either way:
 		//   - RunInTransaction(Action) locks the database during the transaction (for insert/update)
 		//   - RunInDatabaseLock(Action) similarly locks the database but no transaction (for query)
-		private static Dictionary<string, object> syncObjects = new Dictionary<string, object>();
+		private static Dictionary<string, object> syncObjects = new();
 
 		#region debug tracing
 
@@ -1905,7 +1905,7 @@ namespace SQLite4Unity3d
 					&& Name.EndsWith (Orm.ImplicitIndexSuffix, StringComparison.OrdinalIgnoreCase)
 					)
 				{
-					Indices = new IndexedAttribute[] { new IndexedAttribute() };
+					Indices = new IndexedAttribute[] { new() };
 				}
 				IsNullable = !(IsPK || Orm.IsMarkedNotNull(prop));
 				MaxStringLength = Orm.MaxStringLength(prop);
@@ -2242,7 +2242,7 @@ namespace SQLite4Unity3d
 			}
 		}
 
-		internal static IntPtr NegativePointer = new IntPtr (-1);
+		internal static IntPtr NegativePointer = new(-1);
 
 		internal static void BindParameter (Sqlite3Statement stmt, int index, object value, bool storeDateTimeAsTicks)
 		{

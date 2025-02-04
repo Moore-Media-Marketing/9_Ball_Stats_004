@@ -1,128 +1,81 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
-using SQLite4Unity3d;
-using System.Linq;
 
-[Serializable]
+using SQLite; // Required for SQLite attributes
+
+using UnityEngine;
+
 public class Team
 	{
-	// --- Team Basic Info --- //
-	public int teamId;
-	public string teamName;
-	public List<int> playerIds; // List of player IDs associated with this team
+	// --- SQLite Attributes --- //
+	[PrimaryKey, AutoIncrement]
+	public int TeamId { get; set; }  // Unique ID for each team
 
-	// --- SQLite Database Methods --- //
-	private static string dbPath = "TeamDatabase.db";  // Path to the SQLite database file
-	private static SQLiteConnection db;
+	// --- Team Name --- //
+	public string TeamName { get; set; }  // Team's name (getter/setter)
 
-	// --- Parameterless Constructor --- //
-	public Team()
-		{
-		playerIds = new List<int>();  // Initialize player IDs list as empty
-		}
+	// --- Players List --- //
+	[Ignore]  // Ignore this field for SQLite since it's a non-database entity
+	public List<Player> Players { get; set; }  // List of players in the team
 
-	// --- Constructor with Team Name --- //
+	// --- Constructor --- //
+	// Initializes a Team with a given team name and an empty players list
 	public Team(string teamName)
 		{
-		this.teamName = teamName;
-		this.playerIds = new List<int>();  // Initialize player IDs list as empty
-		}
-
-	// --- Initialize Database --- //
-	public static void InitializeDatabase()
-		{
-		if (db == null)
-			{
-			db = new SQLiteConnection(dbPath);
-			db.CreateTable<Team>();  // Create Team table if it doesn't exist
-			}
-		}
-
-	// --- Save Team Data --- //
-	public void SaveTeamData()
-		{
-		try
-			{
-			// If team already exists, update, else insert new record
-			var existingTeam = db.Table<Team>().Where(t => t.teamName == this.teamName).FirstOrDefault();
-			if (existingTeam != null)
-				{
-				db.Update(this);
-				Debug.Log($"Team data for {teamName} updated successfully.");
-				}
-			else
-				{
-				db.Insert(this);
-				Debug.Log($"Team data for {teamName} saved successfully.");
-				}
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error saving team data: " + ex.Message);
-			}
-		}
-
-	// --- Load Team Data --- //
-	public static Team LoadTeamData(int teamId)
-		{
-		try
-			{
-			return db.Table<Team>().Where(t => t.teamId == teamId).FirstOrDefault();
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error loading team data: " + ex.Message);
-			return null;
-			}
-		}
-
-	// --- Update Team Name --- //
-	public void UpdateTeamName(string newTeamName)
-		{
-		this.teamName = newTeamName;
-		SaveTeamData();
+		this.TeamName = teamName;
+		this.Players = new List<Player>(); // Initialize the players list
 		}
 
 	// --- Add Player to Team --- //
-	public void AddPlayerToTeam(int playerId)
+	// Adds a player to the team after checking the 23-Rule and senior player count
+	public bool AddPlayer(Player player)
 		{
-		if (!playerIds.Contains(playerId))
+		int teamSkillLevel = GetTeamSkillLevel(); // Get the current skill level of the team
+
+		// Check if adding the player would violate the 23-Rule or exceed the max senior player limit
+		if (teamSkillLevel + player.SkillLevel > 23 || CountSeniorPlayers() >= 2)
 			{
-			playerIds.Add(playerId);
-			SaveTeamData();
-			Debug.Log($"Player with ID {playerId} added to {teamName}.");
+			Debug.LogWarning("Cannot add player: Violates 23-Rule or too many senior players.");
+			return false; // Reject player if it violates the 23-Rule or too many senior players
 			}
-		else
+
+		Players.Add(player); // Add player to the team
+		return true;
+		}
+
+	// --- Calculate Team Skill Level --- //
+	// Returns the total skill level of all players in the team
+	public int GetTeamSkillLevel()
+		{
+		int totalSkillLevel = 0;
+		foreach (Player player in Players)
 			{
-			Debug.LogWarning($"Player with ID {playerId} is already on {teamName}.");
+			totalSkillLevel += player.SkillLevel;  // Sum up the skill level of each player
 			}
+		return totalSkillLevel;
+		}
+
+	// --- Count Senior Players --- //
+	// Returns the count of senior players (SkillLevel 6-9) in the team
+	public int CountSeniorPlayers()
+		{
+		int seniorPlayers = 0;
+		foreach (Player player in Players)
+			{
+			if (player.SkillLevel >= 6)  // Check if player is considered senior
+				{
+				seniorPlayers++;
+				}
+			}
+		return seniorPlayers;
 		}
 
 	// --- Remove Player from Team --- //
-	public void RemovePlayerFromTeam(int playerId)
+	// Removes a player from the team if they exist in the list
+	public void RemovePlayer(Player player)
 		{
-		if (playerIds.Contains(playerId))
+		if (Players.Contains(player))
 			{
-			playerIds.Remove(playerId);
-			SaveTeamData();
-			Debug.Log($"Player with ID {playerId} removed from {teamName}.");
+			Players.Remove(player);  // Remove the player from the team
 			}
-		else
-			{
-			Debug.LogWarning($"Player with ID {playerId} is not on {teamName}.");
-			}
-		}
-
-	// --- Get Team by ID --- //
-	public static Team GetTeamById(int teamId)
-		{
-		return db.Table<Team>().Where(t => t.teamId == teamId).FirstOrDefault();
-		}
-
-	// --- Get All Teams --- //
-	public static List<Team> GetAllTeams()
-		{
-		return db.Table<Team>().ToList();
 		}
 	}

@@ -13,6 +13,13 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.pixelwizards.sqlite": {
+      "version": "https://github.com/PixelWizards/com.pixelwizards.sqlite.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9596dd62fb2d5e5097831ac39ead6a881977054a"
+    },
     "com.unity.2d.animation": {
       "version": "10.1.4",
       "depth": 1,
@@ -185,7 +192,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.11.2",
+      "version": "1.12.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {

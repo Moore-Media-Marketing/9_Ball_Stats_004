@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using SQLite4Unity3d;
 using System.Linq;
+
+using SQLite4Unity3d;
+
+using UnityEngine;
 
 public class DatabaseManager:MonoBehaviour
 	{
 	// --- Database Path --- //
 	[SerializeField]
-	private string dbPath = "Database.db";  // Now an instance field, visible in Inspector
+	private string dbPath = "Database.db";  // Path for SQLite database (visible in Inspector)
+
 	private SQLiteConnection db;
 
-	// --- Singleton Pattern (Optional) --- //
+	// --- Singleton Pattern --- //
 	public static DatabaseManager Instance { get; private set; }
 
 	private void Awake()
@@ -47,16 +50,17 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var existingPlayer = db.Table<Player>().Where(p => p.playerName == player.playerName && p.teamId == player.teamId).FirstOrDefault();
+			// Ensure that playerId and playerName are valid in the Player class
+			var existingPlayer = db.Table<Player>().Where(p => p.PlayerName == player.PlayerName && p.TeamId == player.TeamId).FirstOrDefault();
 			if (existingPlayer != null)
 				{
 				db.Update(player);  // Update existing player data
-				Debug.Log($"Player data for {player.playerName} updated successfully.");
+				Debug.Log($"Player data for {player.PlayerName} updated successfully.");
 				}
 			else
 				{
 				db.Insert(player);  // Insert new player data
-				Debug.Log($"Player data for {player.playerName} saved successfully.");
+				Debug.Log($"Player data for {player.PlayerName} saved successfully.");
 				}
 			}
 		catch (Exception ex)
@@ -70,7 +74,8 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			return db.Table<Player>().Where(p => p.playerId == playerId).FirstOrDefault();
+			// Load player data based on playerId
+			return db.Table<Player>().Where(p => p.PlayerId == playerId).FirstOrDefault();
 			}
 		catch (Exception ex)
 			{
@@ -84,16 +89,16 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var existingTeam = db.Table<Team>().Where(t => t.teamName == team.teamName).FirstOrDefault();
+			var existingTeam = db.Table<Team>().Where(t => t.TeamName == team.TeamName).FirstOrDefault();
 			if (existingTeam != null)
 				{
 				db.Update(team);  // Update existing team data
-				Debug.Log($"Team data for {team.teamName} updated successfully.");
+				Debug.Log($"Team data for {team.TeamName} updated successfully.");
 				}
 			else
 				{
 				db.Insert(team);  // Insert new team data
-				Debug.Log($"Team data for {team.teamName} saved successfully.");
+				Debug.Log($"Team data for {team.TeamName} saved successfully.");
 				}
 			}
 		catch (Exception ex)
@@ -107,7 +112,8 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			return db.Table<Team>().Where(t => t.teamId == teamId).FirstOrDefault();
+			// Load team data based on teamId
+			return db.Table<Team>().Where(t => t.TeamId == teamId).FirstOrDefault();
 			}
 		catch (Exception ex)
 			{
@@ -149,7 +155,7 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var player = db.Table<Player>().Where(p => p.playerId == playerId).FirstOrDefault();
+			var player = db.Table<Player>().Where(p => p.PlayerId == playerId).FirstOrDefault();
 			if (player != null)
 				{
 				db.Delete(player);  // Delete player from the database
@@ -171,7 +177,7 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var team = db.Table<Team>().Where(t => t.teamId == teamId).FirstOrDefault();
+			var team = db.Table<Team>().Where(t => t.TeamId == teamId).FirstOrDefault();
 			if (team != null)
 				{
 				db.Delete(team);  // Delete team from the database
@@ -187,4 +193,7 @@ public class DatabaseManager:MonoBehaviour
 			Debug.LogError($"Error deleting team: {ex.Message}");
 			}
 		}
+
+	// --- Additional Functions --- //
+	// You can add any extra utility functions here if needed in the future
 	}
