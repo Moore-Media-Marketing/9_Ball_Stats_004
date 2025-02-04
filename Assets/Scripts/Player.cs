@@ -1,60 +1,186 @@
-// --- Region: Player Class --- //
+using System;
+using UnityEngine;
+using SQLite4Unity3d;
+
+[Serializable]
 public class Player
 	{
-	// --- Comment: Player's statistics --- //
-	public string Name { get; set; } // Player's name
-	public int SkillLevel { get; set; } // Player's skill level (1 to 9)
+	// --- Player Basic Info --- //
+	public int playerId;
+	public string playerName;
+	public int teamId;
 
-	// --- Comment: Additional current season statistics --- //
-	public int currentSeasonGamesPlayed { get; set; } // Games played this season
-	public int currentSeasonGamesWon { get; set; } // Games won this season
-	public float currentSeasonPaPercentage { get; set; } // Percentage of successful shots
-	public float currentSeasonPpm { get; set; } // Points per match
-	public int currentSeasonSkillLevel { get; set; } // Skill level this season
-	public int currentSeasonTotalPoints { get; set; } // Total points earned this season
+	// --- Current Season Stats --- //
+	public int currentSeasonMatchesPlayed;
+	public int currentSeasonMatchesWon;
+	public int currentSeasonMiniSlams;
+	public int currentSeasonNineOnTheSnap;
+	public float currentSeasonDefensiveShotAverage;
+	public int currentSeasonShutouts;
+	public float currentSeasonPaPercentage;
+	public int currentSeasonPointsAwarded;
+	public float currentSeasonPointsPerMatch;
+	public int currentSeasonTotalPoints;
+	public int currentSeasonSkillLevel;
+	public float currentSeasonPpm;
+	public int currentSeasonBreakAndRun;
+	public int currentSeasonGamesPlayed;
 
-	// --- Comment: Lifetime statistics --- //
-	public int lifetimeGamesWon { get; set; }
-	public int lifetimeGamesPlayed { get; set; }
-	public float lifetimeDefensiveShotAvg { get; set; }
-	public int matchesPlayedInLast2Years { get; set; }
-	public int lifetimeBreakAndRun { get; set; }
-	public int lifetimeNineOnTheSnap { get; set; }
-	public int lifetimeMiniSlams { get; set; }
-	public int lifetimeShutouts { get; set; }
+	// --- Lifetime Stats --- //
+	public int lifetimeMatchesPlayed;
+	public int lifetimeMatchesWon;
+	public int lifetimeMiniSlams;
+	public int lifetimeNineOnTheSnap;
+	public int lifetimeShutouts;
+	public int lifetimeGamesPlayed;
+	public int lifetimeGamesWon;
+	public float lifetimeDefensiveShotAverage;
+	public int lifetimeBreakAndRun;
 
-	// --- Comment: Player ID and Team ID --- //
-	public string Id { get; set; } // Unique player ID
-	public string TeamId { get; set; } // Associated team ID
+	// --- SQLite Database Methods --- //
+	private static string dbPath = "PlayerDatabase.db";  // Path to the SQLite database file
+	private static SQLiteConnection db;
 
-	// --- Comment: Constructor with parameters --- //
-	public Player(string name, string id, int skillLevel, string teamId)
+	// --- Constructor --- //
+	public Player() // Parameterless constructor for SQLite
 		{
-		Name = name;
-		Id = id;
-		SkillLevel = skillLevel;
-		TeamId = teamId;
-		currentSeasonGamesPlayed = 0;
-		currentSeasonGamesWon = 0;
-		currentSeasonPaPercentage = 0;
-		currentSeasonPpm = 0;
-		currentSeasonSkillLevel = skillLevel;
-		currentSeasonTotalPoints = 0;
-
-		lifetimeGamesWon = 0;
-		lifetimeGamesPlayed = 0;
-		lifetimeDefensiveShotAvg = 0;
-		matchesPlayedInLast2Years = 0;
-		lifetimeBreakAndRun = 0;
-		lifetimeNineOnTheSnap = 0;
-		lifetimeMiniSlams = 0;
-		lifetimeShutouts = 0;
+		// Initialize stats to zero or default values
+		InitializeStats();
 		}
 
-	// --- Comment: Parameterless constructor for SQLite compatibility --- //
-	public Player()
+	public Player(string playerName, int teamId) // Constructor with player details
 		{
-		// This constructor is required for SQLite and similar systems.
+		this.playerName = playerName;
+		this.teamId = teamId;
+
+		// Initialize stats to zero or default values
+		InitializeStats();
+		}
+
+	// --- Initialize Stats --- //
+	private void InitializeStats()
+		{
+		// Initialize current season stats
+		currentSeasonMatchesPlayed = 0;
+		currentSeasonMatchesWon = 0;
+		currentSeasonMiniSlams = 0;
+		currentSeasonNineOnTheSnap = 0;
+		currentSeasonDefensiveShotAverage = 0f;
+		currentSeasonShutouts = 0;
+		currentSeasonPaPercentage = 0f;
+		currentSeasonPointsAwarded = 0;
+		currentSeasonPointsPerMatch = 0f;
+		currentSeasonTotalPoints = 0;
+		currentSeasonSkillLevel = 1;
+		currentSeasonPpm = 0f;
+		currentSeasonBreakAndRun = 0;
+		currentSeasonGamesPlayed = 0;
+
+		// Initialize lifetime stats
+		lifetimeMatchesPlayed = 0;
+		lifetimeMatchesWon = 0;
+		lifetimeMiniSlams = 0;
+		lifetimeNineOnTheSnap = 0;
+		lifetimeShutouts = 0;
+		lifetimeGamesPlayed = 0;
+		lifetimeGamesWon = 0;
+		lifetimeDefensiveShotAverage = 0f;
+		lifetimeBreakAndRun = 0;
+		}
+
+	// --- Initialize Database --- //
+	public static void InitializeDatabase()
+		{
+		if (db == null)
+			{
+			db = new SQLiteConnection(dbPath);
+			db.CreateTable<Player>();  // Create Player table if it doesn't exist
+			}
+		}
+
+	// --- Save Player Data --- //
+	public void SavePlayerData()
+		{
+		try
+			{
+			// If player already exists, update, else insert new record
+			var existingPlayer = db.Table<Player>().Where(p => p.playerName == this.playerName && p.teamId == this.teamId).FirstOrDefault();
+			if (existingPlayer != null)
+				{
+				db.Update(this);
+				Debug.Log($"Player data for {playerName} updated successfully.");
+				}
+			else
+				{
+				db.Insert(this);
+				Debug.Log($"Player data for {playerName} saved successfully.");
+				}
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error saving player data: " + ex.Message);
+			}
+		}
+
+	// --- Load Player Data --- //
+	public static Player LoadPlayerData(int playerId)
+		{
+		try
+			{
+			return db.Table<Player>().Where(p => p.playerId == playerId).FirstOrDefault();
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error loading player data: " + ex.Message);
+			return null;
+			}
+		}
+
+	// --- Update Current Season Stats --- //
+	public void UpdateCurrentSeasonStats(int matchesPlayed, int matchesWon, int miniSlams, int nineOnTheSnap,
+										 float defensiveShotAverage, int shutouts, float paPercentage,
+										 int pointsAwarded, float pointsPerMatch, int totalPoints,
+										 int skillLevel, float ppm, int breakAndRun, int gamesPlayed)
+		{
+		currentSeasonMatchesPlayed = matchesPlayed;
+		currentSeasonMatchesWon = matchesWon;
+		currentSeasonMiniSlams = miniSlams;
+		currentSeasonNineOnTheSnap = nineOnTheSnap;
+		currentSeasonDefensiveShotAverage = defensiveShotAverage;
+		currentSeasonShutouts = shutouts;
+		currentSeasonPaPercentage = paPercentage;
+		currentSeasonPointsAwarded = pointsAwarded;
+		currentSeasonPointsPerMatch = pointsPerMatch;
+		currentSeasonTotalPoints = totalPoints;
+		currentSeasonSkillLevel = skillLevel;
+		currentSeasonPpm = ppm;
+		currentSeasonBreakAndRun = breakAndRun;
+		currentSeasonGamesPlayed = gamesPlayed;
+
+		SavePlayerData();
+		}
+
+	// --- Update Lifetime Stats --- //
+	public void UpdateLifetimeStats(int matchesPlayed, int matchesWon, int miniSlams, int nineOnTheSnap,
+									int shutouts, int gamesPlayed, int gamesWon, float defensiveShotAverage,
+									int breakAndRun)
+		{
+		lifetimeMatchesPlayed = matchesPlayed;
+		lifetimeMatchesWon = matchesWon;
+		lifetimeMiniSlams = miniSlams;
+		lifetimeNineOnTheSnap = nineOnTheSnap;
+		lifetimeShutouts = shutouts;
+		lifetimeGamesPlayed = gamesPlayed;
+		lifetimeGamesWon = gamesWon;
+		lifetimeDefensiveShotAverage = defensiveShotAverage;
+		lifetimeBreakAndRun = breakAndRun;
+
+		SavePlayerData();
+		}
+
+	// --- Get Player by Team ID --- //
+	public static Player GetPlayerByTeamId(int teamId)
+		{
+		return db.Table<Player>().Where(p => p.teamId == teamId).FirstOrDefault();
 		}
 	}
-// --- End Region --- //

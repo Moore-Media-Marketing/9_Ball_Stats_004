@@ -1,14 +1,13 @@
-using System.IO; // Add this line
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO; // Add this line
 
 public class GenerateGameObjectList:MonoBehaviour
 	{
 	// Path to save the file in the Assets folder
 	private string filePath = "Assets/TextFiles/GameObjectHierarchy.txt";
 
-	private void Awake()
+	void Awake()
 		{
 		SaveEntireSceneHierarchyToFile();
 		}
