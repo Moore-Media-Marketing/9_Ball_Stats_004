@@ -63,19 +63,19 @@ public class Player
 	// Method to get points required to win based on skill level
 	public int GetPointsRequired(int skillLevel)
 		{
-		switch (skillLevel)
+		return skillLevel switch
 			{
-			case 1: return 14;
-			case 2: return 19;
-			case 3: return 25;
-			case 4: return 31;
-			case 5: return 38;
-			case 6: return 46;
-			case 7: return 55;
-			case 8: return 65;
-			case 9: return 75;
-			default: return 0; // Default to 0 if invalid skill level
-			}
+				1 => 14,
+				2 => 19,
+				3 => 25,
+				4 => 31,
+				5 => 38,
+				6 => 46,
+				7 => 55,
+				8 => 65,
+				9 => 75,
+				_ => 0,// Default to 0 if invalid skill level
+				};
 		}
 
 	// --- CSV Helper Methods ---

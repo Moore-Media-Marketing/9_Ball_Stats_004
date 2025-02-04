@@ -9,8 +9,9 @@ public class Team
 	public string TeamName { get; set; }  // Team's name
 
 	// Constructor
-	public Team(string teamName)
+	public Team(int teamId, string teamName)
 		{
+		this.TeamId = teamId;
 		this.TeamName = teamName;
 		}
 
@@ -67,7 +68,7 @@ public class Team
 		RemovePlayerFromTeamInCsv(player);  // Remove player from the team's CSV data
 		}
 
-	// --- CSV Helper Methods ---
+	// --- CSV Helper Methods --- //
 	// Adds a player to the team in the CSV file
 	private void AddPlayerToTeamInCsv(Player player)
 		{

@@ -108,27 +108,29 @@ public class MatchupComparisonManager:MonoBehaviour
 		// Send the matchup results to the MatchupResultsPanel
 		if (matchupResultsPanel != null)
 			{
-			matchupResultsPanel.DisplayMatchupResults(matchupResults);
+			// Include the probabilities and a string argument for the result display
+			string resultMessage = "Matchup Results";  // Example message, adjust as needed
+			matchupResultsPanel.DisplayMatchupResults(resultMessage, team1Odds, team2Odds);
 			}
-		// --- End Region: Prepare Data for Results Panel --- //
 		}
+
 
 	// --- Region: Calculate Winning Points --- //
 	private float CalculateWinningPoints(int skillLevel)
 		{
-		switch (skillLevel)
+		return skillLevel switch
 			{
-			case 1: return 14f;
-			case 2: return 19f;
-			case 3: return 25f;
-			case 4: return 31f;
-			case 5: return 38f;
-			case 6: return 46f;
-			case 7: return 55f;
-			case 8: return 65f;
-			case 9: return 75f;
-			default: return 0f;
-			}
+				1 => 14f,
+				2 => 19f,
+				3 => 25f,
+				4 => 31f,
+				5 => 38f,
+				6 => 46f,
+				7 => 55f,
+				8 => 65f,
+				9 => 75f,
+				_ => 0f,
+				};
 		}
 	// --- End Region: Calculate Winning Points --- //
 

@@ -24,8 +24,6 @@ public class OverlayFeedbackPanel:MonoBehaviour
 			File.WriteAllText(feedbackFilePath, "Id,Message\n");  // Add headers if file is new
 			}
 
-		// Attach button click listeners
-		okButton.onClick.AddListener(OnOkButtonClicked);
 		cancelButton.onClick.AddListener(OnCancelButtonClicked);
 		}
 
@@ -41,10 +39,19 @@ public class OverlayFeedbackPanel:MonoBehaviour
 
 		// Store the action to be performed on OK
 		okButton.onClick.RemoveAllListeners();
-		okButton.onClick.AddListener(() => OnOkButtonClicked(onOkAction));
+
+		// Add listener with an intermediate method
+		okButton.onClick.AddListener(() => OnOkButtonClickedWithAction(onOkAction));
 
 		cancelButton.onClick.RemoveAllListeners();
 		cancelButton.onClick.AddListener(OnCancelButtonClicked);
+		}
+
+	// --- Region: OK Button Clicked --- //
+	// Intermediate method to call OnOkButtonClicked with parameter
+	private void OnOkButtonClickedWithAction(System.Action onOkAction)
+		{
+		OnOkButtonClicked(onOkAction);
 		}
 
 	// --- Region: OK Button Clicked --- //
@@ -75,11 +82,11 @@ public class OverlayFeedbackPanel:MonoBehaviour
 
 		if (callback != null)
 			{
-			Invoke("ClosePanel", 2f);  // Wait for 2 seconds before closing the panel
+			Invoke(nameof(ClosePanel), 2f);  // Wait for 2 seconds before closing the panel
 			}
 		else
 			{
-			Invoke("HideFeedback", 2f);  // Hide feedback after 2 seconds
+			Invoke(nameof(HideFeedback), 2f);  // Hide feedback after 2 seconds
 			}
 		}
 
@@ -120,7 +127,7 @@ public class OverlayFeedbackPanel:MonoBehaviour
 			var lines = File.ReadAllLines(feedbackFilePath);
 			if (lines.Length > 1)  // If there are already entries (skipping header)
 				{
-				var lastLine = lines[lines.Length - 1];
+				var lastLine = lines[^1];
 				var lastId = int.Parse(lastLine.Split(',')[0]);  // Extract the ID from the last line
 				nextId = lastId + 1;
 				}

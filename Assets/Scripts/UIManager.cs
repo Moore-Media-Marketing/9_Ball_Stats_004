@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;  // Added for Toggle
+using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.IO;
@@ -71,7 +71,7 @@ public class UIManager:MonoBehaviour
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
 	public TMP_Text settingsHeaderText;
-	public Toggle settingsToggle;  // Fixed Toggle component
+	public Toggle settingsToggle;
 	public TMP_Text settingsBackButtonText;
 	public Button settingsBackButton;
 
@@ -109,7 +109,6 @@ public class UIManager:MonoBehaviour
 	// --- Panel Initialization --- //
 	private void InitializePanels()
 		{
-		// Initialize visibility of panels
 		homePanel.SetActive(true);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
@@ -182,7 +181,11 @@ public class UIManager:MonoBehaviour
 				var columns = line.Split(',');
 				if (columns.Length == 2) // Assuming 2 columns: Id, Name
 					{
-					loadedTeams.Add(new Team { Id = int.Parse(columns[0]), Name = columns[1] });
+					int teamId = int.Parse(columns[0]);  // Parse the TeamId
+					string teamName = columns[1];        // Get the TeamName
+
+					Team team = new(teamId, teamName); // Pass both parameters to the constructor
+					loadedTeams.Add(team); // Add the team to the list
 					}
 				}
 			}
@@ -198,14 +201,15 @@ public class UIManager:MonoBehaviour
 			foreach (var line in lines)
 				{
 				var columns = line.Split(',');
-				if (columns.Length == 4) // Assuming 4 columns: Id, Name, TeamId, SkillLevel
+				if (columns.Length == 5) // Assuming 5 columns: PlayerId, PlayerName, SkillLevel, TotalGames, TotalWins
 					{
 					loadedPlayers.Add(new Player
 						{
-						Id = int.Parse(columns[0]),
-						Name = columns[1],
-						TeamId = int.Parse(columns[2]),
-						SkillLevel = int.Parse(columns[3])
+						PlayerId = int.Parse(columns[0]),
+						PlayerName = columns[1],
+						SkillLevel = int.Parse(columns[2]),
+						TotalGames = int.Parse(columns[3]),
+						TotalWins = int.Parse(columns[4]),
 						});
 					}
 				}
@@ -217,15 +221,12 @@ public class UIManager:MonoBehaviour
 	private void PopulateTeamDropdown()
 		{
 		teamDropdown.ClearOptions();
-		teamDropdown.AddOptions(teams.Select(t => t.Name).ToList());
+		teamDropdown.AddOptions(teams.Select(t => t.TeamName).ToList());
 		}
 
 	private void PopulatePlayerDropdown()
 		{
 		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
+		playerNameDropdown.AddOptions(players.Select(p => p.PlayerName).ToList());
 		}
-
-	// --- Additional Functions --- //
-	// You can add more utility methods here as needed.
 	}

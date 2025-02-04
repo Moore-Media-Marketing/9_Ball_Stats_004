@@ -222,11 +222,10 @@ public class DatabaseManager:MonoBehaviour
 					string[] values = line.Split(',');
 					if (values.Length == 2)  // Assuming 2 columns in the CSV (TeamId, TeamName)
 						{
-						Team team = new()
-							{
-							TeamId = int.Parse(values[0]),
-							TeamName = values[1]
-							};
+						// --- Fix: Ensure 'TeamId' and 'TeamName' are passed correctly --- //
+						int teamId = int.Parse(values[0]);  // Extract TeamId
+						string teamName = values[1];        // Extract TeamName
+						Team team = new(teamId, teamName);  // Pass both parameters
 						teams.Add(team);
 						}
 					}
@@ -238,6 +237,7 @@ public class DatabaseManager:MonoBehaviour
 			}
 		return teams;
 		}
+
 
 	// --- Save Teams to CSV --- //
 	private void SaveTeamsToCsv(List<Team> teams)
