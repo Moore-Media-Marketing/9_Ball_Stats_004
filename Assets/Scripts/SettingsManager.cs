@@ -1,13 +1,11 @@
 using UnityEngine;
-using SQLite; // Required for SQLite functionality
-using System.IO; // For file handling
+using System.IO;
+using System.Linq;
 
 public class SettingsManager:MonoBehaviour
 	{
-	// --- Region: Database Path --- //
-	private string dbPath;  // Path to the SQLite database
-
-	private SQLiteConnection db;  // SQLite connection
+	// --- Region: CSV File Path --- //
+	private string settingsFilePath;  // Path to the settings CSV file
 
 	// --- Region: Sample Data Toggle --- //
 	[SerializeField]
@@ -38,7 +36,7 @@ public class SettingsManager:MonoBehaviour
 	private void GenerateSampleData()
 		{
 		// Your sample data generation logic here
-		// For example, adding players or teams to the database
+		// For example, adding players or teams to the CSV
 		Debug.Log("Generating sample data...");
 		}
 
@@ -54,14 +52,13 @@ public class SettingsManager:MonoBehaviour
 		{
 		try
 			{
-			dbPath = Path.Combine(Application.persistentDataPath, "settings.db");
-			db = new SQLiteConnection(dbPath);
+			settingsFilePath = Path.Combine(Application.persistentDataPath, "settings.csv");
 
-			db.CreateTable<Settings>(); // Create the Settings table if it doesn't exist
-
-			// Save the sample data toggle state to the database
+			// Create or append to the CSV file
 			var settings = new Settings { SampleDataEnabled = sampleDataEnabled };
-			db.InsertOrReplace(settings);
+
+			// Write to CSV (or overwrite existing settings)
+			SaveSettingsToCsv(settings);
 
 			Debug.Log("Settings saved.");
 			}
@@ -76,13 +73,10 @@ public class SettingsManager:MonoBehaviour
 		{
 		try
 			{
-			dbPath = Path.Combine(Application.persistentDataPath, "settings.db");
-			db = new SQLiteConnection(dbPath);
+			settingsFilePath = Path.Combine(Application.persistentDataPath, "settings.csv");
 
-			db.CreateTable<Settings>();  // Ensure Settings table exists
-
-			// Load settings from the database
-			var settings = db.Table<Settings>().FirstOrDefault();
+			// Load settings from CSV
+			var settings = LoadSettingsFromCsv();
 			if (settings != null)
 				{
 				sampleDataEnabled = settings.SampleDataEnabled;  // Set the state of sample data toggle
@@ -109,12 +103,49 @@ public class SettingsManager:MonoBehaviour
 
 	// --- Region: Additional Functions --- //
 	// You can add any extra utility functions here if needed in the future
+
+	// --- CSV Helper Methods ---
+	// Save settings to CSV file
+	private void SaveSettingsToCsv(Settings settings)
+		{
+		var lines = new string[] { settings.ToCsv() };
+		File.WriteAllLines(settingsFilePath, lines);  // Overwrite existing settings or create new file
+		}
+
+	// Load settings from the CSV file
+	private Settings LoadSettingsFromCsv()
+		{
+		if (File.Exists(settingsFilePath))
+			{
+			string[] lines = File.ReadAllLines(settingsFilePath);
+			if (lines.Length > 0)
+				{
+				return Settings.FromCsv(lines[0]);  // Read the first line and convert to Settings
+				}
+			}
+
+		return null;
+		}
 	}
 
 // --- Region: Settings Data Model --- //
 public class Settings
 	{
-	[PrimaryKey, AutoIncrement]
-	public int Id { get; set; }  // Unique ID for each settings record
 	public bool SampleDataEnabled { get; set; }  // Store the state of sample data toggle
+
+	// Convert the Settings object to a CSV string
+	public string ToCsv()
+		{
+		return $"{SampleDataEnabled}";
+		}
+
+	// Convert a CSV string to a Settings object
+	public static Settings FromCsv(string csvLine)
+		{
+		string[] values = csvLine.Split(',');
+		return new Settings
+			{
+			SampleDataEnabled = bool.Parse(values[0])  // Parse the SampleDataEnabled field from CSV
+			};
+		}
 	}

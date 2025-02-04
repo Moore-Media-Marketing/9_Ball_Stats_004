@@ -1,5 +1,5 @@
 using UnityEngine;
-using SQLite;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -20,18 +20,14 @@ public class SampleDataGenerator:MonoBehaviour
 	private readonly int[] pointsRequiredToWin = { 14, 19, 25, 31, 38, 46, 55, 65, 75 }; // Points required based on skill level (1 to 9)
 																						 // --- End Region: Handicap Points for Each Skill Level --- //
 
-	// --- Region: SQLite Database References --- //
-	private SQLiteConnection db;
-	private string dbPath;
-	// --- End Region: SQLite Database References --- //
+	// --- Region: CSV File Path --- //
+	private string filePath;
+	// --- End Region: CSV File Path --- //
 
 	// --- Region: Start Method --- //
 	private void Start()
 		{
-		dbPath = System.IO.Path.Combine(Application.persistentDataPath, "sampleData.db");
-		db = new SQLiteConnection(dbPath);
-		db.CreateTable<Team>();   // Create Team table if not already present
-		db.CreateTable<Player>(); // Create Player table if not already present
+		filePath = Path.Combine(Application.persistentDataPath, "sampleData.csv");
 
 		GenerateSampleTeamsAndPlayers();
 		}
@@ -40,29 +36,33 @@ public class SampleDataGenerator:MonoBehaviour
 	// --- Region: Generate Sample Teams and Players --- //
 	private void GenerateSampleTeamsAndPlayers()
 		{
-		for (int i = 0; i < numberOfTeams; i++)
+		using (StreamWriter writer = new(filePath, false))
 			{
-			Team team = GenerateTeam();  // Generate a new team
-			db.Insert(team);  // Insert team into database
+			writer.WriteLine("TeamName,FirstName,LastName,SkillLevel,CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints,LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeGamesPlayed,LifetimeGamesWon,LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts");
 
-			for (int j = 0; j < 8; j++)  // Generate 8 players for each team
+			for (int i = 0; i < numberOfTeams; i++)
 				{
-				Player newPlayer = GeneratePlayer(team.Id);
-				db.Insert(newPlayer);  // Insert player into database
+				Team team = GenerateTeam();  // Generate a new team
+
+				for (int j = 0; j < 8; j++)  // Generate 8 players for each team
+					{
+					Player newPlayer = GeneratePlayer(team.Name);
+					writer.WriteLine(newPlayer.ToCSV());
+					}
 				}
 			}
 
-		Debug.Log("Sample teams and players generated and saved to the database.");
+		Debug.Log("Sample teams and players generated and saved to CSV.");
 		}
 	// --- End Region: Generate Sample Teams and Players --- //
 
 	// --- Region: Generate Team Method --- //
 	private Team GenerateTeam()
 		{
-		string teamName = teamNames[UnityEngine.Random.Range(0, teamNames.Length)];
+		string teamName = teamNames[Random.Range(0, teamNames.Length)];
 
 		// Generate a new Team and return it
-		Team newTeam = new Team
+		Team newTeam = new()
 			{
 			Name = teamName
 			};
@@ -72,43 +72,43 @@ public class SampleDataGenerator:MonoBehaviour
 	// --- End Region: Generate Team Method --- //
 
 	// --- Region: Generate Player Method --- //
-	private Player GeneratePlayer(int teamId)
+	private Player GeneratePlayer(string teamName)
 		{
-		string firstName = UnityEngine.Random.Range(0, 2) == 0 ? firstNamesMale[UnityEngine.Random.Range(0, firstNamesMale.Length)] : firstNamesFemale[UnityEngine.Random.Range(0, firstNamesFemale.Length)];
-		string lastName = lastNames[UnityEngine.Random.Range(0, lastNames.Length)];
-		int skillLevel = UnityEngine.Random.Range(1, 10); // Skill level between 1 and 9
+		string firstName = Random.Range(0, 2) == 0 ? firstNamesMale[Random.Range(0, firstNamesMale.Length)] : firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
+		string lastName = lastNames[Random.Range(0, lastNames.Length)];
+		int skillLevel = Random.Range(1, 10); // Skill level between 1 and 9
 
 		// Current Season Stats (calculated based on skill level)
 		int currentSeasonBreakAndRun = CalculateBreakAndRun(skillLevel);
 		float currentSeasonDefensiveShotAverage = CalculateDefensiveShotAverage(skillLevel);
-		int currentSeasonMatchesPlayed = UnityEngine.Random.Range(10, 50);
-		int currentSeasonMatchesWon = UnityEngine.Random.Range(5, currentSeasonMatchesPlayed);
+		int currentSeasonMatchesPlayed = Random.Range(10, 50);
+		int currentSeasonMatchesWon = Random.Range(5, currentSeasonMatchesPlayed);
 		int currentSeasonMiniSlams = CalculateMiniSlams(skillLevel);
-		int currentSeasonNineOnTheSnap = UnityEngine.Random.Range(0, skillLevel); // Higher skill = more 9-balls
+		int currentSeasonNineOnTheSnap = Random.Range(0, skillLevel); // Higher skill = more 9-balls
 		float currentSeasonPaPercentage = CalculatePaPercentage(skillLevel);
 		int currentSeasonPointsAwarded = CalculatePointsAwarded(skillLevel);
-		float currentSeasonPointsPerMatch = UnityEngine.Random.Range(5f, 20f);
-		int currentSeasonShutouts = UnityEngine.Random.Range(0, 3);
+		float currentSeasonPointsPerMatch = Random.Range(5f, 20f);
+		int currentSeasonShutouts = Random.Range(0, 3);
 		int currentSeasonSkillLevel = skillLevel;
-		int currentSeasonTotalPoints = UnityEngine.Random.Range(1000, 5000);
+		int currentSeasonTotalPoints = Random.Range(1000, 5000);
 
 		// Lifetime Stats (calculated based on skill level)
 		int lifetimeBreakAndRun = CalculateLifetimeBreakAndRun(skillLevel);
 		float lifetimeDefensiveShotAverage = CalculateLifetimeDefensiveShotAverage(skillLevel);
-		int lifetimeGamesPlayed = UnityEngine.Random.Range(50, 200);
-		int lifetimeGamesWon = UnityEngine.Random.Range(25, lifetimeGamesPlayed);
-		int lifetimeMatchesPlayed = UnityEngine.Random.Range(50, 200);
-		int lifetimeMatchesWon = UnityEngine.Random.Range(25, lifetimeMatchesPlayed);
+		int lifetimeGamesPlayed = Random.Range(50, 200);
+		int lifetimeGamesWon = Random.Range(25, lifetimeGamesPlayed);
+		int lifetimeMatchesPlayed = Random.Range(50, 200);
+		int lifetimeMatchesWon = Random.Range(25, lifetimeMatchesPlayed);
 		int lifetimeMiniSlams = CalculateLifetimeMiniSlams(skillLevel);
-		int lifetimeNineOnTheSnap = UnityEngine.Random.Range(0, skillLevel);
-		int lifetimeShutouts = UnityEngine.Random.Range(0, 5);
+		int lifetimeNineOnTheSnap = Random.Range(0, skillLevel);
+		int lifetimeShutouts = Random.Range(0, 5);
 
-		Player newPlayer = new Player
+		Player newPlayer = new()
 			{
+			TeamName = teamName,
 			FirstName = firstName,
 			LastName = lastName,
 			SkillLevel = skillLevel,
-			TeamId = teamId,
 
 			// Current Season Stats
 			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,
@@ -182,22 +182,13 @@ public class SampleDataGenerator:MonoBehaviour
 		}
 	// --- End Region: Helper Methods for Stats Calculation --- //
 
-	// --- Region: Team and Player Classes --- //
-	public class Team
-		{
-		[PrimaryKey, AutoIncrement]
-		public int Id { get; set; }
-		public string Name { get; set; }
-		}
-
+	// --- Region: Player Class --- //
 	public class Player
 		{
-		[PrimaryKey, AutoIncrement]
-		public int Id { get; set; }
+		public string TeamName { get; set; }
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public int SkillLevel { get; set; }
-		public int TeamId { get; set; }
 
 		// Current Season Stats
 		public int CurrentSeasonBreakAndRun { get; set; }
@@ -223,6 +214,19 @@ public class SampleDataGenerator:MonoBehaviour
 		public int LifetimeMiniSlams { get; set; }
 		public int LifetimeNineOnTheSnap { get; set; }
 		public int LifetimeShutouts { get; set; }
+
+		// Convert Player data to CSV string
+		public string ToCSV()
+			{
+			return $"{TeamName},{FirstName},{LastName},{SkillLevel},{CurrentSeasonBreakAndRun},{CurrentSeasonDefensiveShotAverage},{CurrentSeasonMatchesPlayed},{CurrentSeasonMatchesWon},{CurrentSeasonMiniSlams},{CurrentSeasonNineOnTheSnap},{CurrentSeasonPaPercentage},{CurrentSeasonPointsAwarded},{CurrentSeasonPointsPerMatch},{CurrentSeasonShutouts},{CurrentSeasonSkillLevel},{CurrentSeasonTotalPoints},{LifetimeBreakAndRun},{LifetimeDefensiveShotAverage},{LifetimeGamesPlayed},{LifetimeGamesWon},{LifetimeMatchesPlayed},{LifetimeMatchesWon},{LifetimeMiniSlams},{LifetimeNineOnTheSnap},{LifetimeShutouts}";
+			}
 		}
-	// --- End Region: Team and Player Classes --- //
+	// --- End Region: Player Class --- //
+
+	// --- Region: Team Class --- //
+	public class Team
+		{
+		public string Name { get; set; }
+		}
+	// --- End Region: Team Class --- //
 	}

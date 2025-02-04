@@ -1,14 +1,15 @@
-using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;  // Added for Toggle
+using TMPro;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 public class UIManager:MonoBehaviour
 	{
 	// --- Panel References --- //
 	[Header("Home Panel")]
 	public GameObject homePanel;
-
 	public TMP_Text homeHeaderText;
 	public TMP_Text manageTeamsButtonText;
 	public TMP_Text createPlayerButtonText;
@@ -23,7 +24,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management Panel")]
 	public GameObject teamManagementPanel;
-
 	public TMP_Text teamManagementHeaderText;
 	public TMP_Text teamNameText;
 	public TMP_InputField teamNameInputField;
@@ -41,7 +41,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Player Management Panel")]
 	public GameObject playerManagementPanel;
-
 	public TMP_Text playerManagementHeaderText;
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
@@ -55,51 +54,8 @@ public class UIManager:MonoBehaviour
 	public Button addPlayerDetailsButton;
 	public Button backButtonPlayerManagement;
 
-	[Header("Player Lifetime Data Input Panel")]
-	public GameObject playerLifetimeDataInputPanel;
-
-	public TMP_Text lifetimeDataInputHeaderText;
-	public TMP_Dropdown lifetimeTeamNameDropdown;
-	public TMP_Dropdown lifetimePlayerNameDropdown;
-	public TMP_InputField lifetimeGamesWonInputField;
-	public TMP_InputField lifetimeGamesPlayedInputField;
-	public TMP_InputField lifetimeDefensiveShotAvgInputField;
-	public TMP_InputField matchesPlayedInLast2YearsInputField;
-	public TMP_InputField lifetimeBreakAndRunInputField;
-	public TMP_InputField lifetimeMiniSlamsInputFieldLifetime;  // Renamed to avoid conflict
-	public TMP_InputField lifetimeShutoutsInputField;
-	public TMP_InputField nineOnTheSnapLifetimeInputField;
-	public TMP_Text updateLifetimeButtonText;
-	public TMP_Text backButtonLifetimeDataText;
-	public Button updateLifetimeButton;
-	public Button backButtonLifetimeData;
-
-	[Header("Player Current Season Data Input Panel")]
-	public GameObject playerCurrentSeasonDataInputPanel;
-
-	public TMP_Text currentSeasonDataInputHeaderText;
-	public TMP_Dropdown currentSeasonTeamNameDropdown;
-	public TMP_Dropdown currentSeasonPlayerNameDropdown;
-	public TMP_InputField gamesWonInputField;
-	public TMP_InputField gamesPlayedInputField;
-	public TMP_InputField totalPointsInputField;
-	public TMP_InputField ppmInputField;
-	public TMP_InputField paPercentageInputField;
-	public TMP_InputField breakAndRunInputField;
-	public TMP_InputField miniSlamsInputField;
-	public TMP_InputField nineOnTheSnapCurrentSeasonInputField;
-	public TMP_InputField shutoutsInputField;
-	public TMP_Dropdown skillLevelDropdown;
-	public TMP_Text addPlayerButtonTextCurrentSeason;
-	public TMP_Text removePlayerButtonTextCurrentSeason;
-	public TMP_Text backButtonCurrentSeasonDataText;
-	public Button addPlayerButtonCurrentSeason;
-	public Button removePlayerButtonCurrentSeason;
-	public Button backButtonCurrentSeasonData;
-
 	[Header("Matchup Comparison Panel")]
 	public GameObject matchupComparisonPanel;
-
 	public TMP_Text matchupComparisonHeaderText;
 	public TMP_Text selectTeamAText;
 	public TMP_Dropdown teamADropdown;
@@ -112,21 +68,8 @@ public class UIManager:MonoBehaviour
 	public Button compareButton;
 	public Button backButtonMatchupComparison;
 
-	[Header("Matchup Results Panel")]
-	public GameObject matchupResultsPanel;
-
-	public TMP_Text matchupResultsHeaderText;
-	public TMP_Text teamAHeaderTextResult;
-	public TMP_Text teamBHeaderTextResult;
-	public GameObject matchupsScrollView;
-	public TMP_Text bestMatchupHeaderText;
-	public GameObject bestMatchupsScrollView;
-	public TMP_Text backButtonMatchupResultsText;
-	public Button backButtonMatchupResults;
-
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
-
 	public TMP_Text settingsHeaderText;
 	public Toggle settingsToggle;  // Fixed Toggle component
 	public TMP_Text settingsBackButtonText;
@@ -134,14 +77,33 @@ public class UIManager:MonoBehaviour
 
 	[Header("Overlay Feedback Panel")]
 	public GameObject overlayFeedbackPanel;
-
 	public TMP_Text overlayFeedbackText;
+
+	// --- CSV File Paths --- //
+	private string teamsCsvPath;
+	private string playersCsvPath;
+
+	// --- Data Lists --- //
+	private List<Team> teams = new();
+	private List<Player> players = new();
 
 	// --- Initialization --- //
 	private void Start()
 		{
 		InitializePanels();
 		InitializeButtonListeners();
+
+		// Define file paths for CSVs
+		teamsCsvPath = Path.Combine(Application.persistentDataPath, "teams.csv");
+		playersCsvPath = Path.Combine(Application.persistentDataPath, "players.csv");
+
+		// Load data from CSV files
+		teams = LoadTeamsFromCSV();
+		players = LoadPlayersFromCSV();
+
+		// Populate dropdowns and UI elements
+		PopulateTeamDropdown();
+		PopulatePlayerDropdown();
 		}
 
 	// --- Panel Initialization --- //
@@ -151,10 +113,7 @@ public class UIManager:MonoBehaviour
 		homePanel.SetActive(true);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
-		playerLifetimeDataInputPanel.SetActive(false);
-		playerCurrentSeasonDataInputPanel.SetActive(false);
 		matchupComparisonPanel.SetActive(false);
-		matchupResultsPanel.SetActive(false);
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 		}
@@ -179,54 +138,21 @@ public class UIManager:MonoBehaviour
 		addPlayerDetailsButton.onClick.AddListener(OnAddPlayerDetails);
 		backButtonPlayerManagement.onClick.AddListener(ShowHomePanel);
 
-		updateLifetimeButton.onClick.AddListener(OnUpdateLifetimeData);
-		backButtonLifetimeData.onClick.AddListener(ShowPlayerManagementPanel);
-
-		addPlayerButtonCurrentSeason.onClick.AddListener(OnAddPlayerCurrentSeason);
-		removePlayerButtonCurrentSeason.onClick.AddListener(OnRemovePlayerCurrentSeason);
-		backButtonCurrentSeasonData.onClick.AddListener(ShowPlayerManagementPanel);
-
 		compareButton.onClick.AddListener(OnCompareMatchups);
 		backButtonMatchupComparison.onClick.AddListener(ShowHomePanel);
-
-		backButtonMatchupResults.onClick.AddListener(ShowHomePanel);
 
 		settingsBackButton.onClick.AddListener(ShowHomePanel);
 		}
 
 	// --- Button Actions --- //
-	private void OnAddUpdateTeam()
-		{ /* Add or Update Team */ }
-
-	private void ClearTeamNameInput()
-		{ teamNameInputField.text = ""; }
-
-	private void OnModifyTeamName()
-		{ /* Modify Team Name */ }
-
-	private void OnDeleteTeam()
-		{ /* Delete Team */ }
-
-	private void OnAddPlayer()
-		{ /* Add Player */ }
-
-	private void OnDeletePlayer()
-		{ /* Delete Player */ }
-
-	private void OnAddPlayerDetails()
-		{ /* Add Player Details */ }
-
-	private void OnUpdateLifetimeData()
-		{ /* Update Lifetime Data */ }
-
-	private void OnAddPlayerCurrentSeason()
-		{ /* Add Player to Current Season */ }
-
-	private void OnRemovePlayerCurrentSeason()
-		{ /* Remove Player from Current Season */ }
-
-	private void OnCompareMatchups()
-		{ /* Compare Matchups */ }
+	private void OnAddUpdateTeam() { /* Add or Update Team logic here */ }
+	private void ClearTeamNameInput() { teamNameInputField.text = ""; }
+	private void OnModifyTeamName() { /* Modify Team Name logic here */ }
+	private void OnDeleteTeam() { /* Delete Team logic here */ }
+	private void OnAddPlayer() { /* Add Player logic here */ }
+	private void OnDeletePlayer() { /* Delete Player logic here */ }
+	private void OnAddPlayerDetails() { /* Add Player Details logic here */ }
+	private void OnCompareMatchups() { /* Compare Matchups logic here */ }
 
 	// --- Panel Control Functions --- //
 	public void ShowHomePanel()
@@ -234,60 +160,70 @@ public class UIManager:MonoBehaviour
 		homePanel.SetActive(true);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
-		playerLifetimeDataInputPanel.SetActive(false);
-		playerCurrentSeasonDataInputPanel.SetActive(false);
 		matchupComparisonPanel.SetActive(false);
-		matchupResultsPanel.SetActive(false);
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 		}
 
-	public void ShowTeamManagementPanel()
+	public void ShowTeamManagementPanel() { homePanel.SetActive(false); teamManagementPanel.SetActive(true); }
+	public void ShowPlayerManagementPanel() { homePanel.SetActive(false); playerManagementPanel.SetActive(true); }
+	public void ShowMatchupComparisonPanel() { homePanel.SetActive(false); matchupComparisonPanel.SetActive(true); }
+	public void ShowSettingsPanel() { homePanel.SetActive(false); settingsPanel.SetActive(true); }
+
+	// --- CSV Loading Functions --- //
+	private List<Team> LoadTeamsFromCSV()
 		{
-		homePanel.SetActive(false);
-		teamManagementPanel.SetActive(true);
+		List<Team> loadedTeams = new();
+		if (File.Exists(teamsCsvPath))
+			{
+			string[] lines = File.ReadAllLines(teamsCsvPath);
+			foreach (var line in lines)
+				{
+				var columns = line.Split(',');
+				if (columns.Length == 2) // Assuming 2 columns: Id, Name
+					{
+					loadedTeams.Add(new Team { Id = int.Parse(columns[0]), Name = columns[1] });
+					}
+				}
+			}
+		return loadedTeams;
 		}
 
-	public void ShowPlayerManagementPanel()
+	private List<Player> LoadPlayersFromCSV()
 		{
-		homePanel.SetActive(false);
-		playerManagementPanel.SetActive(true);
+		List<Player> loadedPlayers = new();
+		if (File.Exists(playersCsvPath))
+			{
+			string[] lines = File.ReadAllLines(playersCsvPath);
+			foreach (var line in lines)
+				{
+				var columns = line.Split(',');
+				if (columns.Length == 4) // Assuming 4 columns: Id, Name, TeamId, SkillLevel
+					{
+					loadedPlayers.Add(new Player
+						{
+						Id = int.Parse(columns[0]),
+						Name = columns[1],
+						TeamId = int.Parse(columns[2]),
+						SkillLevel = int.Parse(columns[3])
+						});
+					}
+				}
+			}
+		return loadedPlayers;
 		}
 
-	public void ShowPlayerLifetimeDataInputPanel()
+	// --- UI Population Functions --- //
+	private void PopulateTeamDropdown()
 		{
-		homePanel.SetActive(false);
-		playerLifetimeDataInputPanel.SetActive(true);
+		teamDropdown.ClearOptions();
+		teamDropdown.AddOptions(teams.Select(t => t.Name).ToList());
 		}
 
-	public void ShowPlayerCurrentSeasonDataInputPanel()
+	private void PopulatePlayerDropdown()
 		{
-		homePanel.SetActive(false);
-		playerCurrentSeasonDataInputPanel.SetActive(true);
-		}
-
-	public void ShowMatchupComparisonPanel()
-		{
-		homePanel.SetActive(false);
-		matchupComparisonPanel.SetActive(true);
-		}
-
-	public void ShowMatchupResultsPanel()
-		{
-		homePanel.SetActive(false);
-		matchupResultsPanel.SetActive(true);
-		}
-
-	public void ShowSettingsPanel()
-		{
-		homePanel.SetActive(false);
-		settingsPanel.SetActive(true);
-		}
-
-	public void ShowOverlayFeedbackPanel(string feedback)
-		{
-		overlayFeedbackPanel.SetActive(true);
-		overlayFeedbackText.text = feedback;
+		playerNameDropdown.ClearOptions();
+		playerNameDropdown.AddOptions(players.Select(p => p.Name).ToList());
 		}
 
 	// --- Additional Functions --- //

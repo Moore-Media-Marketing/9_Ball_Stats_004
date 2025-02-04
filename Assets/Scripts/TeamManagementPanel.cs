@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using SQLite;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 public class TeamManagementPanel:MonoBehaviour
@@ -15,23 +15,21 @@ public class TeamManagementPanel:MonoBehaviour
 	public Button backButton;
 	// --- End Region: UI References --- //
 
-	// --- Region: SQLite References --- //
-	private SQLiteConnection db;
-	private string dbPath;
-	// --- End Region: SQLite References --- //
+	// --- Region: CSV References --- //
+	private string csvFilePath;
+	// --- End Region: CSV References --- //
 
 	// --- Region: Initialize Panel --- //
 	private void Start()
 		{
-		dbPath = System.IO.Path.Combine(Application.persistentDataPath, "sampleData.db");
-		db = new SQLiteConnection(dbPath);
-		db.CreateTable<Team>(); // Ensure the Team table exists
+		csvFilePath = Path.Combine(Application.persistentDataPath, "teams.csv");
 
+		// Add listeners for button clicks
 		addUpdateTeamButton.onClick.AddListener(OnAddUpdateTeam);
 		deleteTeamButton.onClick.AddListener(OnDeleteTeam);
 		backButton.onClick.AddListener(OnBackButton);
 
-		PopulateTeamDropdown();
+		PopulateTeamDropdown(); // Populate the dropdown with existing teams
 		}
 	// --- End Region: Initialize Panel --- //
 
@@ -39,21 +37,25 @@ public class TeamManagementPanel:MonoBehaviour
 	private void OnAddUpdateTeam()
 		{
 		string teamName = teamNameInputField.text;
+
 		if (!string.IsNullOrEmpty(teamName))
 			{
-			Team existingTeam = db.Table<Team>().FirstOrDefault(t => t.Name == teamName);
+			List<Team> teams = ReadTeamsFromCSV();
+			Team existingTeam = teams.FirstOrDefault(t => t.Name == teamName);
+
 			if (existingTeam != null)
 				{
 				// Update existing team
 				existingTeam.Name = teamName;
-				db.Update(existingTeam);
+				WriteTeamsToCSV(teams);
 				Debug.Log("Team updated: " + teamName);
 				}
 			else
 				{
 				// Add new team
-				Team newTeam = new Team { Name = teamName };
-				db.Insert(newTeam);
+				Team newTeam = new() { Name = teamName };
+				teams.Add(newTeam);
+				WriteTeamsToCSV(teams);
 				Debug.Log("Team added: " + teamName);
 				}
 
@@ -70,10 +72,13 @@ public class TeamManagementPanel:MonoBehaviour
 	private void OnDeleteTeam()
 		{
 		string teamName = teamDropdown.options[teamDropdown.value].text;
-		Team teamToDelete = db.Table<Team>().FirstOrDefault(t => t.Name == teamName);
+		List<Team> teams = ReadTeamsFromCSV();
+		Team teamToDelete = teams.FirstOrDefault(t => t.Name == teamName);
+
 		if (teamToDelete != null)
 			{
-			db.Delete(teamToDelete);  // Remove team from database
+			teams.Remove(teamToDelete);  // Remove team from list
+			WriteTeamsToCSV(teams);  // Write updated list to CSV
 			Debug.Log("Team deleted: " + teamName);
 			PopulateTeamDropdown();  // Refresh dropdown after deletion
 			}
@@ -87,7 +92,7 @@ public class TeamManagementPanel:MonoBehaviour
 	// --- Region: Populate Team Dropdown --- //
 	private void PopulateTeamDropdown()
 		{
-		List<Team> teams = db.Table<Team>().ToList();  // Get teams from the database
+		List<Team> teams = ReadTeamsFromCSV();
 		teamDropdown.ClearOptions();  // Clear current dropdown options
 
 		// Add team names to dropdown
@@ -104,11 +109,44 @@ public class TeamManagementPanel:MonoBehaviour
 		}
 	// --- End Region: Back Button --- //
 
+	// --- Region: CSV Helper Methods --- //
+	private List<Team> ReadTeamsFromCSV()
+		{
+		List<Team> teams = new();
+
+		if (File.Exists(csvFilePath))
+			{
+			var lines = File.ReadAllLines(csvFilePath);
+
+			foreach (var line in lines)
+				{
+				var columns = line.Split(',');
+				if (columns.Length > 1)  // Assuming each line has a team name
+					{
+					teams.Add(new Team { Name = columns[0] });
+					}
+				}
+			}
+
+		return teams;
+		}
+
+	private void WriteTeamsToCSV(List<Team> teams)
+		{
+		List<string> lines = new();
+
+		foreach (var team in teams)
+			{
+			lines.Add(team.Name);
+			}
+
+		File.WriteAllLines(csvFilePath, lines);
+		}
+	// --- End Region: CSV Helper Methods --- //
+
 	// --- Region: Team Class --- //
 	public class Team
 		{
-		[PrimaryKey, AutoIncrement]
-		public int Id { get; set; }
 		public string Name { get; set; }
 		}
 	// --- End Region: Team Class --- //

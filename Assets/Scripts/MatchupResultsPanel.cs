@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
-using SQLite;  // Required for SQLite functionality
-using UnityEngine.UI;  // Required for Scrollbars and Buttons
+using UnityEngine.UI;
+using System.IO;
+using System.Collections.Generic;
 
 public class MatchupResultsPanel:MonoBehaviour
 	{
@@ -22,22 +23,24 @@ public class MatchupResultsPanel:MonoBehaviour
 	// --- Region: Back Button --- //
 	public TMP_Text backButtonText;
 
-	// --- Region: SQLite References --- //
-	private SQLiteConnection db;
-	private string dbPath;  // SQLite database path
+	private string matchupFilePath;  // Path to the CSV file where matchup results are stored
 
-	// --- Region: Initialize SQLite and UI References --- //
+	// --- Region: Initialize --- //
 	private void Start()
 		{
-		dbPath = System.IO.Path.Combine(Application.persistentDataPath, "matchups.db");
-		db = new SQLiteConnection(dbPath);
-		db.CreateTable<Matchup>();  // Ensure the Matchup table exists
+		matchupFilePath = Path.Combine(Application.persistentDataPath, "matchups.csv");
+
+		// Ensure the CSV file exists (create it if it doesn't)
+		if (!File.Exists(matchupFilePath))
+			{
+			File.WriteAllText(matchupFilePath, "Id,Result,TeamAWinProbability,TeamBWinProbability\n");  // Add headers if file is new
+			}
 
 		// Initialize the Back Button text
 		UpdateBackButtonText();
 
 		// Optionally load existing data if needed
-		LoadMatchupResultsFromDatabase();
+		LoadMatchupResultsFromCsv();
 		}
 
 	// --- Region: Display Matchup Results --- //
@@ -53,28 +56,30 @@ public class MatchupResultsPanel:MonoBehaviour
 		teamAWinProbabilityText.text = "Team A Win Probability: " + teamAWinProbability.ToString("0.00") + "%";
 		teamBWinProbabilityText.text = "Team B Win Probability: " + teamBWinProbability.ToString("0.00") + "%";
 
-		// Optionally store matchup results in the database
+		// Optionally store matchup results in the CSV
 		SaveMatchupResult(result, teamAWinProbability, teamBWinProbability);
 		}
 
-	// --- Region: Save Matchup Results to Database --- //
+	// --- Region: Save Matchup Results to CSV --- //
 	public void SaveMatchupResult(string result, float teamAWinProbability, float teamBWinProbability)
 		{
-		Matchup newMatchup = new Matchup
+		try
 			{
-			Result = result,
-			TeamAWinProbability = teamAWinProbability,
-			TeamBWinProbability = teamBWinProbability
-			};
-
-		db.Insert(newMatchup);  // Save to SQLite
-		Debug.Log("Matchup result saved to database.");
+			int newId = GetNextMatchupId();
+			var line = $"{newId},{result},{teamAWinProbability},{teamBWinProbability}";
+			File.AppendAllLines(matchupFilePath, new[] { line });  // Append new matchup to the CSV
+			Debug.Log("Matchup result saved to CSV.");
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error saving matchup to CSV: {ex.Message}");
+			}
 		}
 
-	// --- Region: Load Matchup Results from Database --- //
-	public void LoadMatchupResultsFromDatabase()
+	// --- Region: Load Matchup Results from CSV --- //
+	public void LoadMatchupResultsFromCsv()
 		{
-		var matchups = db.Table<Matchup>().ToList();  // Retrieve all matchup records from database
+		var matchups = ReadMatchupsFromCsv();  // Read all matchup records from the CSV
 
 		// Clear previous entries
 		ClearMatchupResults();
@@ -89,6 +94,39 @@ public class MatchupResultsPanel:MonoBehaviour
 			TMP_Text matchupDetailsText = entry.transform.Find("MatchupDetailsText").GetComponent<TMP_Text>();
 			matchupDetailsText.text = $"{matchup.Result}\nA Win Probability: {matchup.TeamAWinProbability}% | B Win Probability: {matchup.TeamBWinProbability}%";
 			}
+		}
+
+	// --- Region: Read Matchups from CSV --- //
+	private List<Matchup> ReadMatchupsFromCsv()
+		{
+		var matchups = new List<Matchup>();
+
+		if (File.Exists(matchupFilePath))
+			{
+			var lines = File.ReadAllLines(matchupFilePath);
+			for (int i = 1; i < lines.Length; i++)  // Skip the header line
+				{
+				var parts = lines[i].Split(',');
+
+				if (parts.Length == 4)
+					{
+					int id = int.Parse(parts[0]);
+					string result = parts[1];
+					float teamAWinProbability = float.Parse(parts[2]);
+					float teamBWinProbability = float.Parse(parts[3]);
+
+					matchups.Add(new Matchup
+						{
+						Id = id,
+						Result = result,
+						TeamAWinProbability = teamAWinProbability,
+						TeamBWinProbability = teamBWinProbability
+						});
+					}
+				}
+			}
+
+		return matchups;
 		}
 
 	// --- Region: Clear Matchup Results --- //
@@ -119,10 +157,28 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Optionally, close the current panel and show the previous one
 		}
 
+	// --- Region: Get Next Matchup ID --- //
+	private int GetNextMatchupId()
+		{
+		int nextId = 1;
+
+		if (File.Exists(matchupFilePath))
+			{
+			var lines = File.ReadAllLines(matchupFilePath);
+			if (lines.Length > 1)  // If there are already entries (skipping header)
+				{
+				var lastLine = lines[lines.Length - 1];
+				var lastId = int.Parse(lastLine.Split(',')[0]);  // Extract the ID from the last line
+				nextId = lastId + 1;
+				}
+			}
+
+		return nextId;
+		}
+
 	// --- Region: Matchup Data Model --- //
 	public class Matchup
 		{
-		[PrimaryKey, AutoIncrement]
 		public int Id { get; set; }  // Unique ID for matchup record
 		public string Result { get; set; }  // Result of the matchup
 		public float TeamAWinProbability { get; set; }  // Team A's win probability

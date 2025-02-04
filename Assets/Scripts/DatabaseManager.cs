@@ -1,11 +1,14 @@
-using MyGame.Database;  // Reference to your custom SQLite helper namespace
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class DatabaseManager:MonoBehaviour
 	{
 	// --- Singleton Pattern --- //
 	public static DatabaseManager Instance { get; private set; }
+
+	private string playersCsvPath = "Assets/Resources/players.csv";
+	private string teamsCsvPath = "Assets/Resources/teams.csv";
 
 	private void Awake()
 		{
@@ -19,9 +22,6 @@ public class DatabaseManager:MonoBehaviour
 			{
 			Destroy(gameObject);  // Destroy duplicates
 			}
-
-		// Initialize database connection through DatabaseHelper
-		DatabaseHelper.InitializeDatabase();
 		}
 
 	// --- Save Player Data --- //
@@ -29,18 +29,21 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			// Ensure that playerId and playerName are valid in the Player class
-			var existingPlayer = DatabaseHelper.GetPlayersForTeam(player.TeamId).Find(p => p.PlayerName == player.PlayerName);
+			List<Player> players = LoadPlayersFromCsv();
+			var existingPlayer = players.Find(p => p.PlayerName == player.PlayerName);
+
 			if (existingPlayer != null)
 				{
-				DatabaseHelper.UpdatePlayer(player);  // Update existing player data
+				existingPlayer = player;  // Update existing player data
 				Debug.Log($"Player data for {player.PlayerName} updated successfully.");
 				}
 			else
 				{
-				DatabaseHelper.InsertPlayer(player);  // Insert new player data
+				players.Add(player);  // Insert new player data
 				Debug.Log($"Player data for {player.PlayerName} saved successfully.");
 				}
+
+			SavePlayersToCsv(players);  // Save back to CSV
 			}
 		catch (System.Exception ex)
 			{
@@ -53,8 +56,8 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			// Load player data based on playerId
-			return DatabaseHelper.GetAllPlayers().Find(p => p.PlayerId == playerId);
+			List<Player> players = LoadPlayersFromCsv();
+			return players.Find(p => p.PlayerId == playerId);
 			}
 		catch (System.Exception ex)
 			{
@@ -68,17 +71,21 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var existingTeam = DatabaseHelper.GetAllTeams().Find(t => t.TeamName == team.TeamName);
+			List<Team> teams = LoadTeamsFromCsv();
+			var existingTeam = teams.Find(t => t.TeamName == team.TeamName);
+
 			if (existingTeam != null)
 				{
-				DatabaseHelper.UpdateTeam(team);  // Update existing team data
+				existingTeam = team;  // Update existing team data
 				Debug.Log($"Team data for {team.TeamName} updated successfully.");
 				}
 			else
 				{
-				DatabaseHelper.InsertTeam(team);  // Insert new team data
+				teams.Add(team);  // Insert new team data
 				Debug.Log($"Team data for {team.TeamName} saved successfully.");
 				}
+
+			SaveTeamsToCsv(teams);  // Save back to CSV
 			}
 		catch (System.Exception ex)
 			{
@@ -91,8 +98,8 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			// Load team data based on teamId
-			return DatabaseHelper.GetTeamById(teamId);
+			List<Team> teams = LoadTeamsFromCsv();
+			return teams.Find(t => t.TeamId == teamId);
 			}
 		catch (System.Exception ex)
 			{
@@ -106,11 +113,13 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var player = DatabaseHelper.GetPlayersForTeam(playerId).Find(p => p.PlayerId == playerId);
+			List<Player> players = LoadPlayersFromCsv();
+			var player = players.Find(p => p.PlayerId == playerId);
 			if (player != null)
 				{
-				DatabaseHelper.DeletePlayer(player);  // Delete player from the database
+				players.Remove(player);  // Delete player from the list
 				Debug.Log($"Player with ID {playerId} deleted successfully.");
+				SavePlayersToCsv(players);  // Save back to CSV
 				}
 			else
 				{
@@ -128,11 +137,13 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var team = DatabaseHelper.GetTeamById(teamId);
+			List<Team> teams = LoadTeamsFromCsv();
+			var team = teams.Find(t => t.TeamId == teamId);
 			if (team != null)
 				{
-				DatabaseHelper.DeleteTeam(team);  // Delete team from the database
+				teams.Remove(team);  // Delete team from the list
 				Debug.Log($"Team with ID {teamId} deleted successfully.");
+				SaveTeamsToCsv(teams);  // Save back to CSV
 				}
 			else
 				{
@@ -142,6 +153,107 @@ public class DatabaseManager:MonoBehaviour
 		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error deleting team: {ex.Message}");
+			}
+		}
+
+	// --- Load Players from CSV --- //
+	private List<Player> LoadPlayersFromCsv()
+		{
+		List<Player> players = new();
+		try
+			{
+			if (File.Exists(playersCsvPath))
+				{
+				string[] lines = File.ReadAllLines(playersCsvPath);
+				foreach (string line in lines)
+					{
+					string[] values = line.Split(',');
+					if (values.Length == 5)  // Assuming 5 columns in the CSV (PlayerId, PlayerName, SkillLevel, TotalGames, TotalWins)
+						{
+						Player player = new()
+							{
+							PlayerId = int.Parse(values[0]),
+							PlayerName = values[1],
+							SkillLevel = int.Parse(values[2]),
+							TotalGames = int.Parse(values[3]),
+							TotalWins = int.Parse(values[4])
+							};
+						players.Add(player);
+						}
+					}
+				}
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error loading players from CSV: {ex.Message}");
+			}
+		return players;
+		}
+
+	// --- Save Players to CSV --- //
+	private void SavePlayersToCsv(List<Player> players)
+		{
+		try
+			{
+			List<string> lines = new();
+			foreach (Player player in players)
+				{
+				lines.Add($"{player.PlayerId},{player.PlayerName},{player.SkillLevel},{player.TotalGames},{player.TotalWins}");
+				}
+			File.WriteAllLines(playersCsvPath, lines);
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error saving players to CSV: {ex.Message}");
+			}
+		}
+
+	// --- Load Teams from CSV --- //
+	private List<Team> LoadTeamsFromCsv()
+		{
+		List<Team> teams = new();
+		try
+			{
+			if (File.Exists(teamsCsvPath))
+				{
+				string[] lines = File.ReadAllLines(teamsCsvPath);
+				foreach (string line in lines)
+					{
+					string[] values = line.Split(',');
+					if (values.Length == 2)  // Assuming 2 columns in the CSV (TeamId, TeamName)
+						{
+						Team team = new()
+							{
+							TeamId = int.Parse(values[0]),
+							TeamName = values[1]
+							};
+						teams.Add(team);
+						}
+					}
+				}
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error loading teams from CSV: {ex.Message}");
+			}
+		return teams;
+		}
+
+	// --- Save Teams to CSV --- //
+	private void SaveTeamsToCsv(List<Team> teams)
+		{
+		try
+			{
+			List<string> lines = new();
+			foreach (Team team in teams)
+				{
+				lines.Add($"{team.TeamId},{team.TeamName}");
+				}
+			File.WriteAllLines(teamsCsvPath, lines);
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error saving teams to CSV: {ex.Message}");
 			}
 		}
 	}
