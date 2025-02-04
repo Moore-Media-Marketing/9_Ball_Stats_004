@@ -11,8 +11,8 @@ public class HomePanel:MonoBehaviour
 	public GameObject matchupComparisonPanel;
 	public GameObject settingsPanel;
 	public GameObject overlayFeedbackPanel;
-	public GameObject playerLifetimeDataInputPanel; // Added
-	public GameObject playercurrentSeasonDataInputPanel; // Added
+	public GameObject playerLifetimeDataInputPanel;
+	public GameObject playercurrentSeasonDataInputPanel;
 
 	[Header("Buttons")]
 	public GameObject teamManagementButton;

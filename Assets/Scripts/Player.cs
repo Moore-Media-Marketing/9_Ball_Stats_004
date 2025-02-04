@@ -1,129 +1,136 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;  // --- Importing LINQ extension methods --- //
-
 using UnityEngine;
+using SQLite;
 
-[Serializable]
+[System.Serializable]
 public class Player
 	{
-	// --- Region: Public Variables --- //
-	public string id; // --- Unique ID for each player (changed to string for Guid compatibility) --- //
+	#region Player Information
 
-	public string name; // --- Player's name --- //
-	public int skillLevel; // --- Skill level of the player --- //
-	public int teamId; // --- ID of the team the player belongs to --- //
-					   // --- End Region --- //
+	[Header("Basic Info")]
+	[Tooltip("Player's full name.")]
+	public string Name;
 
-	// --- Region: Lifetime Stats --- //
-	public int lifetimeMatchesPlayed; // --- Lifetime matches played --- //
+	[Tooltip("Skill Level ranging from 1 (lowest) to 9 (highest).")]
+	[Range(1, 9)]
+	public int SkillLevel;
 
-	public int lifetimeMatchesWon; // --- Lifetime matches won --- //
-	public float lifetimeDefensiveShotAvg; // --- Lifetime defensive shot average --- //
-	public int lifetimeGamesPlayed; // --- Lifetime games played --- //
-	public int lifetimeGamesWon; // --- Lifetime games won --- //
-	public int lifetimeMiniSlams; // --- Lifetime mini slams --- //
-	public int lifetimeNineOnTheSnap; // --- Lifetime nine on the snap --- //
-	public int lifetimeShutouts; // --- Lifetime shutouts --- //
-	public int lifetimeBreakAndRun; // --- Lifetime break and run --- //
-	public int lifetimeTotalPoints; // --- Lifetime total points --- //
-	public int matchesPlayedInLast2Years; // --- Matches played in the last 2 years --- //
-										  // --- End Region --- //
+	#endregion
 
-	// --- Region: Current Season Stats --- //
-	public int currentSeasonGamesWon; // --- Current season games won --- //
+	#region Season Stats
 
-	public int currentSeasonGamesPlayed; // --- Current season games played --- //
-	public float currentSeasonPpm; // --- Current season points per match --- //
+	[Header("Season Stats")]
+	[Tooltip("Total matches won this season.")]
+	public int MatchesWon;
 
-	public int currentSeasonBreakAndRun; // --- Current season break and run --- //
-	public float currentSeasonDefensiveShotAverage; // --- Current season defensive shot average --- //
-	public int currentSeasonMatchesPlayed; // --- Current season matches played --- //
-	public int currentSeasonMatchesWon; // --- Current season matches won --- //
-	public int currentSeasonMiniSlams; // --- Current season mini slams --- //
-	public int currentSeasonNineOnTheSnap; // --- Current season nine on the snap --- //
-	public int currentSeasonShutouts; // --- Current season shutouts --- //
-	public float currentSeasonPaPercentage; // --- Current season PA percentage --- //
-	public int currentSeasonSkillLevel; // --- Current season skill level --- //
-	public int currentSeasonTotalPoints; // --- Current season total points --- //
-	public int currentSeasonPointsAwarded; // --- Current season points awarded --- //
-	public float currentSeasonPointsPerMatch; // --- Current season points per match --- //
-											  // --- End Region --- //
+	[Tooltip("Total matches played this season.")]
+	public int MatchesPlayed;
 
-	// --- Region: Points Required to Win (New) --- //
-	public int PointsRequiredToWin; // --- Points required for this player to win a match --- //
-									// --- End Region --- //
+	[Tooltip("Average points scored per match.")]
+	public int PointsPerMatch;
 
-	// --- Region: Static Player List --- //
-	public static List<Player> playerList = new(); // --- Static list to hold all player objects --- //
-												   // --- End Region --- //
+	[Tooltip("Total points awarded this season.")]
+	public int PointsAwarded;
 
-	// --- Region: Constructor --- //
-	public Player(string playerName, int skillLevel, int teamId)
+	#endregion
+
+	#region Lifetime Stats
+
+	[Header("Lifetime Stats")]
+	[Tooltip("Total matches won in lifetime.")]
+	public int LifetimeMatchesWon;
+
+	[Tooltip("Total matches played in lifetime.")]
+	public int LifetimeMatchesPlayed;
+
+	[Tooltip("Lifetime win percentage.")]
+	public float LifetimeWinPercentage => LifetimeMatchesPlayed > 0
+		? (float) LifetimeMatchesWon / LifetimeMatchesPlayed * 100f
+		: 0f;
+
+	[Tooltip("Defensive shot average.")]
+	public float DefensiveShotAverage;
+
+	[Tooltip("Matches played in the last 2 years.")]
+	public int MatchesLast2Years;
+
+	[Tooltip("Number of 9-on-the-Snap shots.")]
+	public int NineOnTheSnap;
+
+	[Tooltip("Number of Mini Slams achieved.")]
+	public int MiniSlams;
+
+	[Tooltip("Number of Shutouts achieved.")]
+	public int Shutouts;
+
+	#endregion
+
+	#region Database Fields
+
+	// SQLite requires a parameterless constructor
+	[PrimaryKey, AutoIncrement]
+	public int Id { get; set; }
+
+	// Add TeamId to link Player to Team
+	public int TeamId { get; set; }
+
+	// Parameterless constructor for SQLite
+	public Player() { }
+
+	#endregion
+
+	#region Constructor
+
+	// --- Constructor to initialize a new player --- //
+	public Player(string name, int skillLevel, int teamId)
 		{
-		this.id = Guid.NewGuid().ToString(); // --- Unique ID generation --- //
-		this.name = playerName;
-		this.skillLevel = skillLevel;
-		this.teamId = teamId;
-
-		playerList.Add(this); // --- Add the player to the static list upon creation --- //
-		}
-	// --- End Region --- //
-
-	// --- Region: Utility Functions --- //
-	// --- Function to get a player by ID --- //
-	public static Player GetPlayerById(string playerId)
-		{
-		return playerList.FirstOrDefault(p => p.id == playerId); // --- Find a player by ID --- //
-		}
-
-	// --- Function to get all players by teamId --- //
-	public static List<Player> GetPlayersByTeam(int teamId)
-		{
-		return playerList.Where(p => p.teamId == teamId).ToList(); // --- Get all players by team ID --- //
-		}
-
-	// --- Function to remove a player by ID --- //
-	public static void RemovePlayerById(string playerId)
-		{
-		Player playerToRemove = playerList.FirstOrDefault(p => p.id == playerId);
-		if (playerToRemove != null)
-			{
-			playerList.Remove(playerToRemove); // --- Remove player from the list --- //
-			}
-		}
-
-	// --- Function to get all player names --- //
-	public static List<string> GetAllPlayerNames()
-		{
-		return playerList.Select(p => p.name).ToList(); // --- Get all player names --- //
-		}
-	// --- End Region --- //
-
-	// --- Region: JSON Save/Load Methods --- //
-	// --- Save player data to JSON file --- //
-	public void SavePlayerToJson(string filePath)
-		{
-		string json = JsonUtility.ToJson(this, true); // --- Serialize the player object to JSON --- //
-		System.IO.File.WriteAllText(filePath, json); // --- Write the JSON data to a file --- //
-		Debug.Log($"Player data saved to {filePath}");
+		Name = name;
+		SkillLevel = Mathf.Clamp(skillLevel, 1, 9);
+		TeamId = teamId; // Link player to team
+		ResetSeasonStats();
+		LifetimeMatchesWon = 0;
+		LifetimeMatchesPlayed = 0;
+		DefensiveShotAverage = 0;
+		MatchesLast2Years = 0;
+		NineOnTheSnap = 0;
+		MiniSlams = 0;
+		Shutouts = 0;
 		}
 
-	// --- Load player data from JSON file --- //
-	public static Player LoadPlayerFromJson(string filePath)
+	#endregion
+
+	#region Methods
+
+	// --- Updates the player's stats after a match --- //
+	public void UpdateStats(int pointsScored, bool wonMatch)
 		{
-		if (System.IO.File.Exists(filePath))
-			{
-			string json = System.IO.File.ReadAllText(filePath); // --- Read the JSON data from the file --- //
-			Player player = JsonUtility.FromJson<Player>(json); // --- Deserialize the JSON to a Player object --- //
-			Debug.Log($"Player data loaded from {filePath}");
-			return player;
-			}
-		else
-			{
-			Debug.LogError("File not found.");
-			return null;
-			}
+		MatchesPlayed++;
+		PointsAwarded += pointsScored;
+		PointsPerMatch = PointsAwarded / MatchesPlayed;
+
+		if (wonMatch)
+			MatchesWon++;
+
+		// --- Update lifetime stats --- //
+		LifetimeMatchesPlayed++;
+		if (wonMatch)
+			LifetimeMatchesWon++;
 		}
-	// --- End Region --- //
+
+	// --- Transfers player to another team --- //
+	public void TransferToNewTeam(int newTeamId)
+		{
+		TeamId = newTeamId;
+		Debug.Log($"{Name} has been moved to a new team.");
+		}
+
+	// --- Resets season stats at the start of a new season --- //
+	public void ResetSeasonStats()
+		{
+		MatchesWon = 0;
+		MatchesPlayed = 0;
+		PointsPerMatch = 0;
+		PointsAwarded = 0;
+		}
+
+	#endregion
 	}

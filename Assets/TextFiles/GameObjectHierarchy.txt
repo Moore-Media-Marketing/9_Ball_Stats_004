@@ -1,9 +1,6 @@
 AdaptivePerformanceManager
-SampleDataGenerator
-DatabaseManager
-DropdownManager
+DataManager
 MatchupManager
-MatchupComparisonManager
 UIManager
 GenerateGameObjectList
 Main Camera
@@ -15,13 +12,7 @@ Canvas
       Text (TMP)
     CreatePlayerButton
       Text (TMP)
-    CreateLifetimePlayerButton
-      Text (TMP)
-    CreateCurrentPlayerButton
-      Text (TMP)
     ComparisonButton
-      Text (TMP)
-    SettingsButton
       Text (TMP)
     ExitButton
       Text (TMP)
@@ -49,6 +40,7 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
+        Canvas
     ModifyTeamNameButton
       Text (TMP)
     DeleteButton
@@ -57,11 +49,7 @@ Canvas
       UpdateBackButtonText
   PlayerManagementPanel
     HeaderText
-    PlayerNameInputField
-      Text Area
-        Placeholder
-        Text
-    TeamDropdown
+    TeamNameDropdown
       Label
       Arrow
       Template
@@ -74,8 +62,7 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
-    CreatePlayerButton
-      Text (TMP)
+        Canvas
     PlayerNameDropdown
       Label
       Arrow
@@ -89,6 +76,13 @@ Canvas
         Scrollbar
           Sliding Area
             Handle
+        Canvas
+    PlayerNameInputField
+      Text Area
+        Placeholder
+        Text
+    AddPlayerButton
+      Text (TMP)
     DeletePlayerButton
       Text (TMP)
     AddPlayerDetailsButton
@@ -97,7 +91,7 @@ Canvas
       UpdateBackButtonText
   PlayerLifetimeDataInputPanel
     HeaderText
-    TeamDropdown
+    TeamNameDropdown
       Label
       Arrow
       Template
@@ -157,15 +151,13 @@ Canvas
       Text Area
         Placeholder
         Text
-    SaveLifetimeButton
-      Text (TMP)
-    AddPlayerCurrentSeasonButton
+    UpdateLifetimeButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
   PlayerCurrentSeasonDataInputPanel
     HeaderText
-    TeamDropdown
+    TeamNameDropdown
       Label
       Arrow
       Template
@@ -243,7 +235,9 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    SaveCurrentSeasonButton
+    AddPlayerButton
+      Text (TMP)
+    RemovePlayerButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
@@ -342,10 +336,6 @@ Canvas
       UpdateBackButtonText
   Settings Panel
     HeaderText
-    SampleDataGeneratorToggle
-      Background
-        Checkmark
-      Label
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel
