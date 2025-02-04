@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-
 using TMPro;
-
 using UnityEngine;
+using System.IO;
 
 public class MatchupManager:MonoBehaviour
 	{
@@ -146,6 +145,37 @@ public class MatchupManager:MonoBehaviour
 	public void CloseMatchupPanel()
 		{
 		matchupPanel.SetActive(false);
+		}
+
+	// --- Save matchup data to JSON --- //
+	public void SaveMatchupResultsToJson(List<string> results, string filePath)
+		{
+		string json = JsonUtility.ToJson(new MatchupResultsWrapper { results = results }, true);
+		File.WriteAllText(filePath, json);
+		Debug.Log($"Matchup results saved to {filePath}");
+		}
+
+	// --- Load matchup data from JSON --- //
+	public List<string> LoadMatchupResultsFromJson(string filePath)
+		{
+		if (File.Exists(filePath))
+			{
+			string json = File.ReadAllText(filePath);
+			MatchupResultsWrapper wrapper = JsonUtility.FromJson<MatchupResultsWrapper>(json);
+			Debug.Log($"Matchup results loaded from {filePath}");
+			return wrapper.results;
+			}
+		else
+			{
+			Debug.LogError("File not found.");
+			return new List<string>();
+			}
+		}
+
+	[System.Serializable]
+	public class MatchupResultsWrapper
+		{
+		public List<string> results;
 		}
 
 	#endregion Methods

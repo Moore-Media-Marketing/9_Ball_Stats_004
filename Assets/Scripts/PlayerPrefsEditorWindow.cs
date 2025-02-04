@@ -1,6 +1,8 @@
-using UnityEditor;
-using UnityEngine;
 using System.Collections.Generic;
+
+using UnityEditor;
+
+using UnityEngine;
 
 public class PlayerPrefsEditorWindow:EditorWindow
 	{
@@ -24,7 +26,7 @@ public class PlayerPrefsEditorWindow:EditorWindow
 		teams.Clear();
 		players.Clear();
 
-		// Load Teams
+		// Load Teams from JSON
 		for (int i = 1; i <= 100; i++)
 			{
 			if (PlayerPrefs.HasKey($"Team_{i}"))
@@ -35,7 +37,7 @@ public class PlayerPrefsEditorWindow:EditorWindow
 				}
 			}
 
-		// Load Players
+		// Load Players from JSON
 		for (int i = 1; i <= 500; i++)
 			{
 			if (PlayerPrefs.HasKey($"Player_{i}"))

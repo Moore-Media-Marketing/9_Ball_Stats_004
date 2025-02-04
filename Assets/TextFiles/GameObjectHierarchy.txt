@@ -342,6 +342,10 @@ Canvas
       UpdateBackButtonText
   Settings Panel
     HeaderText
+    SampleDataGeneratorToggle
+      Background
+        Checkmark
+      Label
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel

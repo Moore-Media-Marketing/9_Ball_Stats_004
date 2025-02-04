@@ -1,7 +1,7 @@
-using TMPro;
+using TMPro;  // --- Importing TextMeshPro for UI elements ---
 
-using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine;  // --- Importing UnityEngine for Unity-related functionality ---
+using UnityEngine.UI;  // --- Importing UI components for handling buttons and toggles ---
 
 public class SettingsPanel:MonoBehaviour
 	{
@@ -15,12 +15,14 @@ public class SettingsPanel:MonoBehaviour
 
 	[Tooltip("Toggle to enable or disable Sample Data Generator")]
 	public Toggle sampleDataToggle;
+
 	// --- End Region ---
 
 	// --- Region: References ---
 	[Header("References")]
 	[Tooltip("Reference to the SampleDataGenerator script")]
 	public SampleDataGenerator sampleDataGenerator;
+
 	// --- End Region ---
 
 	// --- Region: Initialization ---
@@ -56,6 +58,7 @@ public class SettingsPanel:MonoBehaviour
 			Debug.LogError("SampleDataGenerator reference is missing!");
 			}
 		}
+
 	// --- End Region ---
 
 	// --- Region: Button Logic ---
@@ -63,6 +66,7 @@ public class SettingsPanel:MonoBehaviour
 		{
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel); // Use UIManager to switch panels
 		}
+
 	// --- End Region ---
 
 	// --- Region: Toggle Handling ---
@@ -81,6 +85,7 @@ public class SettingsPanel:MonoBehaviour
 		PlayerPrefs.SetInt("SampleDataEnabled", isOn ? 1 : 0);
 		PlayerPrefs.Save();
 		}
+
 	// --- End Region ---
 
 	// --- Region: Enable Sample Data ---
@@ -88,7 +93,7 @@ public class SettingsPanel:MonoBehaviour
 		{
 		if (sampleDataGenerator != null)
 			{
-			sampleDataGenerator.GenerateSampleData();
+			sampleDataGenerator.GenerateSampleTeamsAndPlayers(); // Correct method call
 			Debug.Log("Sample Data Generator activated.");
 			}
 		else
@@ -96,6 +101,7 @@ public class SettingsPanel:MonoBehaviour
 			Debug.LogError("SampleDataGenerator is not assigned!");
 			}
 		}
+
 	// --- End Region ---
 
 	// --- Region: Clear Sample Data ---
@@ -111,5 +117,6 @@ public class SettingsPanel:MonoBehaviour
 			Debug.LogError("SampleDataGenerator is not assigned!");
 			}
 		}
+
 	// --- End Region ---
 	}

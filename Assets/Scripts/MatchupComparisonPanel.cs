@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class MatchupComparisonPanel:MonoBehaviour
 	{
 	#region UI Elements
+
 	[Tooltip("Header text for the matchup comparison panel.")]
 	public TMP_Text headerText;  // --- Displays the panel header ---
 
@@ -101,9 +102,15 @@ public class MatchupComparisonPanel:MonoBehaviour
 		string teamAName = teamADropdown.options[teamADropdown.value].text;
 		string teamBName = teamBDropdown.options[teamBDropdown.value].text;
 
+		// Calculate average skill levels for both teams
+		float teamASkillLevel = CalculateTeamSkillLevel(selectedTeamA);
+		float teamBSkillLevel = CalculateTeamSkillLevel(selectedTeamB);
+
 		// Get the MatchupResultsPanel component using TryGetComponent
 		if (matchupResultsPanel.TryGetComponent(out MatchupResultsPanel resultsPanel))
 			{
+			Debug.Log($"Team A Skill Level: {teamASkillLevel}, Team B Skill Level: {teamBSkillLevel}");
+
 			resultsPanel.SetMatchupData(resultData, teamAName, teamBName);
 			}
 		else
@@ -160,13 +167,30 @@ public class MatchupComparisonPanel:MonoBehaviour
 				}
 			}
 
-		// Returning the result as percentage of wins for each team
+		// Calculate the total comparisons and the winning percentages
 		float totalComparisons = teamA.players.Count * teamB.players.Count;
-		return new MatchupResultData
+
+		// Round the winning percentages to the nearest whole number
+		int roundedTeamAWins = Mathf.RoundToInt((teamAWinsCount / totalComparisons) * 100);
+		int roundedTeamBWins = Mathf.RoundToInt((teamBWinsCount / totalComparisons) * 100);
+
+		// Return the result with rounded percentages
+		return new MatchupResultData(roundedTeamAWins, roundedTeamBWins);  // Pass both values to the constructor
+		}
+
+
+	// New method to calculate the average skill level of a team
+	private float CalculateTeamSkillLevel(Team team)
+		{
+		if (team.players.Count == 0) return 0f;
+
+		float totalSkillLevel = 0f;
+		foreach (var player in team.players)
 			{
-			teamAWins = (teamAWinsCount / totalComparisons) * 100,
-			teamBWins = (teamBWinsCount / totalComparisons) * 100
-			};
+			totalSkillLevel += player.currentSeasonSkillLevel;
+			}
+
+		return totalSkillLevel / team.players.Count;
 		}
 
 	#endregion Matchup Comparison Logic

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO; // --- Added for File I/O --- //
 
 public class PlayerManagementPanel:MonoBehaviour
 	{
@@ -51,14 +50,16 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private void LoadTeams()
 		{
-		if (DatabaseManager.Instance != null)
+		string path = Path.Combine(Application.persistentDataPath, "teams.json"); // --- Path to JSON file --- //
+		if (File.Exists(path))
 			{
-			teamList = DatabaseManager.Instance.GetAllTeams();
+			string json = File.ReadAllText(path); // --- Read the JSON file --- //
+			teamList = JsonUtility.FromJson<TeamListWrapper>(json).teams; // --- Deserialize the JSON into a list of teams --- //
 			Debug.Log("Loaded " + teamList.Count + " teams.");
 			}
 		else
 			{
-			Debug.LogError("DatabaseManager.Instance is null! Cannot load teams.");
+			Debug.LogError("teams.json file not found! Cannot load teams.");
 			}
 		}
 
@@ -107,7 +108,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		Player newPlayer = new(playerName, 5, selectedTeam.id);
 		currentTeamPlayers.Add(newPlayer);
-		DatabaseManager.Instance.AddPlayer(newPlayer);
+		SaveTeams(); // --- Save the updated team list to JSON --- //
 		ShowFeedback($"Player '{playerName}' added to team '{selectedTeam.name}'.");
 		playerNameInputField.text = "";
 		UpdatePlayerDropdown();
@@ -122,6 +123,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			if (playerToDelete != null)
 				{
 				currentTeamPlayers.Remove(playerToDelete);
+				SaveTeams(); // --- Save the updated team list to JSON --- //
 				ShowFeedback($"Player '{playerToDelete.name}' removed from team '{selectedTeam.name}'.");
 				UpdatePlayerDropdown();
 				}
@@ -216,13 +218,23 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		}
 
-
 	#endregion Feedback Functions
+
+	#region JSON Saving
+
+	private void SaveTeams()
+		{
+		string path = Path.Combine(Application.persistentDataPath, "teams.json");
+		TeamListWrapper wrapper = new() { teams = teamList };
+		string json = JsonUtility.ToJson(wrapper, true);
+		File.WriteAllText(path, json); // --- Save the JSON to file --- //
+		}
+
+	[System.Serializable]
+	public class TeamListWrapper
+		{
+		public List<Team> teams; // --- Wrapper class to hold the list of teams --- //
+		}
+
+	#endregion JSON Saving
 	}
-
-
-#region Additional Functions
-
-// --- Additional custom functions can be added here --- //
-
-#endregion Additional Functions

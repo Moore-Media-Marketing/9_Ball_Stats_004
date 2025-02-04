@@ -1,10 +1,9 @@
 // --- Region: Using Directives --- //
-using System.Collections.Generic;
-
 using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
+
 // --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
@@ -56,7 +55,6 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 
 	private void Start()
 		{
-
 		backButton.onClick.AddListener(OnBackButtonClicked);
 		// --- Initialize the UI with the player's current season data on start ---
 		UpdatePlayerData();
@@ -76,7 +74,6 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		// --- Refresh dropdowns using DropdownManager ---
 		DropdownManager.Instance.RefreshAllDropdowns();
 		}
-
 
 	private void OnBackButtonClicked()
 		{

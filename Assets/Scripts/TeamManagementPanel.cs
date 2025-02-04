@@ -1,4 +1,3 @@
-// --- Region: Using Directives --- //
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +7,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// --- End Region: Using Directives --- //
-
-// --- Region: Class Definition --- //
 public class TeamManagementPanel:MonoBehaviour
 	{
 	#region UI Elements
-
 	[Header("UI Elements")]
 	[Tooltip("Header text for the panel.")]
-	public TMP_Text headerText;  // --- Header text for the panel ---
+	public TMP_Text headerText;
 
 	[Tooltip("Input field for team name.")]
 	public TMP_InputField teamNameInputField;
@@ -42,19 +37,14 @@ public class TeamManagementPanel:MonoBehaviour
 
 	[Header("Overlay Feedback")]
 	public GameObject overlayFeedbackPanel;
-
 	public TMP_Text feedbackText;
-
 	#endregion UI Elements
 
 	#region Private Fields
-
 	private List<Team> teamList = new();
-
 	#endregion Private Fields
 
 	#region Unity Methods
-
 	private void Start()
 		{
 		backButton.onClick.AddListener(OnBackButtonClicked);
@@ -65,14 +55,13 @@ public class TeamManagementPanel:MonoBehaviour
 
 		teamDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
 
-		// Update dropdown via DropdownManager rather than directly from DatabaseManager
-		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
+		// Load teams from DatabaseManager
+		teamList = DatabaseManager.Instance.GetAllTeams();
+		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown, teamList); // Ensure this method is updated
 		}
-
 	#endregion Unity Methods
 
 	#region Data Loading and UI Update
-
 	private void OnTeamDropdownValueChanged(int value)
 		{
 		if (value > 0)
@@ -80,11 +69,9 @@ public class TeamManagementPanel:MonoBehaviour
 		else
 			teamNameInputField.text = "";
 		}
-
 	#endregion Data Loading and UI Update
 
 	#region Button Event Handlers
-
 	public void OnAddUpdateTeamClicked()
 		{
 		string teamName = teamNameInputField.text.Trim();
@@ -94,32 +81,25 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		teamList = DatabaseManager.Instance.GetAllTeams();
 		Team existingTeam = teamList.FirstOrDefault(t => t.name.Equals(teamName, System.StringComparison.OrdinalIgnoreCase));
 
 		if (existingTeam != null)
 			{
-			// Find the team ID based on the selected dropdown team
-			int selectedTeamId = teamList.FirstOrDefault(t => t.name == teamDropdown.options[teamDropdown.value].text)?.id ?? -1;
-			if (selectedTeamId == -1)
-				{
-				ShowFeedback("Error: Selected team ID not found.");
-				return;
-				}
-
-			// Update team name using team ID instead of name
-			DatabaseManager.Instance.UpdateTeamName(selectedTeamId, teamName);
+			// Update team name in the list
+			existingTeam.name = teamName;
+			DatabaseManager.Instance.SaveTeams(); // Save to JSON without arguments
 			ShowFeedback($"Team '{teamName}' updated.");
 			}
 		else
 			{
 			Team newTeam = new(teamName);
-			DatabaseManager.Instance.AddTeam(newTeam);
+			teamList.Add(newTeam);
+			DatabaseManager.Instance.SaveTeams(); // Save to JSON without arguments
 			ShowFeedback($"Team '{teamName}' added.");
 			}
 
 		teamNameInputField.text = "";
-		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
+		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown, teamList);
 		}
 
 	public void OnModifyTeamNameClicked()
@@ -133,26 +113,34 @@ public class TeamManagementPanel:MonoBehaviour
 
 		if (teamDropdown.value > 0)
 			{
-			int selectedTeamId = teamList.FirstOrDefault(t => t.name == teamDropdown.options[teamDropdown.value].text)?.id ?? -1;
+			// Find the selected team ID
+			int selectedTeamId = teamDropdown.value > 0
+				? teamList.FirstOrDefault(t => t.name == teamDropdown.options[teamDropdown.value].text)?.id ?? -1
+				: -1;
+
 			if (selectedTeamId == -1)
 				{
 				ShowFeedback("Error: Selected team ID not found.");
 				return;
 				}
 
-			// Update using the correct team ID
-			DatabaseManager.Instance.UpdateTeamName(selectedTeamId, teamName);
-			ShowFeedback($"Team name updated to '{teamName}'.");
+			// Update team name in the list
+			var team = teamList.FirstOrDefault(t => t.id == selectedTeamId);
+			if (team != null)
+				{
+				team.name = teamName;
+				DatabaseManager.Instance.SaveTeams(); // Save to JSON without arguments
+				ShowFeedback($"Team name updated to '{teamName}'.");
 
-			DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
-			teamNameInputField.text = "";
+				DropdownManager.Instance.UpdateTeamDropdown(teamDropdown, teamList);
+				teamNameInputField.text = "";
+				}
 			}
 		else
 			{
 			ShowFeedback("Please select a team to modify.");
 			}
 		}
-
 
 	public void OnClearTeamNameClicked()
 		{
@@ -176,21 +164,28 @@ public class TeamManagementPanel:MonoBehaviour
 	private IEnumerator ConfirmDeletion(string teamName)
 		{
 		yield return new WaitForSeconds(3f);
-		DatabaseManager.Instance.RemoveTeam(teamName);
-		ShowFeedback($"Team '{teamName}' deleted.");
-		DropdownManager.Instance.UpdateTeamDropdown(teamDropdown);
-		teamNameInputField.text = "";
+		Team teamToDelete = teamList.FirstOrDefault(t => t.name == teamName);
+		if (teamToDelete != null)
+			{
+			teamList.Remove(teamToDelete);
+			DatabaseManager.Instance.SaveTeams(); // Save to JSON without arguments
+			ShowFeedback($"Team '{teamName}' deleted.");
+			DropdownManager.Instance.UpdateTeamDropdown(teamDropdown, teamList);
+			teamNameInputField.text = "";
+			}
+		else
+			{
+			ShowFeedback("Error: Team not found.");
+			}
 		}
 
 	private void OnBackButtonClicked()
 		{
 		UIManager.Instance.ShowPanel(UIManager.Instance.homePanel);
 		}
-
 	#endregion Button Event Handlers
 
 	#region Feedback Functions
-
 	private void ShowFeedback(string message)
 		{
 		feedbackText.text = message;
@@ -203,14 +198,9 @@ public class TeamManagementPanel:MonoBehaviour
 		yield return new WaitForSeconds(3f);
 		overlayFeedbackPanel.SetActive(false);
 		}
-
 	#endregion Feedback Functions
 
 	#region Additional Functions
-
 	// --- Additional custom functions can be added here --- //
-
 	#endregion Additional Functions
 	}
-
-// --- End Region: Class Definition --- //

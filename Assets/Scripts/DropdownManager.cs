@@ -1,5 +1,6 @@
 // --- Region: Using Directives --- //
 using System.Collections.Generic;
+using System.Linq;
 
 using TMPro;
 
@@ -36,6 +37,7 @@ public class DropdownManager:MonoBehaviour
 	[Header("Player Management Panel Dropdowns")]
 	[Tooltip("Dropdown for selecting players in Player Management Panel.")]
 	public TMP_Dropdown playerNameDropdown;
+
 	[Tooltip("Dropdown for selecting teams in Player Management Panel.")]
 	public TMP_Dropdown playerTeamDropdown;
 
@@ -43,6 +45,7 @@ public class DropdownManager:MonoBehaviour
 	[Header("Player Lifetime Data Input Panel Dropdowns")]
 	[Tooltip("Dropdown for selecting teams in Player Lifetime Data Input Panel.")]
 	public TMP_Dropdown lifetimeDataTeamDropdown;
+
 	[Tooltip("Dropdown for selecting players in Player Lifetime Data Input Panel.")]
 	public TMP_Dropdown lifetimeDataPlayerDropdown;
 
@@ -50,8 +53,10 @@ public class DropdownManager:MonoBehaviour
 	[Header("Player Current Season Data Input Panel Dropdowns")]
 	[Tooltip("Dropdown for selecting teams in Player Current Season Data Input Panel.")]
 	public TMP_Dropdown currentSeasonDataTeamDropdown;
+
 	[Tooltip("Dropdown for selecting players in Player Current Season Data Input Panel.")]
 	public TMP_Dropdown currentSeasonDataPlayerDropdown;
+
 	[Tooltip("Dropdown for selecting skill level in Player Current Season Data Input Panel.")]
 	public TMP_Dropdown currentSeasonSkillLevelDropdown;
 
@@ -59,6 +64,7 @@ public class DropdownManager:MonoBehaviour
 	[Header("Matchup Comparison Panel Dropdowns")]
 	[Tooltip("Dropdown for selecting Team A in Matchup Comparison Panel.")]
 	public TMP_Dropdown teamADropdown;
+
 	[Tooltip("Dropdown for selecting Team B in Matchup Comparison Panel.")]
 	public TMP_Dropdown teamBDropdown;
 
@@ -98,10 +104,10 @@ public class DropdownManager:MonoBehaviour
 		}
 
 	// --- Comment: Updates a specific team dropdown with the latest team names --- //
-	public void UpdateTeamDropdown(TMP_Dropdown dropdown)
+	public void UpdateTeamDropdown(TMP_Dropdown dropdown, List<Team> teams)
 		{
-		List<string> allTeams = DatabaseManager.Instance.GetAllTeamNames();
-		UpdateDropdown(dropdown, allTeams);
+		List<string> allTeams = teams.Select(t => t.name).ToList(); // Extract team names
+		UpdateDropdown(dropdown, allTeams); // Update the dropdown
 		}
 
 	// --- Comment: Populates the player dropdown using data from DatabaseManager --- //

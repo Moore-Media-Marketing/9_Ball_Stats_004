@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using UnityEngine;
@@ -22,35 +23,34 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-	private const string TeamsKey = "teams_key";
-	private const string PlayersKey = "players_key";
+	private const string TeamsFilePath = "teams.json";
+	private const string PlayersFilePath = "players.json";
 
 	private List<Team> teams = new();
 	private List<Player> players = new();
 
 	// --- Region: Team Methods --- //
+	public List<string> GetAllTeamNames()
+		{
+		if (teams == null || teams.Count == 0)
+			{
+			LoadTeams(); // Load teams if they are not loaded
+			}
+		return teams.Select(t => t.name).Distinct().ToList(); // Get distinct team names
+		}
+
 	public List<Team> GetAllTeams()
 		{
 		if (teams == null || teams.Count == 0)
 			{
-			LoadTeams();
+			LoadTeams();  // Ensure teams are loaded before returning
 			}
 		return teams;
 		}
 
-	public List<string> GetAllTeamNames()
-		{
-		return teams.Select(t => t.name).Distinct().ToList();
-		}
-
 	public Team GetTeamByName(string teamName)
 		{
-		return teams.FirstOrDefault(t => t.name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
-		}
-
-	public bool TeamExists(string teamName)
-		{
-		return teams.Any(t => t.name.Equals(teamName, StringComparison.OrdinalIgnoreCase));
+		return teams.FirstOrDefault(t => t.name.Equals(teamName, StringComparison.OrdinalIgnoreCase)); // Find team by name
 		}
 
 	public void AddTeam(Team team)
@@ -61,9 +61,8 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		team.id = teams.Count > 0 ? teams.Max(t => t.id) + 1 : 1;
 		teams.Add(team);
-		SaveData();
+		SaveTeams(); // Save after adding team
 		Debug.Log("Team added: " + team.name);
 		}
 
@@ -73,8 +72,7 @@ public class DatabaseManager:MonoBehaviour
 		if (team != null)
 			{
 			teams.Remove(team);
-			players.RemoveAll(p => p.teamId == team.id);
-			SaveData();
+			SaveTeams(); // Save after removing team
 			Debug.Log("Team removed: " + team.name);
 			}
 		else
@@ -83,33 +81,48 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-	public void UpdateTeamName(int teamId, string newTeamName)
+	public void UpdateTeamName(string oldName, string newName)
 		{
-		Team teamToUpdate = teams.FirstOrDefault(t => t.id == teamId);
+		Team teamToUpdate = teams.FirstOrDefault(t => t.name.Equals(oldName, StringComparison.OrdinalIgnoreCase));
 		if (teamToUpdate != null)
 			{
-			teamToUpdate.name = newTeamName;
-			SaveData(); // Save after updating the team name
-			Debug.Log("Updated team name to: " + newTeamName);
+			teamToUpdate.name = newName;
+			SaveTeams(); // Save after updating team name
+			Debug.Log("Updated team name to: " + newName);
 			}
 		else
 			{
-			Debug.LogError("UpdateTeamName failed: team with ID " + teamId + " not found.");
+			Debug.LogError("UpdateTeamName failed: team with name " + oldName + " not found.");
 			}
 		}
-	// --- End Region: Team Methods --- //
+
+	// New SaveTeams Method --- //
+	public void SaveTeams()
+		{
+		try
+			{
+			string teamJson = JsonUtility.ToJson(new TeamListWrapper(teams)); // Save the list of teams
+			File.WriteAllText(TeamsFilePath, teamJson); // Save teams to JSON file
+			Debug.Log("Teams saved successfully.");
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error saving teams: " + ex.Message);
+			}
+		}
+
+	// --- End Region --- //
 
 	// --- Region: Player Methods --- //
 	public List<string> GetAllPlayerNames()
 		{
 		if (players == null || players.Count == 0)
 			{
-			LoadPlayers();
+			LoadPlayers(); // Load players if they are not loaded
 			}
-		return players.Select(p => p.name).Distinct().ToList();
+		return players.Select(p => p.name).Distinct().ToList(); // Get distinct player names
 		}
 
-	// --- Add GetAllPlayers Method --- //
 	public List<Player> GetAllPlayers()
 		{
 		if (players == null || players.Count == 0)
@@ -121,7 +134,7 @@ public class DatabaseManager:MonoBehaviour
 
 	public List<Player> GetPlayersByTeam(int teamId)
 		{
-		return players.FindAll(p => p.teamId == teamId);
+		return players.Where(p => p.teamId == teamId).ToList(); // Get players by team ID
 		}
 
 	public void AddPlayer(Player player)
@@ -132,12 +145,42 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		player.id = players.Count > 0 ? players.Max(p => p.id) + 1 : 1;
 		players.Add(player);
-		SaveData();
+		SaveData(); // Save data after adding player
 		Debug.Log("Player added: " + player.name);
 		}
 
+	public void RemovePlayer(string playerName)
+		{
+		Player player = players.FirstOrDefault(p => p.name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
+		if (player != null)
+			{
+			players.Remove(player);
+			SaveData(); // Save data after removing player
+			Debug.Log("Player removed: " + player.name);
+			}
+		else
+			{
+			Debug.LogError("RemovePlayer failed: player not found - " + playerName);
+			}
+		}
+
+	public void UpdatePlayerName(string oldName, string newName)
+		{
+		Player playerToUpdate = players.FirstOrDefault(p => p.name.Equals(oldName, StringComparison.OrdinalIgnoreCase));
+		if (playerToUpdate != null)
+			{
+			playerToUpdate.name = newName;
+			SaveData(); // Save data after updating player name
+			Debug.Log("Updated player name to: " + newName);
+			}
+		else
+			{
+			Debug.LogError("UpdatePlayerName failed: player with name " + oldName + " not found.");
+			}
+		}
+
+	// New SavePlayer Method --- //
 	public void SavePlayer(Player player)
 		{
 		if (player == null)
@@ -146,108 +189,110 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		int index = players.FindIndex(p => p.id == player.id);
-		if (index >= 0)
+		// Check if player already exists, then update or add
+		Player existingPlayer = players.FirstOrDefault(p => p.name.Equals(player.name, StringComparison.OrdinalIgnoreCase));
+		if (existingPlayer != null)
 			{
-			players[index] = player;
+			existingPlayer = player; // Update player
+			Debug.Log("Player updated: " + player.name);
 			}
 		else
 			{
-			players.Add(player);
+			players.Add(player); // Add new player
+			Debug.Log("New player added: " + player.name);
 			}
-		SaveData();
-		Debug.Log("Player data saved: " + player.name);
+
+		SaveData(); // Save after updating or adding player
 		}
+	// --- End Region --- //
 
-	public Player GetPlayerByName(string playerName)
-		{
-		if (string.IsNullOrEmpty(playerName))
-			{
-			Debug.LogError("GetPlayerByName failed: playerName is null or empty.");
-			return null;
-			}
-
-		if (players == null || players.Count == 0)
-			{
-			LoadPlayers(); // Ensure players are loaded before searching
-			}
-
-		Player foundPlayer = players.FirstOrDefault(p => p.name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
-
-		if (foundPlayer != null)
-			{
-			Debug.Log("Player found: " + foundPlayer.name);
-			}
-		else
-			{
-			Debug.LogWarning("Player not found: " + playerName);
-			}
-
-		return foundPlayer;
-		}
-
-	// --- End Region: Player Methods --- //
-
-	// --- Region: Data Loading and Saving --- //
-	private void LoadTeams()
-		{
-		teams.Clear();
-		for (int i = 1; i <= 100; i++) // Assuming max 100 teams for simplicity
-			{
-			if (PlayerPrefs.HasKey($"Team_{i}"))
-				{
-				string json = PlayerPrefs.GetString($"Team_{i}");
-				Team team = JsonUtility.FromJson<Team>(json);
-				teams.Add(team);
-				}
-			}
-		Debug.Log($"Loaded {teams.Count} teams from PlayerPrefs.");
-		}
-
-	private void LoadPlayers()
-		{
-		players.Clear();
-		for (int i = 1; i <= 500; i++) // Assuming max 500 players for simplicity
-			{
-			if (PlayerPrefs.HasKey($"Player_{i}"))
-				{
-				string json = PlayerPrefs.GetString($"Player_{i}");
-				Player player = JsonUtility.FromJson<Player>(json);
-				players.Add(player);
-				}
-			}
-		Debug.Log($"Loaded {players.Count} players from PlayerPrefs.");
-		}
-
-	public void SaveData()
+	// --- Region: Save Data --- //
+	private void SaveData()
 		{
 		try
 			{
-			// Save Teams Individually
-			foreach (Team team in teams)
-				{
-				string teamJson = JsonUtility.ToJson(team);
-				PlayerPrefs.SetString($"Team_{team.id}", teamJson);
-				}
+			string teamJson = JsonUtility.ToJson(new TeamListWrapper(teams)); // Save the list of teams
+			File.WriteAllText(TeamsFilePath, teamJson); // Save teams to JSON file
 
-			// Save Players Individually
-			foreach (Player player in players)
-				{
-				string playerJson = JsonUtility.ToJson(player);
-				PlayerPrefs.SetString($"Player_{player.id}", playerJson);
-				}
+			string playerJson = JsonUtility.ToJson(new PlayerListWrapper(players)); // Save the list of players
+			File.WriteAllText(PlayersFilePath, playerJson); // Save players to JSON file
 
-			PlayerPrefs.Save();
-			Debug.Log("All data saved to PlayerPrefs in individual keys.");
+			Debug.Log("Data saved successfully.");
 			}
 		catch (Exception ex)
 			{
 			Debug.LogError("Error saving data: " + ex.Message);
 			}
 		}
-	// --- End Region: Data Loading and Saving --- //
+	// --- End Region --- //
+
+	// --- Region: Load Data --- //
+	private void LoadTeams()
+		{
+		try
+			{
+			if (File.Exists(TeamsFilePath))
+				{
+				string teamJson = File.ReadAllText(TeamsFilePath);
+				TeamListWrapper wrapper = JsonUtility.FromJson<TeamListWrapper>(teamJson);
+				teams = wrapper.teams;
+				Debug.Log("Teams loaded successfully.");
+				}
+			else
+				{
+				Debug.LogWarning("No teams found in file.");
+				}
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error loading teams: " + ex.Message);
+			}
+		}
+
+	private void LoadPlayers()
+		{
+		try
+			{
+			if (File.Exists(PlayersFilePath))
+				{
+				string playerJson = File.ReadAllText(PlayersFilePath);
+				PlayerListWrapper wrapper = JsonUtility.FromJson<PlayerListWrapper>(playerJson);
+				players = wrapper.players;
+				Debug.Log("Players loaded successfully.");
+				}
+			else
+				{
+				Debug.LogWarning("No players found in file.");
+				}
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error loading players: " + ex.Message);
+			}
+		}
+	// --- End Region --- //
 
 	// --- Region: Additional Functions --- //
+	[Serializable]
+	public class TeamListWrapper
+		{
+		public List<Team> teams;
 
-	// --- End Region: Additional Functions --- //
+		public TeamListWrapper(List<Team> teams)
+			{
+			this.teams = teams;
+			}
+		}
+
+	[Serializable]
+	public class PlayerListWrapper
+		{
+		public List<Player> players;
+
+		public PlayerListWrapper(List<Player> players)
+			{
+			this.players = players;
+			}
+		}
+	// --- End Region --- //
 	}
