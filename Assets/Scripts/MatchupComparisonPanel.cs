@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.Data;
+using Mono.Data.Sqlite; // Import SQLite namespace
 
 public class MatchupComparisonPanel:MonoBehaviour
 	{
@@ -55,7 +55,7 @@ public class MatchupComparisonPanel:MonoBehaviour
 		// Refresh dropdowns
 		if (DropdownManager.Instance != null)
 			{
-			List<string> teamNames = DatabaseManager.Instance.GetAllTeamNames();
+			List<string> teamNames = GetAllTeamNamesFromDatabase();
 			if (teamNames != null && teamNames.Count > 0)
 				{
 				DropdownManager.Instance.UpdateDropdown(teamADropdown, teamNames);
@@ -94,8 +94,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 		matchupResultsPanel.SetActive(true);
 
 		// Perform the matchup comparison
-		Team selectedTeamA = GetTeamFromDropdown(teamADropdown);
-		Team selectedTeamB = GetTeamFromDropdown(teamBDropdown);
+		Team selectedTeamA = GetTeamFromDatabase(teamADropdown);
+		Team selectedTeamB = GetTeamFromDatabase(teamBDropdown);
 		MatchupResultData resultData = PerformMatchupComparison(selectedTeamA, selectedTeamB);
 
 		// Get the selected team names from the dropdowns
@@ -125,11 +125,94 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 	#region Matchup Comparison Logic
 
-	private Team GetTeamFromDropdown(TMP_Dropdown dropdown)
+	private Team GetTeamFromDatabase(TMP_Dropdown dropdown)
 		{
 		string selectedTeamName = dropdown.options[dropdown.value].text;
-		Team selectedTeam = DatabaseManager.Instance.GetTeamByName(selectedTeamName);
+		Team selectedTeam = GetTeamByNameFromDatabase(selectedTeamName);
 		return selectedTeam;
+		}
+
+	private List<string> GetAllTeamNamesFromDatabase()
+		{
+		List<string> teamNames = new List<string>();
+		string connectionString = "URI=file:" + Application.persistentDataPath + "/gameDatabase.db"; // Path to SQLite database
+
+		using (var connection = new SqliteConnection(connectionString))
+			{
+			connection.Open();
+			string query = "SELECT teamName FROM Teams";  // Query to retrieve all team names
+			using (var command = new SqliteCommand(query, connection))
+				{
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						teamNames.Add(reader.GetString(0));  // Add team name to the list
+						}
+					}
+				}
+			}
+
+		return teamNames;
+		}
+
+	private Team GetTeamByNameFromDatabase(string teamName)
+		{
+		Team team = null;
+		string connectionString = "URI=file:" + Application.persistentDataPath + "/gameDatabase.db"; // Path to SQLite database
+
+		using (var connection = new SqliteConnection(connectionString))
+			{
+			connection.Open();
+			string query = "SELECT * FROM Teams WHERE teamName = @teamName";  // Query to get team details
+			using (var command = new SqliteCommand(query, connection))
+				{
+				command.Parameters.AddWithValue("@teamName", teamName);
+				using (var reader = command.ExecuteReader())
+					{
+					if (reader.Read())
+						{
+						team = new Team
+							{
+							teamName = reader.GetString(0),
+							players = GetPlayersForTeamFromDatabase(reader.GetInt32(0))  // Assuming the first column is team name and second is team ID
+							};
+						}
+					}
+				}
+			}
+
+		return team;
+		}
+
+	private List<Player> GetPlayersForTeamFromDatabase(int teamId)
+		{
+		List<Player> players = new List<Player>();
+		string connectionString = "URI=file:" + Application.persistentDataPath + "/gameDatabase.db"; // Path to SQLite database
+
+		using (var connection = new SqliteConnection(connectionString))
+			{
+			connection.Open();
+			string query = "SELECT * FROM Players WHERE teamId = @teamId";  // Query to get players for a team
+			using (var command = new SqliteCommand(query, connection))
+				{
+				command.Parameters.AddWithValue("@teamId", teamId);
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						Player player = new Player
+							{
+							name = reader.GetString(1),  // Assuming column 1 is player name
+							currentSeasonSkillLevel = reader.GetInt32(2)  // Assuming column 2 is current season skill level
+							};
+						players.Add(player);
+						}
+					}
+				}
+			}
+
+		return players;
 		}
 
 	private float GetPointsRequiredToWin(float skillLevel)
@@ -193,7 +276,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 		return new MatchupResultData(Mathf.RoundToInt(teamAWinsPercentage), Mathf.RoundToInt(teamBWinsPercentage));
 		}
-
 
 	// New method to calculate the average skill level of a team
 	private float CalculateTeamSkillLevel(Team team)

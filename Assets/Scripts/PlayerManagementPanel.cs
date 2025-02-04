@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO; // --- Added for File I/O --- //
+using Mono.Data.Sqlite; // --- Added for SQLite support --- //
 
 public class PlayerManagementPanel:MonoBehaviour
 	{
@@ -40,7 +41,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		DropdownManager.Instance.teamDropdown.onValueChanged.AddListener(OnTeamDropdownValueChanged);
 		DropdownManager.Instance.playerNameDropdown.onValueChanged.AddListener(OnPlayerDropdownValueChanged);
 
-		LoadTeams();
+		LoadTeams();  // Load teams from SQLite
 		DropdownManager.Instance.PopulateTeamsDropdown();
 		}
 
@@ -50,17 +51,8 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	private void LoadTeams()
 		{
-		string path = Path.Combine(Application.persistentDataPath, "teams.json"); // --- Path to JSON file --- //
-		if (File.Exists(path))
-			{
-			string json = File.ReadAllText(path); // --- Read the JSON file --- //
-			teamList = JsonUtility.FromJson<TeamListWrapper>(json).teams; // --- Deserialize the JSON into a list of teams --- //
-			Debug.Log("Loaded " + teamList.Count + " teams.");
-			}
-		else
-			{
-			Debug.LogError("teams.json file not found! Cannot load teams.");
-			}
+		teamList = DatabaseManager.Instance.GetAllTeams(); // Load teams from the database
+		Debug.Log("Loaded " + teamList.Count + " teams.");
 		}
 
 	private void UpdatePlayerDropdown()
@@ -106,9 +98,10 @@ public class PlayerManagementPanel:MonoBehaviour
 			ShowFeedback("Player already exists in the team.");
 			return;
 			}
+
 		Player newPlayer = new(playerName, 5, selectedTeam.id);
 		currentTeamPlayers.Add(newPlayer);
-		SaveTeams(); // --- Save the updated team list to JSON --- //
+		DatabaseManager.Instance.SavePlayersToDatabase(currentTeamPlayers); // Save to SQLite
 		ShowFeedback($"Player '{playerName}' added to team '{selectedTeam.name}'.");
 		playerNameInputField.text = "";
 		UpdatePlayerDropdown();
@@ -123,7 +116,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			if (playerToDelete != null)
 				{
 				currentTeamPlayers.Remove(playerToDelete);
-				SaveTeams(); // --- Save the updated team list to JSON --- //
+				DatabaseManager.Instance.SavePlayersToDatabase(currentTeamPlayers); // Save to SQLite
 				ShowFeedback($"Player '{playerToDelete.name}' removed from team '{selectedTeam.name}'.");
 				UpdatePlayerDropdown();
 				}
@@ -167,7 +160,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			selectedTeam = teamList.FirstOrDefault(team => team.name == selectedTeamName);
 			if (selectedTeam != null)
 				{
-				currentTeamPlayers = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id);
+				currentTeamPlayers = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id); // Load players for selected team
 				UpdatePlayerDropdown();
 				Debug.Log($"Team selected: {selectedTeam.name}");
 				}
@@ -219,22 +212,4 @@ public class PlayerManagementPanel:MonoBehaviour
 		}
 
 	#endregion Feedback Functions
-
-	#region JSON Saving
-
-	private void SaveTeams()
-		{
-		string path = Path.Combine(Application.persistentDataPath, "teams.json");
-		TeamListWrapper wrapper = new() { teams = teamList };
-		string json = JsonUtility.ToJson(wrapper, true);
-		File.WriteAllText(path, json); // --- Save the JSON to file --- //
-		}
-
-	[System.Serializable]
-	public class TeamListWrapper
-		{
-		public List<Team> teams; // --- Wrapper class to hold the list of teams --- //
-		}
-
-	#endregion JSON Saving
 	}

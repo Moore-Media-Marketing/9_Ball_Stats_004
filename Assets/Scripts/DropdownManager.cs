@@ -1,10 +1,10 @@
 // --- Region: Using Directives --- //
 using System.Collections.Generic;
 using System.Linq;
-
 using TMPro;
-
 using UnityEngine;
+using System.Data;
+using Mono.Data.Sqlite;
 // --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
@@ -91,10 +91,10 @@ public class DropdownManager:MonoBehaviour
 		PopulateSkillLevelDropdown();
 		}
 
-	// --- Comment: Populates the team dropdowns using data from DatabaseManager --- //
+	// --- Comment: Populates the team dropdowns using data from SQLite --- //
 	public void PopulateTeamsDropdown()
 		{
-		List<string> allTeams = DatabaseManager.Instance.GetAllTeamNames(); // Fetch team names from DB
+		List<string> allTeams = GetAllTeamNamesFromDatabase(); // Fetch team names from DB
 		UpdateDropdown(teamDropdown, allTeams);
 		UpdateDropdown(teamADropdown, allTeams);
 		UpdateDropdown(teamBDropdown, allTeams);
@@ -110,10 +110,10 @@ public class DropdownManager:MonoBehaviour
 		UpdateDropdown(dropdown, allTeams); // Update the dropdown
 		}
 
-	// --- Comment: Populates the player dropdown using data from DatabaseManager --- //
+	// --- Comment: Populates the player dropdown using data from SQLite --- //
 	public void PopulatePlayersDropdown()
 		{
-		List<string> allPlayers = DatabaseManager.Instance.GetAllPlayerNames(); // Fetch player names from DB
+		List<string> allPlayers = GetAllPlayerNamesFromDatabase(); // Fetch player names from DB
 		UpdateDropdown(playerNameDropdown, allPlayers);
 		UpdateDropdown(lifetimeDataPlayerDropdown, allPlayers);
 		UpdateDropdown(currentSeasonDataPlayerDropdown, allPlayers);
@@ -133,6 +133,50 @@ public class DropdownManager:MonoBehaviour
 		if (dropdown == null) return;
 		dropdown.ClearOptions();
 		dropdown.AddOptions(items);
+		}
+
+	// --- Comment: Fetches all team names from SQLite database --- //
+	private List<string> GetAllTeamNamesFromDatabase()
+		{
+		List<string> teamNames = new List<string>();
+		using (var connection = new SqliteConnection("URI=file:YourDatabaseFilePathHere"))
+			{
+			connection.Open();
+			using (var command = connection.CreateCommand())
+				{
+				command.CommandText = "SELECT name FROM Teams"; // Assuming the table name is 'Teams' and column is 'name'
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						teamNames.Add(reader.GetString(0)); // Add team name to list
+						}
+					}
+				}
+			}
+		return teamNames;
+		}
+
+	// --- Comment: Fetches all player names from SQLite database --- //
+	private List<string> GetAllPlayerNamesFromDatabase()
+		{
+		List<string> playerNames = new List<string>();
+		using (var connection = new SqliteConnection("URI=file:YourDatabaseFilePathHere"))
+			{
+			connection.Open();
+			using (var command = connection.CreateCommand())
+				{
+				command.CommandText = "SELECT name FROM Players"; // Assuming the table name is 'Players' and column is 'name'
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						playerNames.Add(reader.GetString(0)); // Add player name to list
+						}
+					}
+				}
+			}
+		return playerNames;
 		}
 	// --- End Region: Dropdown Population Methods --- //
 	}

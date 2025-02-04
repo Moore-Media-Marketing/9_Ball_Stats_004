@@ -1,11 +1,11 @@
 // --- Region: Using Directives --- //
 using System.Collections.Generic;
 using System.Linq;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.Data; // For SQLite
+using Mono.Data.Sqlite; // SQLite namespace
 
 // --- End Region: Using Directives --- //
 
@@ -93,11 +93,11 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 	#region Dropdown Initialization and Event Handlers
 
-	// --- Initialize the team dropdown using data from DatabaseManager ---
+	// --- Initialize the team dropdown using data from SQLite ---
 	private void InitializeDropdowns()
 		{
-		// --- Fetch teams from DatabaseManager (placeholder: "app.csv" or similar data source) ---
-		List<Team> allTeams = DatabaseManager.Instance.GetAllTeams();
+		// --- Fetch teams from SQLite ---
+		List<Team> allTeams = GetTeamsFromDatabase();
 		if (allTeams == null || allTeams.Count == 0)
 			{
 			Debug.LogError("No teams found in the database!");
@@ -116,7 +116,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	// --- Handle team selection changes ---
 	private void OnTeamDropdownChanged(int teamIndex)
 		{
-		List<Team> allTeams = DatabaseManager.Instance.GetAllTeams();
+		List<Team> allTeams = GetTeamsFromDatabase();
 		if (allTeams == null || teamIndex < 0 || teamIndex >= allTeams.Count)
 			{
 			Debug.LogError("Invalid team index selected.");
@@ -138,8 +138,8 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 		if (selectedTeam != null)
 			{
-			// --- Fetch players for the selected team ---
-			List<Player> players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id);
+			// --- Fetch players for the selected team from SQLite ---
+			List<Player> players = GetPlayersByTeamFromDatabase(selectedTeam.id);
 			if (players == null || players.Count == 0)
 				{
 				playerNameDropdown.AddOptions(new List<string> { "No players available" });
@@ -171,7 +171,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			}
 
 		// --- Get list of players from the selected team ---
-		List<Player> players = DatabaseManager.Instance.GetPlayersByTeam(selectedTeam.id);
+		List<Player> players = GetPlayersByTeamFromDatabase(selectedTeam.id);
 		if (players == null || players.Count == 0 || playerIndex < 0 || playerIndex >= players.Count)
 			{
 			Debug.LogError("Invalid player selection.");
@@ -284,8 +284,8 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		selectedPlayer.lifetimeMiniSlams = lifetimeMiniSlams;
 		selectedPlayer.lifetimeShutouts = lifetimeShutouts;
 
-		// --- Save the updated data to the database (placeholder: DatabaseManager.SavePlayer) ---
-		DatabaseManager.Instance.SavePlayer(selectedPlayer);
+		// --- Save the updated data to the database (SQLite) ---
+		SavePlayerToDatabase(selectedPlayer);
 
 		Debug.Log($"Updated lifetime data for player {selectedPlayer.name}");
 		}
@@ -300,9 +300,100 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 	#endregion Button Event Handlers
 
-	#region Additional Functions
+	#region SQLite Methods
 
-	// --- Additional custom functions for lifetime data processing can be added here ---
+	// --- Get all teams from the SQLite database ---
+	private List<Team> GetTeamsFromDatabase()
+		{
+		List<Team> teams = new List<Team>();
 
-	#endregion Additional Functions
+		using (var connection = new SqliteConnection("URI=file:" + Application.persistentDataPath + "/database.db"))
+			{
+			connection.Open();
+			using (var command = new SqliteCommand("SELECT * FROM Teams", connection))
+				{
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						Team team = new Team
+							{
+							id = reader.GetInt32(0),
+							name = reader.GetString(1)
+							};
+						teams.Add(team);
+						}
+					}
+				}
+			}
+
+		return teams;
+		}
+
+	// --- Get players by team from SQLite database ---
+	private List<Player> GetPlayersByTeamFromDatabase(int teamId)
+		{
+		List<Player> players = new List<Player>();
+
+		using (var connection = new SqliteConnection("URI=file:" + Application.persistentDataPath + "/database.db"))
+			{
+			connection.Open();
+			using (var command = new SqliteCommand("SELECT * FROM Players WHERE teamId = @teamId", connection))
+				{
+				command.Parameters.AddWithValue("@teamId", teamId);
+				using (var reader = command.ExecuteReader())
+					{
+					while (reader.Read())
+						{
+						Player player = new Player
+							{
+							id = reader.GetInt32(0),
+							name = reader.GetString(1),
+							lifetimeGamesWon = reader.GetInt32(2),
+							lifetimeGamesPlayed = reader.GetInt32(3),
+							lifetimeDefensiveShotAvg = reader.GetFloat(4),
+							matchesPlayedInLast2Years = reader.GetInt32(5),
+							lifetimeBreakAndRun = reader.GetInt32(6),
+							lifetimeNineOnTheSnap = reader.GetInt32(7),
+							lifetimeMiniSlams = reader.GetInt32(8),
+							lifetimeShutouts = reader.GetInt32(9)
+							};
+						players.Add(player);
+						}
+					}
+				}
+			}
+
+		return players;
+		}
+
+	// --- Save player data to SQLite database ---
+	private void SavePlayerToDatabase(Player player)
+		{
+		using (var connection = new SqliteConnection("URI=file:" + Application.persistentDataPath + "/database.db"))
+			{
+			connection.Open();
+			using (var command = new SqliteCommand("UPDATE Players SET lifetimeGamesWon = @lifetimeGamesWon, " +
+				"lifetimeGamesPlayed = @lifetimeGamesPlayed, lifetimeDefensiveShotAvg = @lifetimeDefensiveShotAvg, " +
+				"matchesPlayedInLast2Years = @matchesPlayedInLast2Years, lifetimeBreakAndRun = @lifetimeBreakAndRun, " +
+				"lifetimeNineOnTheSnap = @lifetimeNineOnTheSnap, lifetimeMiniSlams = @lifetimeMiniSlams, " +
+				"lifetimeShutouts = @lifetimeShutouts WHERE id = @id", connection))
+				{
+				command.Parameters.AddWithValue("@id", player.id);
+				command.Parameters.AddWithValue("@lifetimeGamesWon", player.lifetimeGamesWon);
+				command.Parameters.AddWithValue("@lifetimeGamesPlayed", player.lifetimeGamesPlayed);
+				command.Parameters.AddWithValue("@lifetimeDefensiveShotAvg", player.lifetimeDefensiveShotAvg);
+				command.Parameters.AddWithValue("@matchesPlayedInLast2Years", player.matchesPlayedInLast2Years);
+				command.Parameters.AddWithValue("@lifetimeBreakAndRun", player.lifetimeBreakAndRun);
+				command.Parameters.AddWithValue("@lifetimeNineOnTheSnap", player.lifetimeNineOnTheSnap);
+				command.Parameters.AddWithValue("@lifetimeMiniSlams", player.lifetimeMiniSlams);
+				command.Parameters.AddWithValue("@lifetimeShutouts", player.lifetimeShutouts);
+				command.ExecuteNonQuery();
+				}
+			}
+
+		Debug.Log($"Player {player.name} saved to database.");
+		}
+
+	#endregion SQLite Methods
 	}

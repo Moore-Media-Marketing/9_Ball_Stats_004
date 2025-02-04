@@ -1,10 +1,10 @@
 // --- Region: Using Directives --- //
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
-
-// --- End Region: Using Directives --- //
+using System.Data;
+using Mono.Data.Sqlite;  // --- SQLite Namespace ---
+						 // --- End Region: Using Directives --- //
 
 // --- Region: Class Definition --- //
 public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
@@ -120,6 +120,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int gamesWon))
 			{
 			selectedPlayer.currentSeasonGamesWon = gamesWon;
+			SavePlayerData();
 			}
 		}
 
@@ -129,6 +130,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int gamesPlayed))
 			{
 			selectedPlayer.currentSeasonGamesPlayed = gamesPlayed;
+			SavePlayerData();
 			}
 		}
 
@@ -138,6 +140,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int totalPoints))
 			{
 			selectedPlayer.currentSeasonTotalPoints = totalPoints;
+			SavePlayerData();
 			}
 		}
 
@@ -147,6 +150,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && float.TryParse(value, out float ppm))
 			{
 			selectedPlayer.currentSeasonPpm = (int) ppm;
+			SavePlayerData();
 			}
 		}
 
@@ -156,6 +160,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && float.TryParse(value, out float paPercentage))
 			{
 			selectedPlayer.currentSeasonPaPercentage = paPercentage;
+			SavePlayerData();
 			}
 		}
 
@@ -165,6 +170,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int breakAndRun))
 			{
 			selectedPlayer.currentSeasonBreakAndRun = breakAndRun;
+			SavePlayerData();
 			}
 		}
 
@@ -174,6 +180,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int miniSlams))
 			{
 			selectedPlayer.currentSeasonMiniSlams = miniSlams;
+			SavePlayerData();
 			}
 		}
 
@@ -183,6 +190,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int nineOnTheSnap))
 			{
 			selectedPlayer.currentSeasonNineOnTheSnap = nineOnTheSnap;
+			SavePlayerData();
 			}
 		}
 
@@ -192,6 +200,7 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null && int.TryParse(value, out int shutouts))
 			{
 			selectedPlayer.currentSeasonShutouts = shutouts;
+			SavePlayerData();
 			}
 		}
 
@@ -201,10 +210,46 @@ public class PlayercurrentSeasonDataInputPanel:MonoBehaviour
 		if (selectedPlayer != null)
 			{
 			selectedPlayer.currentSeasonSkillLevel = index;  // Assuming skill level is stored as an integer (0-based index)
+			SavePlayerData();
 			}
 		}
 
 	#endregion Input Field Change Handlers
+
+	#region SQLite Methods
+
+	// --- Method to save player data to SQLite database ---
+	private void SavePlayerData()
+		{
+		string conn = "URI=file:" + Application.persistentDataPath + "/gameDatabase.db";  // Path to SQLite database
+		using (var dbConnection = new SqliteConnection(conn))
+			{
+			dbConnection.Open();
+			string query = "UPDATE Players SET currentSeasonGamesWon = @gamesWon, currentSeasonGamesPlayed = @gamesPlayed, " +
+						   "currentSeasonTotalPoints = @totalPoints, currentSeasonPpm = @ppm, currentSeasonPaPercentage = @paPercentage, " +
+						   "currentSeasonBreakAndRun = @breakAndRun, currentSeasonMiniSlams = @miniSlams, currentSeasonNineOnTheSnap = @nineOnTheSnap, " +
+						   "currentSeasonShutouts = @shutouts, currentSeasonSkillLevel = @skillLevel WHERE playerId = @playerId";
+			using (var cmd = new SqliteCommand(query, dbConnection))
+				{
+				cmd.Parameters.AddWithValue("@gamesWon", selectedPlayer.currentSeasonGamesWon);
+				cmd.Parameters.AddWithValue("@gamesPlayed", selectedPlayer.currentSeasonGamesPlayed);
+				cmd.Parameters.AddWithValue("@totalPoints", selectedPlayer.currentSeasonTotalPoints);
+				cmd.Parameters.AddWithValue("@ppm", selectedPlayer.currentSeasonPpm);
+				cmd.Parameters.AddWithValue("@paPercentage", selectedPlayer.currentSeasonPaPercentage);
+				cmd.Parameters.AddWithValue("@breakAndRun", selectedPlayer.currentSeasonBreakAndRun);
+				cmd.Parameters.AddWithValue("@miniSlams", selectedPlayer.currentSeasonMiniSlams);
+				cmd.Parameters.AddWithValue("@nineOnTheSnap", selectedPlayer.currentSeasonNineOnTheSnap);
+				cmd.Parameters.AddWithValue("@shutouts", selectedPlayer.currentSeasonShutouts);
+				cmd.Parameters.AddWithValue("@skillLevel", selectedPlayer.currentSeasonSkillLevel);
+				cmd.Parameters.AddWithValue("@playerId", selectedPlayer.playerId);  // Assuming each player has a unique playerId
+
+				cmd.ExecuteNonQuery();
+				}
+			dbConnection.Close();
+			}
+		}
+
+	#endregion SQLite Methods
 
 	#region Additional Functions
 

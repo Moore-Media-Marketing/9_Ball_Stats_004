@@ -1,136 +1,60 @@
-using UnityEngine;
-using SQLite;
-
-[System.Serializable]
+// --- Region: Player Class --- //
 public class Player
 	{
-	#region Player Information
+	// --- Comment: Player's statistics --- //
+	public string Name { get; set; } // Player's name
+	public int SkillLevel { get; set; } // Player's skill level (1 to 9)
 
-	[Header("Basic Info")]
-	[Tooltip("Player's full name.")]
-	public string Name;
+	// --- Comment: Additional current season statistics --- //
+	public int currentSeasonGamesPlayed { get; set; } // Games played this season
+	public int currentSeasonGamesWon { get; set; } // Games won this season
+	public float currentSeasonPaPercentage { get; set; } // Percentage of successful shots
+	public float currentSeasonPpm { get; set; } // Points per match
+	public int currentSeasonSkillLevel { get; set; } // Skill level this season
+	public int currentSeasonTotalPoints { get; set; } // Total points earned this season
 
-	[Tooltip("Skill Level ranging from 1 (lowest) to 9 (highest).")]
-	[Range(1, 9)]
-	public int SkillLevel;
+	// --- Comment: Lifetime statistics --- //
+	public int lifetimeGamesWon { get; set; }
+	public int lifetimeGamesPlayed { get; set; }
+	public float lifetimeDefensiveShotAvg { get; set; }
+	public int matchesPlayedInLast2Years { get; set; }
+	public int lifetimeBreakAndRun { get; set; }
+	public int lifetimeNineOnTheSnap { get; set; }
+	public int lifetimeMiniSlams { get; set; }
+	public int lifetimeShutouts { get; set; }
 
-	#endregion
+	// --- Comment: Player ID and Team ID --- //
+	public string Id { get; set; } // Unique player ID
+	public string TeamId { get; set; } // Associated team ID
 
-	#region Season Stats
-
-	[Header("Season Stats")]
-	[Tooltip("Total matches won this season.")]
-	public int MatchesWon;
-
-	[Tooltip("Total matches played this season.")]
-	public int MatchesPlayed;
-
-	[Tooltip("Average points scored per match.")]
-	public int PointsPerMatch;
-
-	[Tooltip("Total points awarded this season.")]
-	public int PointsAwarded;
-
-	#endregion
-
-	#region Lifetime Stats
-
-	[Header("Lifetime Stats")]
-	[Tooltip("Total matches won in lifetime.")]
-	public int LifetimeMatchesWon;
-
-	[Tooltip("Total matches played in lifetime.")]
-	public int LifetimeMatchesPlayed;
-
-	[Tooltip("Lifetime win percentage.")]
-	public float LifetimeWinPercentage => LifetimeMatchesPlayed > 0
-		? (float) LifetimeMatchesWon / LifetimeMatchesPlayed * 100f
-		: 0f;
-
-	[Tooltip("Defensive shot average.")]
-	public float DefensiveShotAverage;
-
-	[Tooltip("Matches played in the last 2 years.")]
-	public int MatchesLast2Years;
-
-	[Tooltip("Number of 9-on-the-Snap shots.")]
-	public int NineOnTheSnap;
-
-	[Tooltip("Number of Mini Slams achieved.")]
-	public int MiniSlams;
-
-	[Tooltip("Number of Shutouts achieved.")]
-	public int Shutouts;
-
-	#endregion
-
-	#region Database Fields
-
-	// SQLite requires a parameterless constructor
-	[PrimaryKey, AutoIncrement]
-	public int Id { get; set; }
-
-	// Add TeamId to link Player to Team
-	public int TeamId { get; set; }
-
-	// Parameterless constructor for SQLite
-	public Player() { }
-
-	#endregion
-
-	#region Constructor
-
-	// --- Constructor to initialize a new player --- //
-	public Player(string name, int skillLevel, int teamId)
+	// --- Comment: Constructor with parameters --- //
+	public Player(string name, string id, int skillLevel, string teamId)
 		{
 		Name = name;
-		SkillLevel = Mathf.Clamp(skillLevel, 1, 9);
-		TeamId = teamId; // Link player to team
-		ResetSeasonStats();
-		LifetimeMatchesWon = 0;
-		LifetimeMatchesPlayed = 0;
-		DefensiveShotAverage = 0;
-		MatchesLast2Years = 0;
-		NineOnTheSnap = 0;
-		MiniSlams = 0;
-		Shutouts = 0;
+		Id = id;
+		SkillLevel = skillLevel;
+		TeamId = teamId;
+		currentSeasonGamesPlayed = 0;
+		currentSeasonGamesWon = 0;
+		currentSeasonPaPercentage = 0;
+		currentSeasonPpm = 0;
+		currentSeasonSkillLevel = skillLevel;
+		currentSeasonTotalPoints = 0;
+
+		lifetimeGamesWon = 0;
+		lifetimeGamesPlayed = 0;
+		lifetimeDefensiveShotAvg = 0;
+		matchesPlayedInLast2Years = 0;
+		lifetimeBreakAndRun = 0;
+		lifetimeNineOnTheSnap = 0;
+		lifetimeMiniSlams = 0;
+		lifetimeShutouts = 0;
 		}
 
-	#endregion
-
-	#region Methods
-
-	// --- Updates the player's stats after a match --- //
-	public void UpdateStats(int pointsScored, bool wonMatch)
+	// --- Comment: Parameterless constructor for SQLite compatibility --- //
+	public Player()
 		{
-		MatchesPlayed++;
-		PointsAwarded += pointsScored;
-		PointsPerMatch = PointsAwarded / MatchesPlayed;
-
-		if (wonMatch)
-			MatchesWon++;
-
-		// --- Update lifetime stats --- //
-		LifetimeMatchesPlayed++;
-		if (wonMatch)
-			LifetimeMatchesWon++;
+		// This constructor is required for SQLite and similar systems.
 		}
-
-	// --- Transfers player to another team --- //
-	public void TransferToNewTeam(int newTeamId)
-		{
-		TeamId = newTeamId;
-		Debug.Log($"{Name} has been moved to a new team.");
-		}
-
-	// --- Resets season stats at the start of a new season --- //
-	public void ResetSeasonStats()
-		{
-		MatchesWon = 0;
-		MatchesPlayed = 0;
-		PointsPerMatch = 0;
-		PointsAwarded = 0;
-		}
-
-	#endregion
 	}
+// --- End Region --- //

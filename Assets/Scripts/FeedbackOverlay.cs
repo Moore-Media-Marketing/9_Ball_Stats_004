@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using SQLite;
 
 public class FeedbackOverlay:MonoBehaviour
 	{
@@ -24,6 +25,9 @@ public class FeedbackOverlay:MonoBehaviour
 		feedbackText.text = message;
 		feedbackPanel.SetActive(true);
 		StartCoroutine(HideFeedbackAfterTime(duration));
+
+		// Log the feedback message to the database
+		LogFeedbackMessage(message);
 		}
 
 	// --- Hides the feedback panel after a delay --- //
@@ -34,4 +38,33 @@ public class FeedbackOverlay:MonoBehaviour
 		}
 
 	#endregion
+
+	#region SQLite Integration
+
+	// Logs the feedback message to the SQLite database
+	private void LogFeedbackMessage(string message)
+		{
+		using (var dbConnection = new SQLiteConnection(DatabaseManager.Instance.GetDatabasePath()))
+			{
+			dbConnection.CreateTable<FeedbackMessage>();
+			var feedback = new FeedbackMessage
+				{
+				Message = message,
+				Timestamp = System.DateTime.Now
+				};
+			dbConnection.Insert(feedback);
+			}
+		}
+
+	#endregion
+	}
+
+public class FeedbackMessage
+	{
+	[PrimaryKey, AutoIncrement]
+	public int Id { get; set; }
+
+	public string Message { get; set; }
+
+	public System.DateTime Timestamp { get; set; }
 	}

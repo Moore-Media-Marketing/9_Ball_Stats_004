@@ -25,7 +25,7 @@ public class TeamManagementPanel:MonoBehaviour
 		// Clear existing options
 		teamDropdown.ClearOptions();
 
-		// Get the list of teams from the database
+		// Get the list of teams from the database (SQLite)
 		teamList = DatabaseManager.Instance.GetAllTeams();
 
 		// Extract just the team names for display
@@ -50,6 +50,7 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
+		// Create a new team object and add it to the database (SQLite)
 		Team newTeam = new(teamName);
 		DatabaseManager.Instance.AddTeam(newTeam);
 
@@ -74,6 +75,7 @@ public class TeamManagementPanel:MonoBehaviour
 
 		if (teamToRemove != null)
 			{
+			// Remove the team from the database (SQLite)
 			DatabaseManager.Instance.RemoveTeam(teamToRemove);
 
 			// Update dropdown
