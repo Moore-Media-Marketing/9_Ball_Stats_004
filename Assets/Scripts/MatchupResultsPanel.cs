@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MatchupResultsPanel:MonoBehaviour
 	{
-	// --- Region: UI Elements ---
+	// --- Region: UI Elements --- //
 	[Header("UI Elements")]
 	[Tooltip("The header text at the top of the panel")]
 	public TMP_Text headerText;
@@ -30,10 +30,9 @@ public class MatchupResultsPanel:MonoBehaviour
 
 	[Tooltip("Prefab for displaying matchup results")]
 	public TMP_Text matchupResultsTextPrefab;  // Ensure this is assigned in the Inspector!
+											   // --- End Region --- //
 
-	// --- End Region ---
-
-	// --- Region: Initialization ---
+	// --- Region: Initialization --- //
 	private void Start()
 		{
 		// Check if backButton is assigned and attach the event listener
@@ -46,10 +45,9 @@ public class MatchupResultsPanel:MonoBehaviour
 			Debug.LogError("BackButton is not assigned in the Inspector!");
 			}
 		}
+	// --- End Region --- //
 
-	// --- End Region ---
-
-	// --- Region: Button Logic ---
+	// --- Region: Button Logic --- //
 	private void OnBackButtonClicked()
 		{
 		// Use UIManager to switch back to the home panel
@@ -62,10 +60,9 @@ public class MatchupResultsPanel:MonoBehaviour
 			Debug.LogError("UIManager instance is null! Cannot navigate back.");
 			}
 		}
+	// --- End Region --- //
 
-	// --- End Region ---
-
-	// --- Region: Update UI ---
+	// --- Region: Update UI --- //
 	public void UpdateMatchupResults(string header, string teamAName, string teamBName, string matchupResults)
 		{
 		// --- Comment --- // Update the header text
@@ -100,10 +97,9 @@ public class MatchupResultsPanel:MonoBehaviour
 			Debug.LogError("No content found in matchupsScrollView.");
 			}
 		}
+	// --- End Region --- //
 
-	// --- End Region ---
-
-	// --- Region: Set Matchup Data ---
+	// --- Region: Set Matchup Data --- //
 	public void SetMatchupData(MatchupResultData resultData, string teamAName, string teamBName)
 		{
 		// --- Comment --- // Check if resultData is valid
@@ -134,44 +130,13 @@ public class MatchupResultsPanel:MonoBehaviour
 			Debug.Log($"Calculated Team A Wins: {teamAWins}, Team B Wins: {teamBWins}");
 
 			Debug.LogError($"Team A Wins: {teamAWins}, Team B Wins: {teamBWins}");
-			return;
-			}
-
-		// --- Comment --- // Ensure wins are not negative
-		if (teamAWins < 0 || teamBWins < 0)
-			{
-			Debug.LogError("Win counts cannot be negative.");
-			return;
-			}
-
-		// --- Comment --- // Calculate and display win percentages safely
-		string matchupResults;
-		float totalMatches = teamAWins + teamBWins;
-
-		if (totalMatches > 0)
-			{
-			float teamAWinPercentage = (teamAWins / totalMatches) * 100f;
-			float teamBWinPercentage = (teamBWins / totalMatches) * 100f;
-
-			// --- Comment --- // Debug logs for calculated win percentages
-			Debug.Log($"Team A Win Percentage: {teamAWinPercentage:F2}%");
-			Debug.Log($"Team B Win Percentage: {teamBWinPercentage:F2}%");
-
-			matchupResults = $"Team A Wins: {teamAWinPercentage:F2}%\nTeam B Wins: {teamBWinPercentage:F2}%";
 			}
 		else
 			{
-			matchupResults = "No valid matches played.";
-			Debug.LogWarning("Total matches played is zero. Win percentages cannot be calculated.");
+			// --- Comment --- // Create and update results text dynamically
+			string matchupResults = $"Team A: {teamAWins}%\nTeam B: {teamBWins}%";
+			UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
 			}
-
-		// --- Comment --- // Update the UI with calculated results
-		UpdateMatchupResults(header, teamAName, teamBName, matchupResults);
 		}
-
-	// --- End Region ---
-
-	// --- Region: Additional Functions ---
-	// --- Comment --- // Add any extra utility methods here if needed.
-	// --- End Region ---
+	// --- End Region --- //
 	}

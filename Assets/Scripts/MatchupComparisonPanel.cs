@@ -178,7 +178,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 		return new MatchupResultData(roundedTeamAWins, roundedTeamBWins);  // Pass both values to the constructor
 		}
 
-
 	// New method to calculate the average skill level of a team
 	private float CalculateTeamSkillLevel(Team team)
 		{
