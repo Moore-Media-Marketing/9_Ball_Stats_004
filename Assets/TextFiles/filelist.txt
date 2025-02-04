@@ -1,5 +1,16 @@
+DatabaseHelper.cs
 DatabaseManager.cs
+MatchupComparisonManager.cs
+MatchupManager.cs
+MatchupResultData.cs
+MatchupResultsPanel.cs
+OverlayFeedbackPanel.cs
 Player.cs
+PlayerManagementPanel.cs
+SampleDataGenerator.cs
+SettingsManager.cs
 SQLite.cs
+SQLiteHelper.cs
 Team.cs
+TeamManagementPanel.cs
 UIManager.cs

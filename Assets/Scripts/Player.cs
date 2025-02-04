@@ -1,4 +1,4 @@
-using SQLite;  // Ensure this is included for SQLite attributes
+using SQLite;
 
 [Table("Players")]  // SQLite Table attribute to map the class to the 'Players' table
 public class Player
@@ -15,14 +15,12 @@ public class Player
 
 	// Career Statistics
 	public int TotalGames { get; set; } // Total games played
-
 	public int TotalWins { get; set; }  // Total wins
 	public int TotalPoints { get; set; } // Total points scored
 	public int PointsRequiredToWin { get; set; } // Points required to win based on skill level
 
 	// Current Season Statistics
 	public int CurrentSeasonBreakAndRun { get; set; }
-
 	public float CurrentSeasonDefensiveShotAverage { get; set; }
 	public int CurrentSeasonMatchesPlayed { get; set; }
 	public int CurrentSeasonMatchesWon { get; set; }
@@ -38,7 +36,6 @@ public class Player
 
 	// Lifetime Statistics
 	public int LifetimeBreakAndRun { get; set; }
-
 	public float LifetimeDefensiveShotAverage { get; set; }
 	public float LifetimeDefensiveShotAvg { get; set; }  // Same as LifetimeDefensiveShotAverage
 	public int LifetimeGamesPlayed { get; set; }
@@ -50,8 +47,7 @@ public class Player
 	public int LifetimeShutouts { get; set; }
 
 	// Parameterless constructor required for SQLite
-	public Player()
-		{ }
+	public Player() { }
 
 	// Constructor to initialize the Player with given parameters
 	public Player(string playerName, int skillLevel, int totalGames, int totalWins, int totalPoints)

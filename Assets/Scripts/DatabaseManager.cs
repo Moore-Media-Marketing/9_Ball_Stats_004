@@ -1,19 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using SQLite4Unity3d;
-
+using MyGame.Database;  // Reference to your custom SQLite helper namespace
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DatabaseManager:MonoBehaviour
 	{
-	// --- Database Path --- //
-	[SerializeField]
-	private string dbPath = "Database.db";  // Path for SQLite database (visible in Inspector)
-
-	private SQLiteConnection db;
-
 	// --- Singleton Pattern --- //
 	public static DatabaseManager Instance { get; private set; }
 
@@ -30,19 +20,8 @@ public class DatabaseManager:MonoBehaviour
 			Destroy(gameObject);  // Destroy duplicates
 			}
 
-		InitializeDatabase();
-		}
-
-	// --- Initialize Database --- //
-	public void InitializeDatabase()
-		{
-		if (db == null)
-			{
-			db = new SQLiteConnection(dbPath);
-			db.CreateTable<Player>();  // Create Player table if it doesn't exist
-			db.CreateTable<Team>();    // Create Team table if it doesn't exist
-			Debug.Log("Database initialized and tables created.");
-			}
+		// Initialize database connection through DatabaseHelper
+		DatabaseHelper.InitializeDatabase();
 		}
 
 	// --- Save Player Data --- //
@@ -51,19 +30,19 @@ public class DatabaseManager:MonoBehaviour
 		try
 			{
 			// Ensure that playerId and playerName are valid in the Player class
-			var existingPlayer = db.Table<Player>().Where(p => p.PlayerName == player.PlayerName && p.TeamId == player.TeamId).FirstOrDefault();
+			var existingPlayer = DatabaseHelper.GetPlayersForTeam(player.TeamId).Find(p => p.PlayerName == player.PlayerName);
 			if (existingPlayer != null)
 				{
-				db.Update(player);  // Update existing player data
+				DatabaseHelper.UpdatePlayer(player);  // Update existing player data
 				Debug.Log($"Player data for {player.PlayerName} updated successfully.");
 				}
 			else
 				{
-				db.Insert(player);  // Insert new player data
+				DatabaseHelper.InsertPlayer(player);  // Insert new player data
 				Debug.Log($"Player data for {player.PlayerName} saved successfully.");
 				}
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error saving player data: {ex.Message}");
 			}
@@ -75,9 +54,9 @@ public class DatabaseManager:MonoBehaviour
 		try
 			{
 			// Load player data based on playerId
-			return db.Table<Player>().Where(p => p.PlayerId == playerId).FirstOrDefault();
+			return DatabaseHelper.GetAllPlayers().Find(p => p.PlayerId == playerId);
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error loading player data: {ex.Message}");
 			return null;
@@ -89,19 +68,19 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var existingTeam = db.Table<Team>().Where(t => t.TeamName == team.TeamName).FirstOrDefault();
+			var existingTeam = DatabaseHelper.GetAllTeams().Find(t => t.TeamName == team.TeamName);
 			if (existingTeam != null)
 				{
-				db.Update(team);  // Update existing team data
+				DatabaseHelper.UpdateTeam(team);  // Update existing team data
 				Debug.Log($"Team data for {team.TeamName} updated successfully.");
 				}
 			else
 				{
-				db.Insert(team);  // Insert new team data
+				DatabaseHelper.InsertTeam(team);  // Insert new team data
 				Debug.Log($"Team data for {team.TeamName} saved successfully.");
 				}
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error saving team data: {ex.Message}");
 			}
@@ -113,40 +92,12 @@ public class DatabaseManager:MonoBehaviour
 		try
 			{
 			// Load team data based on teamId
-			return db.Table<Team>().Where(t => t.TeamId == teamId).FirstOrDefault();
+			return DatabaseHelper.GetTeamById(teamId);
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error loading team data: {ex.Message}");
 			return null;
-			}
-		}
-
-	// --- Get All Teams --- //
-	public List<Team> GetAllTeams()
-		{
-		try
-			{
-			return db.Table<Team>().ToList();  // Retrieve all teams
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"Error retrieving all teams: {ex.Message}");
-			return new List<Team>();
-			}
-		}
-
-	// --- Get All Players --- //
-	public List<Player> GetAllPlayers()
-		{
-		try
-			{
-			return db.Table<Player>().ToList();  // Retrieve all players
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"Error retrieving all players: {ex.Message}");
-			return new List<Player>();
 			}
 		}
 
@@ -155,10 +106,10 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var player = db.Table<Player>().Where(p => p.PlayerId == playerId).FirstOrDefault();
+			var player = DatabaseHelper.GetPlayersForTeam(playerId).Find(p => p.PlayerId == playerId);
 			if (player != null)
 				{
-				db.Delete(player);  // Delete player from the database
+				DatabaseHelper.DeletePlayer(player);  // Delete player from the database
 				Debug.Log($"Player with ID {playerId} deleted successfully.");
 				}
 			else
@@ -166,7 +117,7 @@ public class DatabaseManager:MonoBehaviour
 				Debug.LogWarning($"Player with ID {playerId} not found.");
 				}
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error deleting player: {ex.Message}");
 			}
@@ -177,10 +128,10 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			var team = db.Table<Team>().Where(t => t.TeamId == teamId).FirstOrDefault();
+			var team = DatabaseHelper.GetTeamById(teamId);
 			if (team != null)
 				{
-				db.Delete(team);  // Delete team from the database
+				DatabaseHelper.DeleteTeam(team);  // Delete team from the database
 				Debug.Log($"Team with ID {teamId} deleted successfully.");
 				}
 			else
@@ -188,12 +139,9 @@ public class DatabaseManager:MonoBehaviour
 				Debug.LogWarning($"Team with ID {teamId} not found.");
 				}
 			}
-		catch (Exception ex)
+		catch (System.Exception ex)
 			{
 			Debug.LogError($"Error deleting team: {ex.Message}");
 			}
 		}
-
-	// --- Additional Functions --- //
-	// You can add any extra utility functions here if needed in the future
 	}

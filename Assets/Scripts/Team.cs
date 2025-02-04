@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
-using SQLite; // Required for SQLite attributes
-
+using MyGame.Database;  // Reference to your custom SQLite helper namespace
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Team
 	{
@@ -13,20 +11,13 @@ public class Team
 	// --- Team Name --- //
 	public string TeamName { get; set; }  // Team's name (getter/setter)
 
-	// --- Players List --- //
-	[Ignore]  // Ignore this field for SQLite since it's a non-database entity
-	public List<Player> Players { get; set; }  // List of players in the team
-
-	// --- Constructor --- //
-	// Initializes a Team with a given team name and an empty players list
+	// Constructor
 	public Team(string teamName)
 		{
 		this.TeamName = teamName;
-		this.Players = new List<Player>(); // Initialize the players list
 		}
 
 	// --- Add Player to Team --- //
-	// Adds a player to the team after checking the 23-Rule and senior player count
 	public bool AddPlayer(Player player)
 		{
 		int teamSkillLevel = GetTeamSkillLevel(); // Get the current skill level of the team
@@ -38,30 +29,29 @@ public class Team
 			return false; // Reject player if it violates the 23-Rule or too many senior players
 			}
 
-		Players.Add(player); // Add player to the team
+		// Insert the player into the database (teamId is set when adding the player)
+		SQLiteHelper.InsertPlayer(player);  // Use custom helper to insert player
 		return true;
 		}
 
-	// --- Calculate Team Skill Level --- //
-	// Returns the total skill level of all players in the team
+	// --- Get Team Skill Level --- //
 	public int GetTeamSkillLevel()
 		{
 		int totalSkillLevel = 0;
-		foreach (Player player in Players)
+		foreach (var player in SQLiteHelper.GetPlayersForTeam(TeamId))  // Fetch players using custom SQLite helper
 			{
-			totalSkillLevel += player.SkillLevel;  // Sum up the skill level of each player
+			totalSkillLevel += player.SkillLevel;
 			}
 		return totalSkillLevel;
 		}
 
 	// --- Count Senior Players --- //
-	// Returns the count of senior players (SkillLevel 6-9) in the team
 	public int CountSeniorPlayers()
 		{
 		int seniorPlayers = 0;
-		foreach (Player player in Players)
+		foreach (var player in SQLiteHelper.GetPlayersForTeam(TeamId))  // Fetch players using custom SQLite helper
 			{
-			if (player.SkillLevel >= 6)  // Check if player is considered senior
+			if (player.SkillLevel >= 6)
 				{
 				seniorPlayers++;
 				}
@@ -70,12 +60,9 @@ public class Team
 		}
 
 	// --- Remove Player from Team --- //
-	// Removes a player from the team if they exist in the list
 	public void RemovePlayer(Player player)
 		{
-		if (Players.Contains(player))
-			{
-			Players.Remove(player);  // Remove the player from the team
-			}
+		// Remove player from database using custom SQLite helper
+		SQLiteHelper.DeletePlayer(player);
 		}
 	}
