@@ -71,6 +71,12 @@ public class UIManager:MonoBehaviour
 	public Button compareButton;
 	public Button backButtonMatchupComparison;
 
+	[Header("Matchup Results Panel")]
+	public GameObject matchupResultsPanel;
+	public TMP_Text resultsHeaderText;
+	public TMP_Text resultsText;
+	public Button backButtonMatchupResults;
+
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
 	public TMP_Text settingsHeaderText;
@@ -82,21 +88,12 @@ public class UIManager:MonoBehaviour
 	public GameObject overlayFeedbackPanel;
 	public TMP_Text overlayFeedbackText;
 
-	// --- CSV File Paths --- //
-	private string teamsCsvPath;
-	private string playersCsvPath;
-
-	// --- Data Lists --- //
-	private List<Team> teams = new();
-	private List<Player> players = new();
-
 	// --- Panel History --- //
-	private Stack<GameObject> panelHistory = new Stack<GameObject>();
+	private Stack<GameObject> panelHistory = new();
 
 	// --- Initialization --- //
 	private void Awake()
 		{
-		// --- Singleton Setup --- //
 		if (Instance == null)
 			{
 			Instance = this;
@@ -112,18 +109,6 @@ public class UIManager:MonoBehaviour
 		{
 		InitializePanels();
 		InitializeButtonListeners();
-
-		// Define file paths for CSVs
-		teamsCsvPath = Path.Combine(Application.persistentDataPath, "teams.csv");
-		playersCsvPath = Path.Combine(Application.persistentDataPath, "players.csv");
-
-		// Load data from CSV files
-		teams = LoadTeamsFromCSV();
-		players = LoadPlayersFromCSV();
-
-		// Populate dropdowns and UI elements
-		PopulateTeamDropdown();
-		PopulatePlayerDropdown();
 		}
 
 	// --- Panel Initialization --- //
@@ -133,6 +118,7 @@ public class UIManager:MonoBehaviour
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
 		matchupComparisonPanel.SetActive(false);
+		matchupResultsPanel.SetActive(false);  // Hide the Matchup Results Panel initially
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 		}
@@ -161,17 +147,8 @@ public class UIManager:MonoBehaviour
 		backButtonMatchupComparison.onClick.AddListener(() => GoBackToPreviousPanel());
 
 		settingsBackButton.onClick.AddListener(() => GoBackToPreviousPanel());
+		backButtonMatchupResults.onClick.AddListener(() => GoBackToPreviousPanel());
 		}
-
-	// --- Button Actions --- //
-	private void OnAddUpdateTeam() { /* Add or Update Team logic here */ }
-	private void ClearTeamNameInput() { teamNameInputField.text = ""; }
-	private void OnModifyTeamName() { /* Modify Team Name logic here */ }
-	private void OnDeleteTeam() { /* Delete Team logic here */ }
-	private void OnAddPlayer() { /* Add Player logic here */ }
-	private void OnDeletePlayer() { /* Delete Player logic here */ }
-	private void OnAddPlayerDetails() { /* Add Player Details logic here */ }
-	private void OnCompareMatchups() { /* Compare Matchups logic here */ }
 
 	// --- Panel Control Functions --- //
 	public void ShowHomePanel()
@@ -213,6 +190,14 @@ public class UIManager:MonoBehaviour
 		settingsPanel.SetActive(true);
 		}
 
+	public void ShowMatchupResultsPanel(string resultText)
+		{
+		panelHistory.Push(matchupComparisonPanel); // Save previous panel
+		matchupComparisonPanel.SetActive(false);
+		matchupResultsPanel.SetActive(true);
+		resultsText.text = resultText;  // Set the result text dynamically
+		}
+
 	public void GoBackToPreviousPanel()
 		{
 		if (panelHistory.Count > 0)
@@ -222,16 +207,33 @@ public class UIManager:MonoBehaviour
 			teamManagementPanel.SetActive(false);
 			playerManagementPanel.SetActive(false);
 			matchupComparisonPanel.SetActive(false);
+			matchupResultsPanel.SetActive(false);  // Make sure results panel is hidden
 			settingsPanel.SetActive(false);
 			overlayFeedbackPanel.SetActive(false);
 			previousPanel.SetActive(true);
 			}
 		}
 
+	// --- Button Actions --- //
+	private void OnAddUpdateTeam() { /* Add or Update Team logic here */ }
+	private void ClearTeamNameInput() { teamNameInputField.text = ""; }
+	private void OnModifyTeamName() { /* Modify Team Name logic here */ }
+	private void OnDeleteTeam() { /* Delete Team logic here */ }
+	private void OnAddPlayer() { /* Add Player logic here */ }
+	private void OnDeletePlayer() { /* Delete Player logic here */ }
+	private void OnAddPlayerDetails() { /* Add Player Details logic here */ }
+	private void OnCompareMatchups()
+		{
+		// Handle comparison logic here, then show results panel
+		string comparisonResult = "Team A wins 3-2"; // Example result, replace with actual logic
+		ShowMatchupResultsPanel(comparisonResult);
+		}
+
 	// --- CSV Loading Functions --- //
 	private List<Team> LoadTeamsFromCSV()
 		{
 		List<Team> loadedTeams = new();
+		string teamsCsvPath = Path.Combine(Application.persistentDataPath, "teams.csv"); // This path should be from DatabaseManager
 		if (File.Exists(teamsCsvPath))
 			{
 			string[] lines = File.ReadAllLines(teamsCsvPath);
@@ -242,7 +244,6 @@ public class UIManager:MonoBehaviour
 					{
 					int teamId = int.Parse(columns[0]);  // Parse the TeamId
 					string teamName = columns[1];        // Get the TeamName
-
 					Team team = new(teamId, teamName); // Pass both parameters to the constructor
 					loadedTeams.Add(team); // Add the team to the list
 					}
@@ -254,6 +255,7 @@ public class UIManager:MonoBehaviour
 	private List<Player> LoadPlayersFromCSV()
 		{
 		List<Player> loadedPlayers = new();
+		string playersCsvPath = Path.Combine(Application.persistentDataPath, "players.csv"); // This path should be from DatabaseManager
 		if (File.Exists(playersCsvPath))
 			{
 			string[] lines = File.ReadAllLines(playersCsvPath);
@@ -280,12 +282,12 @@ public class UIManager:MonoBehaviour
 	private void PopulateTeamDropdown()
 		{
 		teamDropdown.ClearOptions();
-		teamDropdown.AddOptions(teams.Select(t => t.TeamName).ToList());
+		teamDropdown.AddOptions(LoadTeamsFromCSV().Select(t => t.TeamName).ToList());
 		}
 
 	private void PopulatePlayerDropdown()
 		{
 		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(players.Select(p => p.PlayerName).ToList());
+		playerNameDropdown.AddOptions(LoadPlayersFromCSV().Select(p => p.PlayerName).ToList());
 		}
 	}

@@ -1,8 +1,8 @@
 AdaptivePerformanceManager
+SampleDataGenerator
 DatabaseManager
 SettingsManager
 MatchupComparisonManager
-SampleDataGenerator
 UIManager
 GenerateGameObjectList
 Main Camera

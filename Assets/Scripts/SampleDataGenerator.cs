@@ -22,8 +22,8 @@ public class SampleDataGenerator:MonoBehaviour
 
 	private void Start()
 		{
-		playersFilePath = Path.Combine(Application.persistentDataPath, "players.csv");
-		teamsFilePath = Path.Combine(Application.persistentDataPath, "teams.csv");
+		playersFilePath = "Assets/Resources/players.csv";  // Update path to Assets/Resources/
+		teamsFilePath = "Assets/Resources/teams.csv";      // Update path to Assets/Resources/
 
 		GenerateSampleTeamsAndPlayers();
 		}
