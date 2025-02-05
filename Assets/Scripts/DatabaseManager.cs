@@ -157,7 +157,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Load Players from CSV --- //
-	private List<Player> LoadPlayersFromCsv()
+	public List<Player> LoadPlayersFromCsv()
 		{
 		List<Player> players = new();
 		try
@@ -191,7 +191,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Save Players to CSV --- //
-	private void SavePlayersToCsv(List<Player> players)
+	public void SavePlayersToCsv(List<Player> players)
 		{
 		try
 			{
@@ -209,7 +209,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Load Teams from CSV --- //
-	private List<Team> LoadTeamsFromCsv()
+	public List<Team> LoadTeamsFromCsv()
 		{
 		List<Team> teams = new();
 		try
@@ -222,7 +222,6 @@ public class DatabaseManager:MonoBehaviour
 					string[] values = line.Split(',');
 					if (values.Length == 2)  // Assuming 2 columns in the CSV (TeamId, TeamName)
 						{
-						// --- Fix: Ensure 'TeamId' and 'TeamName' are passed correctly --- //
 						int teamId = int.Parse(values[0]);  // Extract TeamId
 						string teamName = values[1];        // Extract TeamName
 						Team team = new(teamId, teamName);  // Pass both parameters
@@ -238,9 +237,8 @@ public class DatabaseManager:MonoBehaviour
 		return teams;
 		}
 
-
 	// --- Save Teams to CSV --- //
-	private void SaveTeamsToCsv(List<Team> teams)
+	public void SaveTeamsToCsv(List<Team> teams)
 		{
 		try
 			{

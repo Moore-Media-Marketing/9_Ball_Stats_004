@@ -1,5 +1,8 @@
 AdaptivePerformanceManager
-DataManager
+DatabaseManager
+SettingsManager
+MatchupComparisonManager
+SampleDataGenerator
 UIManager
 GenerateGameObjectList
 Main Camera
@@ -88,6 +91,8 @@ Canvas
       Text (TMP)
     AddPlayerDetailsButton
       Text (TMP)
+    SaveToCSVButton
+      Text (TMP)
     BackButton
       UpdateBackButtonText
   PlayerLifetimeDataInputPanel
@@ -153,6 +158,8 @@ Canvas
         Placeholder
         Text
     UpdateLifetimeButton
+      Text (TMP)
+    SaveToCSVButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
@@ -240,6 +247,8 @@ Canvas
       Text (TMP)
     RemovePlayerButton
       Text (TMP)
+    SaveToCSVButton
+      Text (TMP)
     BackButton
       UpdateBackButtonText
   MatchupComparisonPanel
@@ -309,7 +318,9 @@ Canvas
   MatchupResultsPanel
     HeaderText
     TeamAHeaderText
+    TeamAWinProbabilityText
     TeamBHeaderText
+    TeamBWinProbabilityText
     MatchupsScrollView
       Viewport
         MatchupListContent

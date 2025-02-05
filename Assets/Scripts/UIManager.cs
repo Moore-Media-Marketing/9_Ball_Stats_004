@@ -7,6 +7,9 @@ using System.Linq;
 
 public class UIManager:MonoBehaviour
 	{
+	// --- Singleton Pattern --- //
+	public static UIManager Instance { get; private set; }
+
 	// --- Panel References --- //
 	[Header("Home Panel")]
 	public GameObject homePanel;
@@ -87,7 +90,24 @@ public class UIManager:MonoBehaviour
 	private List<Team> teams = new();
 	private List<Player> players = new();
 
+	// --- Panel History --- //
+	private Stack<GameObject> panelHistory = new Stack<GameObject>();
+
 	// --- Initialization --- //
+	private void Awake()
+		{
+		// --- Singleton Setup --- //
+		if (Instance == null)
+			{
+			Instance = this;
+			DontDestroyOnLoad(gameObject); // Keep the instance between scenes
+			}
+		else
+			{
+			Destroy(gameObject); // Destroy duplicates
+			}
+		}
+
 	private void Start()
 		{
 		InitializePanels();
@@ -130,17 +150,17 @@ public class UIManager:MonoBehaviour
 		clearTeamNameButton.onClick.AddListener(ClearTeamNameInput);
 		modifyTeamNameButton.onClick.AddListener(OnModifyTeamName);
 		deleteButton.onClick.AddListener(OnDeleteTeam);
-		backButton.onClick.AddListener(ShowHomePanel);
+		backButton.onClick.AddListener(() => GoBackToPreviousPanel());
 
 		addPlayerButton.onClick.AddListener(OnAddPlayer);
 		deletePlayerButton.onClick.AddListener(OnDeletePlayer);
 		addPlayerDetailsButton.onClick.AddListener(OnAddPlayerDetails);
-		backButtonPlayerManagement.onClick.AddListener(ShowHomePanel);
+		backButtonPlayerManagement.onClick.AddListener(() => GoBackToPreviousPanel());
 
 		compareButton.onClick.AddListener(OnCompareMatchups);
-		backButtonMatchupComparison.onClick.AddListener(ShowHomePanel);
+		backButtonMatchupComparison.onClick.AddListener(() => GoBackToPreviousPanel());
 
-		settingsBackButton.onClick.AddListener(ShowHomePanel);
+		settingsBackButton.onClick.AddListener(() => GoBackToPreviousPanel());
 		}
 
 	// --- Button Actions --- //
@@ -156,6 +176,7 @@ public class UIManager:MonoBehaviour
 	// --- Panel Control Functions --- //
 	public void ShowHomePanel()
 		{
+		panelHistory.Push(homePanel); // Save current panel to history
 		homePanel.SetActive(true);
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
@@ -164,10 +185,48 @@ public class UIManager:MonoBehaviour
 		overlayFeedbackPanel.SetActive(false);
 		}
 
-	public void ShowTeamManagementPanel() { homePanel.SetActive(false); teamManagementPanel.SetActive(true); }
-	public void ShowPlayerManagementPanel() { homePanel.SetActive(false); playerManagementPanel.SetActive(true); }
-	public void ShowMatchupComparisonPanel() { homePanel.SetActive(false); matchupComparisonPanel.SetActive(true); }
-	public void ShowSettingsPanel() { homePanel.SetActive(false); settingsPanel.SetActive(true); }
+	public void ShowTeamManagementPanel()
+		{
+		panelHistory.Push(homePanel); // Save previous panel
+		homePanel.SetActive(false);
+		teamManagementPanel.SetActive(true);
+		}
+
+	public void ShowPlayerManagementPanel()
+		{
+		panelHistory.Push(homePanel); // Save previous panel
+		homePanel.SetActive(false);
+		playerManagementPanel.SetActive(true);
+		}
+
+	public void ShowMatchupComparisonPanel()
+		{
+		panelHistory.Push(homePanel); // Save previous panel
+		homePanel.SetActive(false);
+		matchupComparisonPanel.SetActive(true);
+		}
+
+	public void ShowSettingsPanel()
+		{
+		panelHistory.Push(homePanel); // Save previous panel
+		homePanel.SetActive(false);
+		settingsPanel.SetActive(true);
+		}
+
+	public void GoBackToPreviousPanel()
+		{
+		if (panelHistory.Count > 0)
+			{
+			var previousPanel = panelHistory.Pop();
+			homePanel.SetActive(false);
+			teamManagementPanel.SetActive(false);
+			playerManagementPanel.SetActive(false);
+			matchupComparisonPanel.SetActive(false);
+			settingsPanel.SetActive(false);
+			overlayFeedbackPanel.SetActive(false);
+			previousPanel.SetActive(true);
+			}
+		}
 
 	// --- CSV Loading Functions --- //
 	private List<Team> LoadTeamsFromCSV()
