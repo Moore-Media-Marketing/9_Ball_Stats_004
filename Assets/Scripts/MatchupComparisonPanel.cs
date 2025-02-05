@@ -19,6 +19,10 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Player Toggle Prefab Reference --- //
 	public GameObject playerTogglePrefab;
 
+	// --- Matchup Result Panel --- //
+	public GameObject matchupResultPanel;
+	public TMP_Text matchupResultText;
+
 	// --- Initialization --- //
 	private void Start()
 		{
@@ -97,23 +101,33 @@ public class MatchupComparisonPanel:MonoBehaviour
 		string teamAName = teamADropdown.options[teamADropdown.value].text;
 		string teamBName = teamBDropdown.options[teamBDropdown.value].text;
 
-		// You would need to gather scores and winning information, possibly based on selected players
-		int teamAScore = 30; // Example score, replace with actual score logic
-		int teamBScore = 25; // Example score, replace with actual score logic
+		// Example scores (you can replace these with actual logic)
+		int teamAScore = 30;
+		int teamBScore = 25;
 
-		// Example calculation of win probabilities (replace with actual calculation logic)
+		// Example win probabilities (replace with actual logic)
 		float teamAWinProbability = 0.65f;
 		float teamBWinProbability = 0.35f;
 
-		// Example of determining the winning team
+		// Example winner logic
 		string winningTeam = teamAScore > teamBScore ? teamAName : teamBName;
 
-		// Create a new MatchupResultData with gathered data
+		// Create the MatchupResultData object
 		MatchupResultData matchupResult = new(teamAName, teamBName, teamAScore, teamBScore,
-												teamAWinProbability, teamBWinProbability, winningTeam);
+											   teamAWinProbability, teamBWinProbability, winningTeam);
 
-		// Now pass the matchupResult to the ShowMatchupResultsPanel method
-		UIManager.Instance.ShowMatchupResultsPanel(matchupResult);
+		// Display the matchup result in the current panel
+		ShowMatchupResultsPanel(matchupResult);
+		}
+
+	// --- Show Matchup Results Panel --- //
+	private void ShowMatchupResultsPanel(MatchupResultData matchupResult)
+		{
+		matchupResultPanel.SetActive(true);
+		matchupResultText.text = $"{matchupResult.teamA} vs {matchupResult.teamB}\n" +
+								 $"Score: {matchupResult.TeamAScore} - {matchupResult.TeamBScore}\n" +
+								 $"Winner: {matchupResult.WinningTeamName}\n" +
+								 $"Win Probabilities: {matchupResult.teamAWinProbability * 100}% vs {matchupResult.teamBWinProbability * 100}%";
 		}
 
 	// --- Back Button --- //

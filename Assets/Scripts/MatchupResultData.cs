@@ -2,32 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using UnityEngine;
-
 [Serializable]
 public class MatchupResultData
 	{
-	// Update to match the expected names
-	public string TeamAName;
-	public string TeamBName;
+	public string teamA;  // Changed from TeamAName to teamA
+	public string teamB;  // Changed from TeamBName to teamB
 	public int TeamAScore;
 	public int TeamBScore;
-	public string WinningTeamName;
-
 	public float teamAWinProbability;
 	public float teamBWinProbability;
+	public string WinningTeamName;
 
 	// --- Region: Constructor --- //
 	public MatchupResultData(string teamA, string teamB, int teamAScore, int teamBScore,
-							  float teamAWinProbability, float teamBWinProbability, string winningTeam)
+							  float teamAWinProbability, float teamBWinProbability, string winningTeamName)
 		{
-		this.TeamAName = teamA;
-		this.TeamBName = teamB;
+		this.teamA = teamA;
+		this.teamB = teamB;
 		this.TeamAScore = teamAScore;
 		this.TeamBScore = teamBScore;
 		this.teamAWinProbability = teamAWinProbability;
 		this.teamBWinProbability = teamBWinProbability;
-		this.WinningTeamName = winningTeam;
+		this.WinningTeamName = winningTeamName;
 		}
 
 	// --- Region: Default Constructor --- //
@@ -36,15 +32,22 @@ public class MatchupResultData
 	// --- Region: CSV Serialization --- //
 	public static void SaveMatchupResultsToCSV(List<MatchupResultData> matchupResults, string filePath)
 		{
-		using StreamWriter writer = new(filePath);
-		// Write header
-		writer.WriteLine("TeamAName,TeamBName,TeamAScore,TeamBScore,TeamAWinProbability,TeamBWinProbability,WinningTeamName");
-
-		// Write data
-		foreach (var result in matchupResults)
+		try
 			{
-			writer.WriteLine($"{result.TeamAName},{result.TeamBName},{result.TeamAScore},{result.TeamBScore}," +
-							 $"{result.teamAWinProbability},{result.teamBWinProbability},{result.WinningTeamName}");
+			using StreamWriter writer = new(filePath);
+			// Write header
+			writer.WriteLine("teamA,teamB,TeamAScore,TeamBScore,teamAWinProbability,teamBWinProbability,WinningTeamName");
+
+			// Write data
+			foreach (var result in matchupResults)
+				{
+				writer.WriteLine($"{result.teamA},{result.teamB},{result.TeamAScore},{result.TeamBScore}," +
+								 $"{result.teamAWinProbability},{result.teamBWinProbability},{result.WinningTeamName}");
+				}
+			}
+		catch (IOException ex)
+			{
+			Console.WriteLine($"Error saving matchup results: {ex.Message}");
 			}
 		}
 
@@ -53,33 +56,41 @@ public class MatchupResultData
 		{
 		List<MatchupResultData> matchupResults = new();
 
-		if (File.Exists(filePath))
+		try
 			{
-			using StreamReader reader = new(filePath);
-			// Skip header
-			reader.ReadLine();
-
-			// Read each line
-			string line;
-			while ((line = reader.ReadLine()) != null)
+			if (File.Exists(filePath))
 				{
-				string[] columns = line.Split(',');
+				using StreamReader reader = new(filePath);
+				// Skip header
+				reader.ReadLine();
 
-				if (columns.Length == 7)
+				// Read each line
+				string line;
+				while ((line = reader.ReadLine()) != null)
 					{
-					string teamA = columns[0];
-					string teamB = columns[1];
-					int teamAScore = int.Parse(columns[2]);
-					int teamBScore = int.Parse(columns[3]);
-					float teamAWinProbability = float.Parse(columns[4]);
-					float teamBWinProbability = float.Parse(columns[5]);
-					string winningTeam = columns[6];
+					string[] columns = line.Split(',');
 
-					MatchupResultData result = new(teamA, teamB, teamAScore, teamBScore, teamAWinProbability, teamBWinProbability, winningTeam);
-					matchupResults.Add(result);
+					if (columns.Length == 7)
+						{
+						string teamA = columns[0];
+						string teamB = columns[1];
+						int teamAScore = int.Parse(columns[2]);
+						int teamBScore = int.Parse(columns[3]);
+						float teamAWinProbability = float.Parse(columns[4]);
+						float teamBWinProbability = float.Parse(columns[5]);
+						string winningTeam = columns[6];
+
+						MatchupResultData result = new(teamA, teamB, teamAScore, teamBScore, teamAWinProbability, teamBWinProbability, winningTeam);
+						matchupResults.Add(result);
+						}
 					}
 				}
 			}
+		catch (IOException ex)
+			{
+			Console.WriteLine($"Error loading matchup results: {ex.Message}");
+			}
+
 		return matchupResults;
 		}
 	}

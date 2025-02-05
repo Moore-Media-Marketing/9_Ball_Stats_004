@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+
 
 public class UIManager:MonoBehaviour
 	{
@@ -71,12 +70,6 @@ public class UIManager:MonoBehaviour
 	public Button compareButton;
 	public Button backButtonMatchupComparison;
 
-	[Header("Matchup Results Panel")]
-	public GameObject matchupResultsPanel;
-	public TMP_Text resultsHeaderText;
-	public TMP_Text resultsText;
-	public Button backButtonMatchupResults;
-
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
 	public TMP_Text settingsHeaderText;
@@ -118,7 +111,6 @@ public class UIManager:MonoBehaviour
 		teamManagementPanel.SetActive(false);
 		playerManagementPanel.SetActive(false);
 		matchupComparisonPanel.SetActive(false);
-		matchupResultsPanel.SetActive(false);  // Hide the Matchup Results Panel initially
 		settingsPanel.SetActive(false);
 		overlayFeedbackPanel.SetActive(false);
 		}
@@ -147,7 +139,6 @@ public class UIManager:MonoBehaviour
 		backButtonMatchupComparison.onClick.AddListener(() => GoBackToPreviousPanel());
 
 		settingsBackButton.onClick.AddListener(() => GoBackToPreviousPanel());
-		backButtonMatchupResults.onClick.AddListener(() => GoBackToPreviousPanel());
 		}
 
 	// --- Panel Control Functions --- //
@@ -190,14 +181,6 @@ public class UIManager:MonoBehaviour
 		settingsPanel.SetActive(true);
 		}
 
-	public void ShowMatchupResultsPanel(string resultText)
-		{
-		panelHistory.Push(matchupComparisonPanel); // Save previous panel
-		matchupComparisonPanel.SetActive(false);
-		matchupResultsPanel.SetActive(true);
-		resultsText.text = resultText;  // Set the result text dynamically
-		}
-
 	public void GoBackToPreviousPanel()
 		{
 		if (panelHistory.Count > 0)
@@ -207,7 +190,6 @@ public class UIManager:MonoBehaviour
 			teamManagementPanel.SetActive(false);
 			playerManagementPanel.SetActive(false);
 			matchupComparisonPanel.SetActive(false);
-			matchupResultsPanel.SetActive(false);  // Make sure results panel is hidden
 			settingsPanel.SetActive(false);
 			overlayFeedbackPanel.SetActive(false);
 			previousPanel.SetActive(true);
@@ -222,72 +204,5 @@ public class UIManager:MonoBehaviour
 	private void OnAddPlayer() { /* Add Player logic here */ }
 	private void OnDeletePlayer() { /* Delete Player logic here */ }
 	private void OnAddPlayerDetails() { /* Add Player Details logic here */ }
-	private void OnCompareMatchups()
-		{
-		// Handle comparison logic here, then show results panel
-		string comparisonResult = "Team A wins 3-2"; // Example result, replace with actual logic
-		ShowMatchupResultsPanel(comparisonResult);
-		}
-
-	// --- CSV Loading Functions --- //
-	private List<Team> LoadTeamsFromCSV()
-		{
-		List<Team> loadedTeams = new();
-		string teamsCsvPath = Path.Combine(Application.persistentDataPath, "teams.csv"); // This path should be from DatabaseManager
-		if (File.Exists(teamsCsvPath))
-			{
-			string[] lines = File.ReadAllLines(teamsCsvPath);
-			foreach (var line in lines)
-				{
-				var columns = line.Split(',');
-				if (columns.Length == 2) // Assuming 2 columns: Id, Name
-					{
-					int teamId = int.Parse(columns[0]);  // Parse the TeamId
-					string teamName = columns[1];        // Get the TeamName
-					Team team = new(teamId, teamName); // Pass both parameters to the constructor
-					loadedTeams.Add(team); // Add the team to the list
-					}
-				}
-			}
-		return loadedTeams;
-		}
-
-	private List<Player> LoadPlayersFromCSV()
-		{
-		List<Player> loadedPlayers = new();
-		string playersCsvPath = Path.Combine(Application.persistentDataPath, "players.csv"); // This path should be from DatabaseManager
-		if (File.Exists(playersCsvPath))
-			{
-			string[] lines = File.ReadAllLines(playersCsvPath);
-			foreach (var line in lines)
-				{
-				var columns = line.Split(',');
-				if (columns.Length == 5) // Assuming 5 columns: PlayerId, PlayerName, SkillLevel, TotalGames, TotalWins
-					{
-					loadedPlayers.Add(new Player
-						{
-						PlayerId = int.Parse(columns[0]),
-						PlayerName = columns[1],
-						SkillLevel = int.Parse(columns[2]),
-						TotalGames = int.Parse(columns[3]),
-						TotalWins = int.Parse(columns[4]),
-						});
-					}
-				}
-			}
-		return loadedPlayers;
-		}
-
-	// --- UI Population Functions --- //
-	private void PopulateTeamDropdown()
-		{
-		teamDropdown.ClearOptions();
-		teamDropdown.AddOptions(LoadTeamsFromCSV().Select(t => t.TeamName).ToList());
-		}
-
-	private void PopulatePlayerDropdown()
-		{
-		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(LoadPlayersFromCSV().Select(p => p.PlayerName).ToList());
-		}
+	private void OnCompareMatchups() { /* Compare Matchups logic here */ }
 	}
