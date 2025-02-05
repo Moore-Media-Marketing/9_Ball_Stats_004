@@ -9,8 +9,11 @@ public class SampleDataGenerator:MonoBehaviour
 
 	// Sample Data Arrays (for names and team names)
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Anthony", "Kevin", "Jason", "Jeff", "Ryan" };
+
 	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy", "Lisa", "Nancy", "Karen", "Betty", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Sarah", "Kimberly", "Jessica" };
+
 	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott", "Green", "Adams", "Baker", "Hall", "Nelson", "Carter", "Mitchell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Morris", "Morgan" };
+
 	private static readonly string[] teamNames = { "Atomic Squirrels", "Crimson Cobras", "Electric Eels", "Phantom Phantoms", "Rainbow Raptors", "Mystic Moose", "Silent Serpents", "Cosmic Crusaders", "Neon Ninjas", "Lunar Lions", "Galactic Gorillas", "Iron Eagles", "Shadow Strikers", "Velocity Vipers", "Quicksilver Quails", "Turbo Turtles", "Diamond Dragons", "Emerald Emus", "Golden Geckos", "Icy Iguanas", "Jade Jaguars", "Kinetic Kangaroos", "Laser Lemurs", "Magma Monkeys", "Nova Narwhals", "Onyx Owls", "Plasma Pandas", "Quantum Quetzals", "Ruby Rhinos", "Sapphire Sharks", "Titanium Tigers", "Uranium Unicorns", "Violet Vultures", "Wild Wolverines", "X-Ray Xenopus", "Yellow Yetis", "Zebra Zephyrs" };
 
 	private string playersFilePath;
@@ -33,7 +36,12 @@ public class SampleDataGenerator:MonoBehaviour
 		using (StreamWriter teamsWriter = new(teamsFilePath, false))
 			{
 			// Write header to players.csv
-			playersWriter.WriteLine("TeamName,PlayerName,SkillLevel,LifetimeGamesPlayed,LifetimeGamesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints");
+			playersWriter.WriteLine("TeamName,PlayerId,PlayerName,TotalGames,TotalWins,TotalPoints,PointsRequiredToWin," +
+				"CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon," +
+				"CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded," +
+				"CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints," +
+				"LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeDefensiveShotAvg,LifetimeGamesPlayed,LifetimeGamesWon," +
+				"LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,LifetimeMatchesPlayedInLast2Years");
 
 			// Write header to teams.csv
 			teamsWriter.WriteLine("TeamName");
@@ -115,43 +123,43 @@ public class SampleDataGenerator:MonoBehaviour
 		int currentSeasonMatchesPlayed = 16; // Fixed to 16
 		int currentSeasonMatchesWon = Mathf.RoundToInt(currentSeasonMatchesPlayed * winRate); // Wins scaled by skill level
 		int currentSeasonMiniSlams = Mathf.RoundToInt(lifetimeMiniSlams * skillLevel / 9f); // More mini slams for higher skill
-		int currentSeasonNineOnTheSnap = Mathf.RoundToInt(lifetimeNineOnTheSnap * skillLevel / 9f); // More 9-ball on break for higher skill
-		float currentSeasonPaPercentage = Mathf.RoundToInt(50f + (skillLevel * 5)); // Skill level scales performance percentage
-		int currentSeasonPointsAwarded = Mathf.RoundToInt(totalPointsEarned / lifetimeGamesPlayed); // Scale points by performance
-		float currentSeasonPointsPerMatch = Mathf.Round(pointsPerMatchRate * 4); // Higher skill scores more points per match
-		float currentSeasonPpm = currentSeasonPointsPerMatch;
-		int currentSeasonShutouts = lifetimeShutouts; // Based on lifetime shutouts
-		int currentSeasonSkillLevel = skillLevel;
-		int currentSeasonTotalPoints = currentSeasonPointsAwarded + Random.Range(0, 20); // Add a bit of randomness
+		int currentSeasonNineOnTheSnap = Mathf.RoundToInt(lifetimeNineOnTheSnap * skillLevel / 9f); // More 9-Balls on the break for higher skill
+		float currentSeasonPaPercentage = Random.Range(50f, 100f); // Player's performance average for the season
+		int currentSeasonPointsAwarded = Mathf.RoundToInt(pointsToWin * currentSeasonMatchesWon);
+		float currentSeasonPointsPerMatch = Mathf.RoundToInt((float) currentSeasonPointsAwarded / currentSeasonMatchesPlayed);
+		float currentSeasonPpm = currentSeasonPointsPerMatch * 0.9f + Random.Range(0f, 0.1f); // Points per match adjusted
+		int currentSeasonShutouts = Mathf.RoundToInt(lifetimeShutouts * 0.8f); // Reduced shutouts for current season
 
-		// Create the player with the stats generated above
-		Player newPlayer = new Player(playerName, skillLevel, 0, 0, 0)
+		// Returning a new Player object
+		return new Player(playerName, skillLevel, lifetimeGamesPlayed, lifetimeGamesWon, totalPointsEarned)
 			{
 			TeamId = teamId,
-			PlayerName = playerName,
-			SkillLevel = skillLevel,
 			TeamName = teamName,
-			LifetimeGamesPlayed = lifetimeGamesPlayed,
-			LifetimeGamesWon = lifetimeGamesWon,
-			LifetimeDefensiveShotAvg = Mathf.Round(Random.Range(1f, 10f)), // Round to whole number
-			LifetimeMiniSlams = lifetimeMiniSlams,
-			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,
-			LifetimeShutouts = lifetimeShutouts,
 			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,
-			CurrentSeasonDefensiveShotAverage = Mathf.Round(currentSeasonDefensiveShotAverage * 100) / 100f, // Round to 2 decimal places
+			CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage,
 			CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed,
 			CurrentSeasonMatchesWon = currentSeasonMatchesWon,
 			CurrentSeasonMiniSlams = currentSeasonMiniSlams,
 			CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap,
-			CurrentSeasonPaPercentage = Mathf.Round(currentSeasonPaPercentage), // Round to whole number percentage
+			CurrentSeasonPaPercentage = currentSeasonPaPercentage,
 			CurrentSeasonPointsAwarded = currentSeasonPointsAwarded,
-			CurrentSeasonPointsPerMatch = Mathf.Round(currentSeasonPointsPerMatch), // Round to whole number
-			CurrentSeasonPpm = Mathf.Round(currentSeasonPpm), // Round to whole number
+			CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch,
+			CurrentSeasonPpm = currentSeasonPpm,
 			CurrentSeasonShutouts = currentSeasonShutouts,
-			CurrentSeasonSkillLevel = currentSeasonSkillLevel,
-			CurrentSeasonTotalPoints = currentSeasonTotalPoints
+			CurrentSeasonSkillLevel = skillLevel,
+			CurrentSeasonTotalPoints = totalPointsEarned,
+			LifetimeBreakAndRun = lifetimeMiniSlams, // Adjusted
+			LifetimeDefensiveShotAverage = currentSeasonDefensiveShotAverage,
+			LifetimeDefensiveShotAvg = currentSeasonDefensiveShotAverage,
+			LifetimeGamesPlayed = lifetimeGamesPlayed,
+			LifetimeGamesWon = lifetimeGamesWon,
+			LifetimeMatchesPlayed = lifetimeGamesPlayed, // Adjusted
+			LifetimeMatchesWon = lifetimeGamesWon,
+			LifetimeMiniSlams = lifetimeMiniSlams,
+			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,
+			LifetimeShutouts = lifetimeShutouts,
+			LifetimeMatchesPlayedInLast2Years = lifetimeGamesPlayed // Assuming all games played recently
 			};
-
-		return newPlayer;
 		}
 	}
+

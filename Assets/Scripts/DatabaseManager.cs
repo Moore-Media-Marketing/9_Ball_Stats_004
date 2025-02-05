@@ -8,8 +8,8 @@ public class DatabaseManager:MonoBehaviour
 	// --- Singleton Pattern --- //
 	public static DatabaseManager Instance { get; private set; }
 
-	private string playersCsvPath = "Assets/Resources/players.csv";  // Update to Assets/Resources/
-	private string teamsCsvPath = "Assets/Resources/teams.csv";      // Update to Assets/Resources/
+	private string playersCsvPath = "Assets/Resources/players.csv";
+	private string teamsCsvPath = "Assets/Resources/teams.csv";
 
 	private void Awake()
 		{
@@ -27,7 +27,7 @@ public class DatabaseManager:MonoBehaviour
 	// --- Load Players from CSV --- //
 	public List<Player> LoadPlayersFromCsv()
 		{
-		List<Player> players = new();
+		List<Player> players = new List<Player>();
 		try
 			{
 			if (File.Exists(playersCsvPath))
@@ -36,39 +36,38 @@ public class DatabaseManager:MonoBehaviour
 				foreach (string line in lines)
 					{
 					string[] values = line.Split(',');
-					if (values.Length >= 20)  // Ensure all stats are included
+					if (values.Length >= 20)  // Ensure there are enough values in the CSV
 						{
-						Player player = new()
+						// Handle missing or invalid data
+						if (int.TryParse(values[0], out int playerId) &&
+							int.TryParse(values[2], out int skillLevel) &&
+							int.TryParse(values[3], out int breakAndRun) &&
+							float.TryParse(values[4], out float defensiveShotAvg))
 							{
-							PlayerId = int.Parse(values[0]),
-							PlayerName = values[1],
-							SkillLevel = int.Parse(values[2]),
-							CurrentSeasonBreakAndRun = int.Parse(values[3]),
-							CurrentSeasonDefensiveShotAverage = float.Parse(values[4]),
-							CurrentSeasonMatchesPlayed = int.Parse(values[5]),
-							CurrentSeasonMatchesWon = int.Parse(values[6]),
-							CurrentSeasonMiniSlams = int.Parse(values[7]),
-							CurrentSeasonNineOnTheSnap = int.Parse(values[8]),
-							CurrentSeasonPaPercentage = float.Parse(values[9]),
-							CurrentSeasonPointsAwarded = int.Parse(values[10]),
-							CurrentSeasonPointsPerMatch = float.Parse(values[11]),
-							CurrentSeasonPpm = float.Parse(values[12]),
-							CurrentSeasonShutouts = int.Parse(values[13]),
-							CurrentSeasonSkillLevel = int.Parse(values[14]),
-							CurrentSeasonTotalPoints = int.Parse(values[15]),
-							LifetimeBreakAndRun = int.Parse(values[16]),
-							LifetimeDefensiveShotAverage = float.Parse(values[17]),
-							LifetimeGamesPlayed = int.Parse(values[18]),
-							LifetimeGamesWon = int.Parse(values[19]),
-							LifetimeMatchesPlayed = int.Parse(values[20]),
-							LifetimeMatchesWon = int.Parse(values[21]),
-							LifetimeMiniSlams = int.Parse(values[22]),
-							LifetimeNineOnTheSnap = int.Parse(values[23]),
-							LifetimeShutouts = int.Parse(values[24])
-							};
-						players.Add(player);
+							// Use the Player constructor with the required parameters
+							Player player = new Player(playerId, values[1], skillLevel)
+								{
+								CurrentSeasonBreakAndRun = breakAndRun,
+								CurrentSeasonDefensiveShotAverage = defensiveShotAvg,
+								// Add other properties similarly, with appropriate error handling if necessary
+								};
+							players.Add(player);
+							}
+						else
+							{
+							Debug.LogWarning($"Invalid data in CSV for player with ID: {values[0]}");
+							}
+						}
+					else
+						{
+						Debug.LogWarning($"Skipping line with insufficient data: {line}");
 						}
 					}
+				}
+			else
+				{
+				Debug.LogWarning("Players CSV file not found, creating new file.");
+				SavePlayersToCsv(players); // Optionally create an empty file if not found
 				}
 			}
 		catch (System.Exception ex)
@@ -83,10 +82,10 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			List<string> lines = new();
+			List<string> lines = new List<string>();
 			foreach (Player player in players)
 				{
-				lines.Add($"{player.PlayerId},{player.PlayerName},{player.SkillLevel},{player.CurrentSeasonBreakAndRun},{player.CurrentSeasonDefensiveShotAverage},{player.CurrentSeasonMatchesPlayed},{player.CurrentSeasonMatchesWon},{player.CurrentSeasonMiniSlams},{player.CurrentSeasonNineOnTheSnap},{player.CurrentSeasonPaPercentage},{player.CurrentSeasonPointsAwarded},{player.CurrentSeasonPointsPerMatch},{player.CurrentSeasonPpm},{player.CurrentSeasonShutouts},{player.CurrentSeasonSkillLevel},{player.CurrentSeasonTotalPoints},{player.LifetimeBreakAndRun},{player.LifetimeDefensiveShotAverage},{player.LifetimeGamesPlayed},{player.LifetimeGamesWon},{player.LifetimeMatchesPlayed},{player.LifetimeMatchesWon},{player.LifetimeMiniSlams},{player.LifetimeNineOnTheSnap},{player.LifetimeShutouts}");
+				lines.Add(player.ToCsv()); // Assuming Player class has ToCsv method
 				}
 			File.WriteAllLines(playersCsvPath, lines);
 			}
@@ -99,7 +98,7 @@ public class DatabaseManager:MonoBehaviour
 	// --- Load Teams from CSV --- //
 	public List<Team> LoadTeams()
 		{
-		List<Team> teams = new();
+		List<Team> teams = new List<Team>();
 		try
 			{
 			if (File.Exists(teamsCsvPath))
@@ -108,14 +107,19 @@ public class DatabaseManager:MonoBehaviour
 				foreach (string line in lines)
 					{
 					string[] values = line.Split(',');
-					if (values.Length == 2)  // Assuming 2 columns: TeamId, TeamName
+					if (values.Length == 2)
 						{
 						int teamId = int.Parse(values[0]);
 						string teamName = values[1];
-						Team team = new(teamId, teamName);
+						Team team = new Team(teamId, teamName);
 						teams.Add(team);
 						}
 					}
+				}
+			else
+				{
+				Debug.LogWarning("Teams CSV file not found, creating new file.");
+				SaveTeams(teams); // Optionally create an empty file if not found
 				}
 			}
 		catch (System.Exception ex)
@@ -130,7 +134,7 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			List<string> lines = new();
+			List<string> lines = new List<string>();
 			foreach (Team team in teams)
 				{
 				lines.Add($"{team.TeamId},{team.TeamName}");
