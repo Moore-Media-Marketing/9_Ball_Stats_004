@@ -1,23 +1,27 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+
+using TMPro;
+
+using UnityEngine;
 
 public class MatchupResultsPanel:MonoBehaviour
 	{
 	// --- Region: UI References --- //
 	public TMP_Text headerText;
+
 	public TMP_Text teamAHeaderText;
 	public TMP_Text teamBHeaderText;
 
 	// --- Matchup Results Section --- //
 	public TMP_Text matchupResultText;
+
 	public TMP_Text teamAWinProbabilityText;
 	public TMP_Text teamBWinProbabilityText;
 
 	// --- Region: ScrollView References --- //
 	public Transform matchupListContent;
+
 	public Transform bestMatchupListContent;
 
 	// --- Region: Back Button --- //
@@ -167,7 +171,7 @@ public class MatchupResultsPanel:MonoBehaviour
 			var lines = File.ReadAllLines(matchupFilePath);
 			if (lines.Length > 1)  // If there are already entries (skipping header)
 				{
-				var lastLine = lines[lines.Length - 1];
+				var lastLine = lines[^1];
 				var lastId = int.Parse(lastLine.Split(',')[0]);  // Extract the ID from the last line
 				nextId = lastId + 1;
 				}

@@ -1,7 +1,6 @@
-using UnityEngine;
 using System.IO;
-using System.Linq;
-using System.Collections.Generic;
+
+using UnityEngine;
 
 public class SampleDataGenerator:MonoBehaviour
 	{
@@ -34,7 +33,7 @@ public class SampleDataGenerator:MonoBehaviour
 		using (StreamWriter teamsWriter = new(teamsFilePath, false))
 			{
 			// Write header to players.csv
-			playersWriter.WriteLine("TeamName,PlayerName,SkillLevel,LifetimeGamesPlayed,LifetimeGamesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts");
+			playersWriter.WriteLine("TeamName,PlayerName,SkillLevel,LifetimeGamesPlayed,LifetimeGamesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints");
 
 			// Write header to teams.csv
 			teamsWriter.WriteLine("TeamName");
@@ -72,34 +71,85 @@ public class SampleDataGenerator:MonoBehaviour
 		int pointsToWin = pointsRequiredToWin[skillLevel - 1];
 
 		// Simulate the player's performance over 16 matches
-		int lifetimeGamesPlayed = matchesPerSeason;
+		int lifetimeGamesPlayed = 16; // Fixed to 16 games per season
 		int lifetimeGamesWon = 0;
-		int lifetimeMiniSlams = Random.Range(0, 5);
-		int lifetimeNineOnTheSnap = Random.Range(0, 3);
-		int lifetimeShutouts = Random.Range(0, 2);
+		int lifetimeMiniSlams = Random.Range(0, 2);
+		int lifetimeNineOnTheSnap = Random.Range(0, 2);
+		int lifetimeShutouts = 0;
 		int totalPointsEarned = 0;
 
-		for (int i = 0; i < matchesPerSeason; i++)
+		// Adjust stats based on skill level
+		float winRate = Mathf.Clamp(skillLevel / 9f, 0.2f, 1f); // Higher skill level increases win rate
+		float breakAndRunRate = Mathf.Clamp(skillLevel / 9f, 0.1f, 0.8f); // Higher skill level increases break-and-run rate
+		float pointsPerMatchRate = Mathf.Clamp(skillLevel / 9f, 0.5f, 1.5f); // Higher skill level increases points per match
+
+		// Randomize based on skill level
+		for (int i = 0; i < lifetimeGamesPlayed; i++)
 			{
-			int pointsScored = Random.Range(pointsToWin - 5, pointsToWin + 5); // Randomize points scored around required win points
+			bool wonGame = Random.Range(0f, 1f) < winRate; // Win or lose based on skill level
+			if (wonGame)
+				lifetimeGamesWon++;
+
+			int pointsScored = Mathf.RoundToInt(pointsToWin * Random.Range(0.7f, 1.2f)); // Scale points scored by skill level
 			totalPointsEarned += pointsScored;
 
-			if (pointsScored >= pointsToWin)
-				lifetimeGamesWon++; // Player wins if they score enough points
+			// Simulate break-and-run success
+			bool breakAndRun = Random.Range(0f, 1f) < breakAndRunRate;
+			if (breakAndRun)
+				lifetimeMiniSlams++;
+
+			// Simulate 9-ball on the break
+			bool nineOnTheBreak = Random.Range(0f, 1f) < (breakAndRunRate / 2f); // Lower chance for lower skill levels
+			if (nineOnTheBreak)
+				lifetimeNineOnTheSnap++;
+
+			// Simulate shutouts
+			bool shutout = Random.Range(0f, 1f) < (winRate * 0.2f); // Lower chance for lower skill levels
+			if (shutout)
+				lifetimeShutouts++;
 			}
 
-		Player newPlayer = new(playerName, skillLevel, 0, 0, 0)
+		// Current season stats (randomized, adjusted by skill level)
+		int currentSeasonBreakAndRun = Mathf.RoundToInt(breakAndRunRate * 5); // Higher skill = more break-and-runs
+		float currentSeasonDefensiveShotAverage = Random.Range(0f, 1f); // This stat may not be directly affected by skill level
+		int currentSeasonMatchesPlayed = 16; // Fixed to 16
+		int currentSeasonMatchesWon = Mathf.RoundToInt(currentSeasonMatchesPlayed * winRate); // Wins scaled by skill level
+		int currentSeasonMiniSlams = Mathf.RoundToInt(lifetimeMiniSlams * skillLevel / 9f); // More mini slams for higher skill
+		int currentSeasonNineOnTheSnap = Mathf.RoundToInt(lifetimeNineOnTheSnap * skillLevel / 9f); // More 9-ball on break for higher skill
+		float currentSeasonPaPercentage = Mathf.RoundToInt(50f + (skillLevel * 5)); // Skill level scales performance percentage
+		int currentSeasonPointsAwarded = Mathf.RoundToInt(totalPointsEarned / lifetimeGamesPlayed); // Scale points by performance
+		float currentSeasonPointsPerMatch = Mathf.Round(pointsPerMatchRate * 4); // Higher skill scores more points per match
+		float currentSeasonPpm = currentSeasonPointsPerMatch;
+		int currentSeasonShutouts = lifetimeShutouts; // Based on lifetime shutouts
+		int currentSeasonSkillLevel = skillLevel;
+		int currentSeasonTotalPoints = currentSeasonPointsAwarded + Random.Range(0, 20); // Add a bit of randomness
+
+		// Create the player with the stats generated above
+		Player newPlayer = new Player(playerName, skillLevel, 0, 0, 0)
 			{
 			TeamId = teamId,
 			PlayerName = playerName,
 			SkillLevel = skillLevel,
-			TeamName = teamName,  // Save the team name here for CSV
+			TeamName = teamName,
 			LifetimeGamesPlayed = lifetimeGamesPlayed,
 			LifetimeGamesWon = lifetimeGamesWon,
-			LifetimeDefensiveShotAvg = Random.Range(1f, 10f), // Random lifetime defensive shot avg
+			LifetimeDefensiveShotAvg = Mathf.Round(Random.Range(1f, 10f)), // Round to whole number
 			LifetimeMiniSlams = lifetimeMiniSlams,
 			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,
-			LifetimeShutouts = lifetimeShutouts
+			LifetimeShutouts = lifetimeShutouts,
+			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,
+			CurrentSeasonDefensiveShotAverage = Mathf.Round(currentSeasonDefensiveShotAverage * 100) / 100f, // Round to 2 decimal places
+			CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed,
+			CurrentSeasonMatchesWon = currentSeasonMatchesWon,
+			CurrentSeasonMiniSlams = currentSeasonMiniSlams,
+			CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap,
+			CurrentSeasonPaPercentage = Mathf.Round(currentSeasonPaPercentage), // Round to whole number percentage
+			CurrentSeasonPointsAwarded = currentSeasonPointsAwarded,
+			CurrentSeasonPointsPerMatch = Mathf.Round(currentSeasonPointsPerMatch), // Round to whole number
+			CurrentSeasonPpm = Mathf.Round(currentSeasonPpm), // Round to whole number
+			CurrentSeasonShutouts = currentSeasonShutouts,
+			CurrentSeasonSkillLevel = currentSeasonSkillLevel,
+			CurrentSeasonTotalPoints = currentSeasonTotalPoints
 			};
 
 		return newPlayer;

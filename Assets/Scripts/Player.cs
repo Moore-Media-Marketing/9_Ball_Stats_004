@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Player
 	{
 	// Player's unique ID
@@ -19,12 +17,14 @@ public class Player
 
 	// Career Statistics
 	public int TotalGames { get; set; }
+
 	public int TotalWins { get; set; }
 	public int TotalPoints { get; set; }
 	public int PointsRequiredToWin { get; set; }
 
 	// Current Season Statistics
 	public int CurrentSeasonBreakAndRun { get; set; }
+
 	public float CurrentSeasonDefensiveShotAverage { get; set; }
 	public int CurrentSeasonMatchesPlayed { get; set; }
 	public int CurrentSeasonMatchesWon { get; set; }
@@ -40,6 +40,7 @@ public class Player
 
 	// Lifetime Statistics
 	public int LifetimeBreakAndRun { get; set; }
+
 	public float LifetimeDefensiveShotAverage { get; set; }
 	public float LifetimeDefensiveShotAvg { get; set; }
 	public int LifetimeGamesPlayed { get; set; }
@@ -64,7 +65,8 @@ public class Player
 		}
 
 	// Default constructor
-	public Player() { }
+	public Player()
+		{ }
 
 	// Method to get points required to win based on skill level
 	public int GetPointsRequired(int skillLevel)

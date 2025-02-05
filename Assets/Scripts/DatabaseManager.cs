@@ -24,43 +24,6 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-	// --- Save Player Data --- //
-	public void SavePlayerData(Player player)
-		{
-		try
-			{
-			List<Player> players = LoadPlayersFromCsv();
-			var existingPlayer = players.Find(p => p.PlayerId == player.PlayerId);
-
-			if (existingPlayer != null)
-				{
-				players.Remove(existingPlayer);
-				}
-			players.Add(player);
-			SavePlayersToCsv(players);
-			Debug.Log($"Player data for {player.PlayerName} saved/updated successfully.");
-			}
-		catch (System.Exception ex)
-			{
-			Debug.LogError($"Error saving player data: {ex.Message}");
-			}
-		}
-
-	// --- Load Player Data by ID --- //
-	public Player LoadPlayerData(int playerId)
-		{
-		try
-			{
-			List<Player> players = LoadPlayersFromCsv();
-			return players.Find(p => p.PlayerId == playerId);
-			}
-		catch (System.Exception ex)
-			{
-			Debug.LogError($"Error loading player data: {ex.Message}");
-			return null;
-			}
-		}
-
 	// --- Load Players from CSV --- //
 	public List<Player> LoadPlayersFromCsv()
 		{
@@ -134,7 +97,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Load Teams from CSV --- //
-	public List<Team> LoadTeamsFromCsv()
+	public List<Team> LoadTeams()
 		{
 		List<Team> teams = new();
 		try
@@ -163,7 +126,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Save Teams to CSV --- //
-	public void SaveTeamsToCsv(List<Team> teams)
+	public void SaveTeams(List<Team> teams)
 		{
 		try
 			{

@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.IO;
-using System.Linq;
+
+using UnityEngine;
 
 public class SettingsManager:MonoBehaviour
 	{

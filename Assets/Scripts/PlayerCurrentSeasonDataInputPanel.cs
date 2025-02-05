@@ -1,14 +1,17 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using TMPro;
+
+using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 	{
 	// --- Region: UI References --- //
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField gamesWonInputField;
@@ -29,6 +32,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 
 	// --- Region: CSV File Paths --- //
 	private string teamCsvFilePath;
+
 	private string playerCsvFilePath;
 	private string seasonDataCsvFilePath;
 	// --- End Region: CSV File Paths --- //
@@ -52,6 +56,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		PopulateSkillLevelDropdown();
 		PopulatePlayerDropdown();
 		}
+
 	// --- End Region: Initialization --- //
 
 	// --- Region: Add or Remove Player --- //
@@ -134,6 +139,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		// Handle the back button (navigate to the previous panel)
 		Debug.Log("Back button clicked.");
 		}
+
 	// --- End Region: Back Button --- //
 
 	// --- Region: Populate UI Dropdowns --- //
@@ -160,6 +166,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		skillLevelDropdown.ClearOptions();
 		skillLevelDropdown.AddOptions(skillLevels);
 		}
+
 	// --- End Region: Populate UI Dropdowns --- //
 
 	// --- Region: CSV Helper Methods --- //
@@ -235,6 +242,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 
 		File.WriteAllLines(seasonDataCsvFilePath, lines);
 		}
+
 	// --- End Region: CSV Helper Methods --- //
 
 	// --- Region: Data Classes --- //
@@ -254,5 +262,6 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		public int Shutouts;
 		public int SkillLevel;
 		}
+
 	// --- End Region: Data Classes --- //
 	}

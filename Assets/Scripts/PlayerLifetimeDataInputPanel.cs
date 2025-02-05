@@ -1,13 +1,16 @@
-using UnityEngine;
-using TMPro; // Corrected: Using TextMeshPro for text and dropdown
 using System.Collections.Generic;
 using System.Linq;
+
+using TMPro; // Corrected: Using TextMeshPro for text and dropdown
+
+using UnityEngine;
 
 public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	{
 	// --- UI Elements --- //
 	[Header("UI Elements")]
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 
@@ -47,7 +50,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	// --- Dropdown Population --- //
 	private void PopulateTeamDropdown()
 		{
-		teams = DatabaseManager.Instance.LoadTeamsFromCsv(); // Corrected method call
+		teams = DatabaseManager.Instance.LoadTeams(); // Corrected method call
 		List<string> teamNames = teams.Select(t => t.TeamName).ToList();
 
 		teamNameDropdown.ClearOptions();

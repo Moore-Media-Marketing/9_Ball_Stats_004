@@ -1,11 +1,13 @@
-using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+
+using UnityEngine;
 
 public class Team
 	{
 	// --- Team Attributes --- //
 	public int TeamId { get; set; }  // Unique ID for each team
+
 	public string TeamName { get; set; }  // Team's name
 
 	// Constructor

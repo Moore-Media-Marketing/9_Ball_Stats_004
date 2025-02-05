@@ -1,8 +1,9 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
 
+using TMPro;
+
+using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager:MonoBehaviour
 	{
@@ -12,6 +13,7 @@ public class UIManager:MonoBehaviour
 	// --- Panel References --- //
 	[Header("Home Panel")]
 	public GameObject homePanel;
+
 	public TMP_Text homeHeaderText;
 	public TMP_Text manageTeamsButtonText;
 	public TMP_Text createPlayerButtonText;
@@ -26,6 +28,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management Panel")]
 	public GameObject teamManagementPanel;
+
 	public TMP_Text teamManagementHeaderText;
 	public TMP_Text teamNameText;
 	public TMP_InputField teamNameInputField;
@@ -43,6 +46,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Player Management Panel")]
 	public GameObject playerManagementPanel;
+
 	public TMP_Text playerManagementHeaderText;
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
@@ -58,6 +62,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Matchup Comparison Panel")]
 	public GameObject matchupComparisonPanel;
+
 	public TMP_Text matchupComparisonHeaderText;
 	public TMP_Text selectTeamAText;
 	public TMP_Dropdown teamADropdown;
@@ -72,6 +77,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
+
 	public TMP_Text settingsHeaderText;
 	public Toggle settingsToggle;
 	public TMP_Text settingsBackButtonText;
@@ -79,6 +85,7 @@ public class UIManager:MonoBehaviour
 
 	[Header("Overlay Feedback Panel")]
 	public GameObject overlayFeedbackPanel;
+
 	public TMP_Text overlayFeedbackText;
 
 	// --- Panel History --- //
@@ -197,12 +204,27 @@ public class UIManager:MonoBehaviour
 		}
 
 	// --- Button Actions --- //
-	private void OnAddUpdateTeam() { /* Add or Update Team logic here */ }
-	private void ClearTeamNameInput() { teamNameInputField.text = ""; }
-	private void OnModifyTeamName() { /* Modify Team Name logic here */ }
-	private void OnDeleteTeam() { /* Delete Team logic here */ }
-	private void OnAddPlayer() { /* Add Player logic here */ }
-	private void OnDeletePlayer() { /* Delete Player logic here */ }
-	private void OnAddPlayerDetails() { /* Add Player Details logic here */ }
-	private void OnCompareMatchups() { /* Compare Matchups logic here */ }
+	private void OnAddUpdateTeam()
+		{ /* Add or Update Team logic here */ }
+
+	private void ClearTeamNameInput()
+		{ teamNameInputField.text = ""; }
+
+	private void OnModifyTeamName()
+		{ /* Modify Team Name logic here */ }
+
+	private void OnDeleteTeam()
+		{ /* Delete Team logic here */ }
+
+	private void OnAddPlayer()
+		{ /* Add Player logic here */ }
+
+	private void OnDeletePlayer()
+		{ /* Delete Player logic here */ }
+
+	private void OnAddPlayerDetails()
+		{ /* Add Player Details logic here */ }
+
+	private void OnCompareMatchups()
+		{ /* Compare Matchups logic here */ }
 	}

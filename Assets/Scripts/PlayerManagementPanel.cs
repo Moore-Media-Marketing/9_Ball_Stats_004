@@ -1,14 +1,17 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+using TMPro;  // For using TMP components
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;  // For using TMP components
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 
 public class PlayerManagementPanel:MonoBehaviour
 	{
 	// --- Region: Panel References --- //
 	public TMP_Dropdown teamNameDropdown;
+
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
 	public Button addPlayerButton;
@@ -20,6 +23,7 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	// --- Region: CSV Data References --- //
 	private string teamsCsvPath;
+
 	private string playersCsvPath;
 	private List<Team> teams;
 	private List<Player> players;
@@ -44,6 +48,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		PopulateTeamDropdown();
 		PopulatePlayerDropdown();
 		}
+
 	// --- End Region: Initialize Panel --- //
 
 	// --- Region: Add Player --- //
@@ -68,6 +73,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			Debug.Log("Please enter a valid player name.");
 			}
 		}
+
 	// --- End Region: Add Player --- //
 
 	// --- Region: Delete Player --- //
@@ -86,6 +92,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			Debug.Log("Player not found.");
 			}
 		}
+
 	// --- End Region: Delete Player --- //
 
 	// --- Region: Add Player Details --- //
@@ -95,6 +102,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		// Logic to show player details input panel (expand as needed)
 		Debug.Log($"Adding details for player: {playerName}");
 		}
+
 	// --- End Region: Add Player Details --- //
 
 	// --- Region: Populate Team Dropdown --- //
@@ -104,6 +112,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		List<string> teamNames = teams.Select(t => t.Name).ToList();
 		teamNameDropdown.AddOptions(teamNames);
 		}
+
 	// --- End Region: Populate Team Dropdown --- //
 
 	// --- Region: Populate Player Dropdown --- //
@@ -113,6 +122,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		List<string> playerNames = players.Select(p => p.Name).ToList();
 		playerNameDropdown.AddOptions(playerNames);
 		}
+
 	// --- End Region: Populate Player Dropdown --- //
 
 	// --- Region: Back Button --- //
@@ -121,6 +131,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		// Show the home panel or previous panel
 		Debug.Log("Back button clicked.");
 		}
+
 	// --- End Region: Back Button --- //
 
 	// --- Region: Save Data to CSV --- //
@@ -130,6 +141,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		SavePlayersToCSV(players);
 		Debug.Log("Data saved to CSV files.");
 		}
+
 	// --- End Region: Save Data to CSV --- //
 
 	// --- Region: Load Teams from CSV --- //
@@ -154,6 +166,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		return loadedTeams;
 		}
+
 	// --- End Region: Load Teams from CSV --- //
 
 	// --- Region: Load Players from CSV --- //
@@ -179,6 +192,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		return loadedPlayers;
 		}
+
 	// --- End Region: Load Players from CSV --- //
 
 	// --- Region: Save Teams to CSV --- //
@@ -191,6 +205,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		File.WriteAllLines(teamsCsvPath, lines);
 		}
+
 	// --- End Region: Save Teams to CSV --- //
 
 	// --- Region: Save Players to CSV --- //
@@ -203,6 +218,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		File.WriteAllLines(playersCsvPath, lines);
 		}
+
 	// --- End Region: Save Players to CSV --- //
 
 	// --- Region: Player Class --- //
@@ -212,6 +228,7 @@ public class PlayerManagementPanel:MonoBehaviour
 		public string Name { get; set; }
 		public int TeamId { get; set; }  // Foreign key to the team
 		}
+
 	// --- End Region: Player Class --- //
 
 	// --- Region: Team Class --- //
@@ -220,5 +237,6 @@ public class PlayerManagementPanel:MonoBehaviour
 		public int Id { get; set; }
 		public string Name { get; set; }
 		}
+
 	// --- End Region: Team Class --- //
 	}
