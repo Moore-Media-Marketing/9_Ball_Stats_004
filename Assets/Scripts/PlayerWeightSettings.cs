@@ -1,0 +1,26 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "PlayerWeightSettings", menuName = "Player/WeightSettings", order = 1)]
+public class PlayerWeightSettings:ScriptableObject
+	{
+	// Current Season Statistics Weights
+	public float weightCurrentSeasonPointsAwarded = 1.0f;
+	public float weightCurrentSeasonMatchesWon = 1.0f;
+	public float weightCurrentSeasonDefensiveShotAverage = 1.0f;
+	public float weightCurrentSeasonSkillLevel = 1.0f;
+	public float weightCurrentSeasonPpm = 1.0f;
+	public float weightCurrentSeasonShutouts = 1.0f;
+	public float weightCurrentSeasonMiniSlams = 1.0f;
+	public float weightCurrentSeasonNineOnTheSnap = 1.0f;
+	public float weightCurrentSeasonPaPercentage = 1.0f;
+	public float weightCurrentSeasonBreakAndRun = 1.0f;
+
+	// Lifetime Statistics Weights
+	public float weightLifetimeGamesWon = 1.0f;
+	public float weightLifetimeMiniSlams = 1.0f;
+	public float weightLifetimeNineOnTheSnap = 1.0f;
+	public float weightLifetimeShutouts = 1.0f;
+	public float weightLifetimeBreakAndRun = 1.0f;
+	public float weightLifetimeDefensiveShotAverage = 1.0f;
+	public float weightLifetimeMatchesPlayed = 1.0f;
+	}

@@ -8,8 +8,9 @@ public class DatabaseManager:MonoBehaviour
 	// --- Singleton Pattern --- //
 	public static DatabaseManager Instance { get; private set; }
 
-	private string playersCsvPath = "Assets/Resources/players.csv";
-	private string teamsCsvPath = "Assets/Resources/teams.csv";
+	private string playersCsvPath = "Assets/Resources/players.csv"; // Path to players CSV file
+	private string teamsCsvPath = "Assets/Resources/teams.csv"; // Path to teams CSV file
+	private string matchupsCsvPath = "Assets/Resources/matchups.csv"; // Path to matchups CSV file
 
 	private void Awake()
 		{
@@ -36,12 +37,12 @@ public class DatabaseManager:MonoBehaviour
 				foreach (string line in lines)
 					{
 					string[] values = line.Split(',');
-					if (values.Length >= 27) // Adjusted length
+					if (values.Length >= 27) // Adjusted length for CSV structure
 						{
 						// Parse required values safely
 						if (int.TryParse(values[0], out int playerId) &&
 							int.TryParse(values[2], out int skillLevel) &&
-							int.TryParse(values[3], out int teamIdCsv) &&  // Changed from teamId to teamIdCsv for distinction
+							int.TryParse(values[3], out int teamIdCsv) &&  // Using teamIdCsv to distinguish
 							float.TryParse(values[4], out float defensiveShotAvg) &&
 							int.TryParse(values[5], out int currentSeasonMatchesPlayed) &&
 							int.TryParse(values[6], out int currentSeasonMatchesWon) &&
@@ -64,9 +65,8 @@ public class DatabaseManager:MonoBehaviour
 							int.TryParse(values[24], out int currentSeasonTotalPoints) &&
 							int.TryParse(values[25], out int lifetimeMatchesPlayedInLast2Years))
 							{
-							// Create Player object with correct types
 							Player player = new Player(
-								teamIdCsv,  // Using teamIdCsv for filtering
+								teamIdCsv, // Using teamIdCsv to filter by team
 								values[8], // TeamName
 								values[1], // PlayerName
 								skillLevel,
@@ -81,13 +81,13 @@ public class DatabaseManager:MonoBehaviour
 								lifetimeGamesWon,
 								lifetimeMiniSlams,
 								lifetimeNineOnTheSnap,
-								lifetimeShutouts, // Make sure this is passed as an int
+								lifetimeShutouts,
 								lifetimeMatchesPlayedInLast2Years,
 								lifetimeBreakAndRun,
 								lifetimeDefensiveShotAverage
 							);
 
-							if (player.TeamId == teamId) // Filter players by teamId
+							if (player.TeamId == teamId) // Filter by teamId
 								{
 								players.Add(player);
 								}
@@ -106,7 +106,7 @@ public class DatabaseManager:MonoBehaviour
 			else
 				{
 				Debug.LogWarning("Players CSV file not found, creating new file.");
-				SavePlayersToCsv(players); // Create empty file if not found
+				SavePlayersToCsv(players); // Optionally create a new file if not found
 				}
 			}
 		catch (System.Exception ex)
@@ -124,9 +124,8 @@ public class DatabaseManager:MonoBehaviour
 			List<string> lines = new List<string>();
 			foreach (Player player in players)
 				{
-				lines.Add(player.ToCsv()); // Assuming Player class has ToCsv method
+				lines.Add(player.ToCsv()); // Assuming Player has ToCsv method
 				}
-			// Write all lines with UTF-8 encoding to handle special characters
 			File.WriteAllLines(playersCsvPath, lines, System.Text.Encoding.UTF8);
 			}
 		catch (System.Exception ex)
@@ -135,55 +134,70 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
-	// --- Load Teams from CSV --- //
-	public List<Team> LoadTeams()
+	// --- Load Matchups from CSV --- //
+	public List<Match> LoadMatchupsFromCsv()
 		{
-		List<Team> teams = new List<Team>();
+		List<Match> matchups = new List<Match>();
 		try
 			{
-			if (File.Exists(teamsCsvPath))
+			if (File.Exists(matchupsCsvPath))
 				{
-				string[] lines = File.ReadAllLines(teamsCsvPath, System.Text.Encoding.UTF8);
+				string[] lines = File.ReadAllLines(matchupsCsvPath, System.Text.Encoding.UTF8);
 				foreach (string line in lines)
 					{
 					string[] values = line.Split(',');
-					if (values.Length == 2)
+					if (values.Length == 6) // MatchId, Player1Id, Player2Id, Player1Score, Player2Score, WinnerId
 						{
-						int teamId = int.Parse(values[0]);
-						string teamName = values[1];
-						Team team = new Team(teamId, teamName);
-						teams.Add(team);
+						// Parse values and create Match object
+						if (int.TryParse(values[0], out int matchId) &&
+							int.TryParse(values[1], out int player1Id) &&
+							int.TryParse(values[2], out int player2Id) &&
+							int.TryParse(values[3], out int player1Score) &&
+							int.TryParse(values[4], out int player2Score) &&
+							int.TryParse(values[5], out int winnerId))
+							{
+							Match match = new Match(matchId, player1Id, player2Id, player1Score, player2Score, winnerId);
+							matchups.Add(match);
+							}
+						else
+							{
+							Debug.LogWarning($"Invalid data in CSV for match with ID: {values[0]}");
+							}
+						}
+					else
+						{
+						Debug.LogWarning($"Skipping line with insufficient data: {line}");
 						}
 					}
 				}
 			else
 				{
-				Debug.LogWarning("Teams CSV file not found, creating new file.");
-				SaveTeams(teams); // Create empty file if not found
+				Debug.LogWarning("Matchups CSV file not found, creating new file.");
+				// Optionally, create an empty file if it doesn't exist
 				}
 			}
 		catch (System.Exception ex)
 			{
-			Debug.LogError($"Error loading teams from CSV: {ex.Message}");
+			Debug.LogError($"Error loading matchups from CSV: {ex.Message}");
 			}
-		return teams;
+		return matchups;
 		}
 
-	// --- Save Teams to CSV --- //
-	public void SaveTeams(List<Team> teams)
+	// --- Save Matchups to CSV --- //
+	public void SaveMatchupsToCsv(List<Match> matchups)
 		{
 		try
 			{
 			List<string> lines = new List<string>();
-			foreach (Team team in teams)
+			foreach (Match match in matchups)
 				{
-				lines.Add($"{team.TeamId},{team.TeamName}");
+				lines.Add($"{match.MatchId},{match.Player1Id},{match.Player2Id},{match.Player1Score},{match.Player2Score},{match.WinnerId}");
 				}
-			File.WriteAllLines(teamsCsvPath, lines, System.Text.Encoding.UTF8);
+			File.WriteAllLines(matchupsCsvPath, lines, System.Text.Encoding.UTF8);
 			}
 		catch (System.Exception ex)
 			{
-			Debug.LogError($"Error saving teams to CSV: {ex.Message}");
+			Debug.LogError($"Error saving matchups to CSV: {ex.Message}");
 			}
 		}
 	}

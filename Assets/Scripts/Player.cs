@@ -28,7 +28,6 @@ public class Player
 	public int LifetimeBreakAndRun { get; set; }
 	public float LifetimeDefensiveShotAverage { get; set; }
 
-	// Updated constructor to remove LifetimeDefensiveShotAvg
 	public Player(
 		int teamId, string teamName, string playerName, int skillLevel, int currentSeasonMatchesPlayed,
 		int currentSeasonMatchesWon, int currentSeasonPointsAwarded, float currentSeasonPointsPerMatch,
@@ -57,6 +56,35 @@ public class Player
 		LifetimeDefensiveShotAverage = lifetimeDefensiveShotAverage;
 		}
 
+	// Calculate overall score using weighted statistics
+	public float CalculateOverallScore(PlayerWeightSettings weightSettings)
+		{
+		float score = 0;
+
+		// Apply current season statistics weights
+		score += weightSettings.weightCurrentSeasonPointsAwarded * CurrentSeasonPointsAwarded;
+		score += weightSettings.weightCurrentSeasonMatchesWon * CurrentSeasonMatchesWon;
+		score += weightSettings.weightCurrentSeasonDefensiveShotAverage * CurrentSeasonDefensiveShotAverage;
+		score += weightSettings.weightCurrentSeasonSkillLevel * CurrentSeasonSkillLevel;
+		score += weightSettings.weightCurrentSeasonPpm * CurrentSeasonPpm;
+		score += weightSettings.weightCurrentSeasonShutouts * CurrentSeasonShutouts;
+		score += weightSettings.weightCurrentSeasonMiniSlams * CurrentSeasonMiniSlams;
+		score += weightSettings.weightCurrentSeasonNineOnTheSnap * CurrentSeasonNineOnTheSnap;
+		score += weightSettings.weightCurrentSeasonPaPercentage * CurrentSeasonPaPercentage;
+		score += weightSettings.weightCurrentSeasonBreakAndRun * CurrentSeasonBreakAndRun;
+
+		// Apply lifetime statistics weights
+		score += weightSettings.weightLifetimeGamesWon * LifetimeGamesWon;
+		score += weightSettings.weightLifetimeMiniSlams * LifetimeMiniSlams;
+		score += weightSettings.weightLifetimeNineOnTheSnap * LifetimeNineOnTheSnap;
+		score += weightSettings.weightLifetimeShutouts * LifetimeShutouts;
+		score += weightSettings.weightLifetimeBreakAndRun * LifetimeBreakAndRun;
+		score += weightSettings.weightLifetimeDefensiveShotAverage * LifetimeDefensiveShotAverage;
+		score += weightSettings.weightLifetimeMatchesPlayed * LifetimeMatchesPlayed;
+
+		return score;
+		}
+
 	public string ToCsv()
 		{
 		return $"{TeamName},{TeamId},{PlayerName},{LifetimeGamesPlayed},{LifetimeGamesWon},{CurrentSeasonPointsAwarded},{LifetimeGamesPlayed}, " +
@@ -66,7 +94,6 @@ public class Player
 			$"{LifetimeDefensiveShotAverage},{LifetimeGamesPlayed},{LifetimeGamesWon},{LifetimeMatchesPlayed},{LifetimeMatchesWon}," +
 			$"{LifetimeMiniSlams},{LifetimeNineOnTheSnap},{LifetimeShutouts},{LifetimeMatchesPlayedInLast2Years}";
 		}
-
 
 	public static Player FromCsv(string csvLine)
 		{

@@ -1,11 +1,11 @@
-TeamName
-Yellow Yetis
-Sapphire Sharks
-Turbo Turtles
-Zebra Zephyrs
-Onyx Owls
-Sapphire Sharks
-Titanium Tigers
-Icy Iguanas
-Galactic Gorillas
-Ruby Rhinos
+TeamName,TeamId,TeamSkillLevel
+Violet Vultures,1,6
+Wild Wolverines,2,1
+Quantum Quetzals,3,6
+Kinetic Kangaroos,4,9
+Silent Serpents,5,6
+Cosmic Crusaders,6,9
+Atomic Squirrels,7,9
+Magma Monkeys,8,3
+Icy Iguanas,9,5
+Turbo Turtles,10,9
