@@ -6897,7 +6897,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 462430496}
-  - component: {fileID: 462430497}
   m_Layer: 0
   m_Name: MatchupComparisonManager
   m_TagString: Untagged
@@ -6920,19 +6919,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &462430497
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 462430495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51cbe50bdf8450940841224b7f13269b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  matchupResultsPanel: {fileID: 948563817}
 --- !u!114 &470968295 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5586954189099093330, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
@@ -10478,7 +10464,7 @@ MonoBehaviour:
   playerNameDropdown: {fileID: 647432626851626498}
   lifetimeGamesWonInputField: {fileID: 1502863894}
   lifetimeGamesPlayedInputField: {fileID: 1213567585}
-  lifetimeDefensiveShotAvgInputField: {fileID: 1464591979}
+  lifetimeDefensiveShotAverageInputField: {fileID: 1464591979}
   matchesPlayedInLast2YearsInputField: {fileID: 2005610822}
   lifetimeBreakAndRunInputField: {fileID: 1136461355}
   nineOnTheSnapInputField: {fileID: 1075463347}
@@ -12509,6 +12495,8 @@ MonoBehaviour:
   matchupListContent: {fileID: 111132015}
   bestMatchupListContent: {fileID: 824889229}
   backButtonText: {fileID: 739972608}
+  comparisonManager: {fileID: 0}
+  weightSettings: {fileID: 0}
 --- !u!1 &953081339
 GameObject:
   m_ObjectHideFlags: 0
@@ -23892,18 +23880,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c315ed7c9735714cac67071ed10814a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  headerText: {fileID: 1442442119}
-  selectTeamAText: {fileID: 1855493173}
-  teamADropdown: {fileID: 647432627324966437}
-  teamAPlayerScrollView: {fileID: 1228306774}
-  teamBTeamText: {fileID: 1471807661}
-  teamBDropdown: {fileID: 647432627767420183}
-  teamBPlayerScrollView: {fileID: 1425682440}
-  compareButtonText: {fileID: 662436}
-  backButtonText: {fileID: 470968295}
-  playerTogglePrefab: {fileID: 5174340578026233130, guid: 061539e421d78a94f89fd2196a62d890, type: 3}
-  matchupResultPanel: {fileID: 948563813}
-  matchupResultText: {fileID: 2745481344350921619, guid: ae3bf4ef1d7c45a43b9ae5a1e49a090a, type: 3}
+  headerText: {fileID: 0}
+  selectTeamAText: {fileID: 0}
+  teamADropdown: {fileID: 0}
+  teamAPlayerScrollView: {fileID: 0}
+  teamBTeamText: {fileID: 0}
+  teamBDropdown: {fileID: 0}
+  teamBPlayerScrollView: {fileID: 0}
+  compareButtonText: {fileID: 0}
+  backButtonText: {fileID: 0}
+  playerTogglePrefab: {fileID: 0}
+  matchupResultPanel: {fileID: 0}
+  matchupResultText: {fileID: 0}
 --- !u!1 &1585296884
 GameObject:
   m_ObjectHideFlags: 0

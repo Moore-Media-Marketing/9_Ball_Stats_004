@@ -46,83 +46,65 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 		teamADropdown.ClearOptions();
 		teamADropdown.AddOptions(teamNames);
+
 		teamBDropdown.ClearOptions();
 		teamBDropdown.AddOptions(teamNames);
 		}
 
-	// --- On Team Selection Changed --- //
-	public void OnTeamADropdownChanged(int index)
+	// --- Select Team A --- //
+	public void OnSelectTeamA()
 		{
-		Team selectedTeam = DatabaseManager.Instance.LoadTeams()[index];
-		PopulateTeamPlayerScrollView(teamAPlayerScrollView, selectedTeam);
+		int selectedTeamId = teamADropdown.value + 1; // Assuming 1-based ID for teams
+		List<Player> teamAPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeamId);
+		CreatePlayerToggles(teamAPlayerScrollView, teamAPlayers);
 		}
 
-	public void OnTeamBDropdownChanged(int index)
+	// --- Select Team B --- //
+	public void OnSelectTeamB()
 		{
-		Team selectedTeam = DatabaseManager.Instance.LoadTeams()[index];
-		PopulateTeamPlayerScrollView(teamBPlayerScrollView, selectedTeam);
+		int selectedTeamId = teamBDropdown.value + 1; // Assuming 1-based ID for teams
+		List<Player> teamBPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeamId);
+		CreatePlayerToggles(teamBPlayerScrollView, teamBPlayers);
 		}
 
-	// --- Populate Team Players ScrollView --- //
-	private void PopulateTeamPlayerScrollView(GameObject scrollView, Team team)
+	// --- Create Player Toggles --- //
+	private void CreatePlayerToggles(GameObject playerScrollView, List<Player> players)
 		{
-		foreach (Transform child in scrollView.transform)
+		foreach (Transform child in playerScrollView.transform)
 			{
-			Destroy(child.gameObject);
+			Destroy(child.gameObject); // Remove any existing toggles
 			}
 
-		List<Player> teamPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(team.TeamId);
-
-		foreach (var player in teamPlayers)
+		foreach (Player player in players)
 			{
-			GameObject playerToggle = Instantiate(playerTogglePrefab, scrollView.transform);
-			TMP_Text playerNameText = playerToggle.GetComponentInChildren<TMP_Text>();
+			GameObject toggleObject = Instantiate(playerTogglePrefab, playerScrollView.transform);
+			TMP_Text playerNameText = toggleObject.GetComponentInChildren<TMP_Text>();
 			playerNameText.text = player.PlayerName;
-			Toggle playerToggleComponent = playerToggle.GetComponent<Toggle>();
-			playerToggleComponent.onValueChanged.AddListener((bool value) => { OnPlayerToggleChanged(value, player); });
+			// Add any additional toggle logic here
 			}
 		}
 
-	// --- Handle Player Toggle Changes --- //
-	private void OnPlayerToggleChanged(bool isSelected, Player player)
+	// --- Compare Teams --- //
+	public void CompareTeams()
 		{
-		Debug.Log($"Player {player.PlayerName} selected: {isSelected}");
-		}
-
-	// --- On Compare Button Clicked --- //
-	public void OnCompareButtonClicked()
-		{
-		string teamAName = teamADropdown.options[teamADropdown.value].text;
-		string teamBName = teamBDropdown.options[teamBDropdown.value].text;
-
-		// Load matchups directly from CSV
-		List<string[]> matchups = DatabaseManager.Instance.LoadMatchupsFromCsv();
-		string[] matchup = matchups.Find(m => m[0] == teamAName && m[1] == teamBName);
-
-		if (matchup != null)
-			{
-			ShowMatchupResultsPanel(matchup);
-			}
-		else
-			{
-			matchupResultText.text = "No matchup data available for this pairing.";
-			matchupResultPanel.SetActive(true);
-			}
-		}
-
-	// --- Show Matchup Results Panel --- //
-	private void ShowMatchupResultsPanel(string[] matchup)
-		{
+		List<Player> teamAPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(teamADropdown.value + 1);
+		List<Player> teamBPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(teamBDropdown.value + 1);
 		matchupResultPanel.SetActive(true);
-		matchupResultText.text = $"{matchup[0]} vs {matchup[1]}\n" +
-								 $"Score: {matchup[2]} - {matchup[3]}\n" +
-								 $"Winner: {matchup[4]}\n" +
-								 $"Win Probabilities: {float.Parse(matchup[5]) * 100}% vs {float.Parse(matchup[6]) * 100}%";
+
+		int teamAScore = CalculateTotalScore(teamAPlayers);
+		int teamBScore = CalculateTotalScore(teamBPlayers);
+
+		matchupResultText.text = $"Team A Score: {teamAScore}\nTeam B Score: {teamBScore}";
 		}
 
-	// --- Back Button --- //
-	public void OnBackButtonClicked()
+	// --- Calculate Total Score --- //
+	private int CalculateTotalScore(List<Player> players)
 		{
-		UIManager.Instance.GoBackToPreviousPanel();
+		int totalScore = 0;
+		foreach (Player player in players)
+			{
+			totalScore += player.CurrentSeasonPointsAwarded;
+			}
+		return totalScore;
 		}
 	}

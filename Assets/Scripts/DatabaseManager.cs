@@ -28,7 +28,7 @@ public class DatabaseManager:MonoBehaviour
 	// --- Load Players from CSV --- //
 	public List<Player> LoadPlayersFromCsv(int teamId)
 		{
-		List<Player> players = new List<Player>();
+		List<Player> players = new();
 		try
 			{
 			if (File.Exists(playersCsvPath))
@@ -65,7 +65,7 @@ public class DatabaseManager:MonoBehaviour
 							int.TryParse(values[24], out int currentSeasonTotalPoints) &&
 							int.TryParse(values[25], out int lifetimeMatchesPlayedInLast2Years))
 							{
-							Player player = new Player(
+							Player player = new(
 								teamIdCsv, // Using teamIdCsv to filter by team
 								values[8], // TeamName
 								values[1], // PlayerName
@@ -121,7 +121,7 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			List<string> lines = new List<string>();
+			List<string> lines = new();
 			foreach (Player player in players)
 				{
 				lines.Add(player.ToCsv()); // Assuming Player has ToCsv method
@@ -134,10 +134,58 @@ public class DatabaseManager:MonoBehaviour
 			}
 		}
 
+	// --- Load Teams from CSV --- //
+	public List<Team> LoadTeams()
+		{
+		List<Team> teams = new();
+		try
+			{
+			if (File.Exists(teamsCsvPath))
+				{
+				string[] lines = File.ReadAllLines(teamsCsvPath, System.Text.Encoding.UTF8);
+				foreach (string line in lines)
+					{
+					if (!string.IsNullOrWhiteSpace(line))
+						{
+						Team team = Team.FromCsv(line);
+						teams.Add(team);
+						}
+					}
+				}
+			else
+				{
+				Debug.LogWarning("Teams CSV file not found, creating new file.");
+				}
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error loading teams from CSV: {ex.Message}");
+			}
+		return teams;
+		}
+
+	// --- Save Teams to CSV --- //
+	public void SaveTeams(List<Team> teams)
+		{
+		try
+			{
+			List<string> lines = new();
+			foreach (Team team in teams)
+				{
+				lines.Add(team.ToCsv()); // Assuming Team has ToCsv method
+				}
+			File.WriteAllLines(teamsCsvPath, lines, System.Text.Encoding.UTF8);
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError($"Error saving teams to CSV: {ex.Message}");
+			}
+		}
+
 	// --- Load Matchups from CSV --- //
 	public List<Match> LoadMatchupsFromCsv()
 		{
-		List<Match> matchups = new List<Match>();
+		List<Match> matchups = new();
 		try
 			{
 			if (File.Exists(matchupsCsvPath))
@@ -156,7 +204,7 @@ public class DatabaseManager:MonoBehaviour
 							int.TryParse(values[4], out int player2Score) &&
 							int.TryParse(values[5], out int winnerId))
 							{
-							Match match = new Match(matchId, player1Id, player2Id, player1Score, player2Score, winnerId);
+							Match match = new(matchId, player1Id, player2Id, player1Score, player2Score, winnerId);
 							matchups.Add(match);
 							}
 						else
@@ -188,7 +236,7 @@ public class DatabaseManager:MonoBehaviour
 		{
 		try
 			{
-			List<string> lines = new List<string>();
+			List<string> lines = new();
 			foreach (Match match in matchups)
 				{
 				lines.Add($"{match.MatchId},{match.Player1Id},{match.Player2Id},{match.Player1Score},{match.Player2Score},{match.WinnerId}");
