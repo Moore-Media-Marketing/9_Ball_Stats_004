@@ -16,7 +16,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 	public TMP_InputField lifetimeGamesWonInputField;
 	public TMP_InputField lifetimeGamesPlayedInputField;
-	public TMP_InputField lifetimeDefensiveShotAvgInputField;
+	public TMP_InputField lifetimeDefensiveShotAverageInputField; // Corrected variable name
 	public TMP_InputField matchesPlayedInLast2YearsInputField;
 	public TMP_InputField lifetimeBreakAndRunInputField;
 	public TMP_InputField nineOnTheSnapInputField;
@@ -70,7 +70,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		{
 		// Handle team selection change (e.g., filter players based on team)
 		Team selectedTeam = teams[selectedIndex];
-		players = DatabaseManager.Instance.LoadPlayersFromCsv(); // Corrected method call
+		players = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeam.TeamId); // Corrected method call to filter by team
 		PopulatePlayerDropdown();
 		}
 
@@ -86,7 +86,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		{
 		lifetimeGamesWonInputField.text = player.LifetimeGamesWon.ToString();
 		lifetimeGamesPlayedInputField.text = player.LifetimeGamesPlayed.ToString();
-		lifetimeDefensiveShotAvgInputField.text = player.LifetimeDefensiveShotAvg.ToString("F2");
+		lifetimeDefensiveShotAverageInputField.text = player.LifetimeDefensiveShotAverage.ToString("F2"); // Corrected variable name
 		matchesPlayedInLast2YearsInputField.text = player.LifetimeMatchesPlayedInLast2Years.ToString();
 		lifetimeBreakAndRunInputField.text = player.LifetimeBreakAndRun.ToString();
 		nineOnTheSnapInputField.text = player.LifetimeNineOnTheSnap.ToString();
@@ -104,7 +104,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		// Update player stats from input fields
 		selectedPlayer.LifetimeGamesWon = int.Parse(lifetimeGamesWonInputField.text);
 		selectedPlayer.LifetimeGamesPlayed = int.Parse(lifetimeGamesPlayedInputField.text);
-		selectedPlayer.LifetimeDefensiveShotAvg = float.Parse(lifetimeDefensiveShotAvgInputField.text);
+		selectedPlayer.LifetimeDefensiveShotAverage = float.Parse(lifetimeDefensiveShotAverageInputField.text); // Corrected variable name
 		selectedPlayer.LifetimeMatchesPlayedInLast2Years = int.Parse(matchesPlayedInLast2YearsInputField.text);
 		selectedPlayer.LifetimeBreakAndRun = int.Parse(lifetimeBreakAndRunInputField.text);
 		selectedPlayer.LifetimeNineOnTheSnap = int.Parse(nineOnTheSnapInputField.text);

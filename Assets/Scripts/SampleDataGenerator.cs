@@ -9,11 +9,8 @@ public class SampleDataGenerator:MonoBehaviour
 
 	// Sample Data Arrays (for names and team names)
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Anthony", "Kevin", "Jason", "Jeff", "Ryan" };
-
 	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy", "Lisa", "Nancy", "Karen", "Betty", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Sarah", "Kimberly", "Jessica" };
-
 	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott", "Green", "Adams", "Baker", "Hall", "Nelson", "Carter", "Mitchell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Morris", "Morgan" };
-
 	private static readonly string[] teamNames = { "Atomic Squirrels", "Crimson Cobras", "Electric Eels", "Phantom Phantoms", "Rainbow Raptors", "Mystic Moose", "Silent Serpents", "Cosmic Crusaders", "Neon Ninjas", "Lunar Lions", "Galactic Gorillas", "Iron Eagles", "Shadow Strikers", "Velocity Vipers", "Quicksilver Quails", "Turbo Turtles", "Diamond Dragons", "Emerald Emus", "Golden Geckos", "Icy Iguanas", "Jade Jaguars", "Kinetic Kangaroos", "Laser Lemurs", "Magma Monkeys", "Nova Narwhals", "Onyx Owls", "Plasma Pandas", "Quantum Quetzals", "Ruby Rhinos", "Sapphire Sharks", "Titanium Tigers", "Uranium Unicorns", "Violet Vultures", "Wild Wolverines", "X-Ray Xenopus", "Yellow Yetis", "Zebra Zephyrs" };
 
 	private string playersFilePath;
@@ -36,130 +33,70 @@ public class SampleDataGenerator:MonoBehaviour
 		using (StreamWriter teamsWriter = new(teamsFilePath, false))
 			{
 			// Write header to players.csv
-			playersWriter.WriteLine("TeamName,PlayerId,PlayerName,TotalGames,TotalWins,TotalPoints,PointsRequiredToWin," +
-				"CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon," +
-				"CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded," +
-				"CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints," +
-				"LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeDefensiveShotAvg,LifetimeGamesPlayed,LifetimeGamesWon," +
-				"LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,LifetimeMatchesPlayedInLast2Years");
+			playersWriter.WriteLine("TeamName,TeamId,PlayerName,LifetimeGamesPlayed,LifetimeGamesWon,CurrentSeasonPointsAwarded,LifetimeGamesPlayed," +
+				"CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonMiniSlams," +
+				"CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts," +
+				"CurrentSeasonSkillLevel,CurrentSeasonTotalPoints,LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeGamesPlayed," +
+				"LifetimeGamesWon,LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,LifetimeMatchesPlayedInLast2Years");
 
 			// Write header to teams.csv
-			teamsWriter.WriteLine("TeamName");
+			teamsWriter.WriteLine("TeamName,TeamId,TeamSkillLevel");
 
 			for (int i = 0; i < numberOfTeams; i++)
 				{
-				Team team = GenerateTeam(i); // Generate a new team, passing the team ID
-				teamsWriter.WriteLine(team.TeamName); // Write team name to teams.csv
+				int teamId = i + 1;
+				string teamName = teamNames[Random.Range(0, teamNames.Length)];
+				int teamSkillLevel = Random.Range(1, 10); // Skill level between 1 and 9
 
-				for (int j = 0; j < 8; j++) // Generate 8 players for each team
+				// Write the team data to teams.csv
+				teamsWriter.WriteLine($"{teamName},{teamId},{teamSkillLevel}");
+
+				// Generate 3 players for each team
+				for (int j = 0; j < 3; j++)
 					{
-					Player newPlayer = GeneratePlayer(team.TeamId, team.TeamName); // Pass the team ID and team name
-					playersWriter.WriteLine(newPlayer.ToCsv()); // Write player data to players.csv
+					string playerName = GetRandomName();
+					int skillLevel = Random.Range(1, 10); // Skill level between 1 and 9
+					int totalPointsEarned = Random.Range(0, pointsRequiredToWin[skillLevel - 1]); // Random points based on skill level
+
+					Player player = GenerateRandomPlayer(teamId, teamName, playerName, skillLevel, totalPointsEarned);
+
+					// Write the player data to players.csv
+					playersWriter.WriteLine(player.ToCsv());
 					}
 				}
 			}
 
-		Debug.Log("Sample teams and players generated and saved to CSV.");
+		Debug.Log("Sample data generation complete.");
 		}
 
-	private Team GenerateTeam(int teamId)
-		{
-		string teamName = teamNames[Random.Range(0, teamNames.Length)];
-		return new Team(teamId, teamName);
-		}
-
-	private Player GeneratePlayer(int teamId, string teamName)
+	private string GetRandomName()
 		{
 		string firstName = Random.Range(0, 2) == 0 ? firstNamesMale[Random.Range(0, firstNamesMale.Length)] : firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
 		string lastName = lastNames[Random.Range(0, lastNames.Length)];
-		string playerName = $"{firstName} {lastName}";
-		int skillLevel = Random.Range(1, 10); // Skill level between 1 and 9
 
-		// Calculate points required to win based on skill level
-		int pointsToWin = pointsRequiredToWin[skillLevel - 1];
+		return $"{firstName} {lastName}";
+		}
 
-		// Simulate the player's performance over 16 matches
-		int lifetimeGamesPlayed = 16; // Fixed to 16 games per season
-		int lifetimeGamesWon = 0;
-		int lifetimeMiniSlams = Random.Range(0, 2);
-		int lifetimeNineOnTheSnap = Random.Range(0, 2);
-		int lifetimeShutouts = 0;
-		int totalPointsEarned = 0;
+	// Generates a random player with random stats
+	private Player GenerateRandomPlayer(int teamId, string teamName, string playerName, int skillLevel, int totalPointsEarned)
+		{
+		int lifetimeGamesPlayed = Random.Range(100, 300);
+		int lifetimeGamesWon = Random.Range(30, lifetimeGamesPlayed);
+		int lifetimeMiniSlams = Random.Range(0, 5);
+		int lifetimeNineOnTheSnap = Random.Range(0, 5);
+		int lifetimeShutouts = Random.Range(0, 5);
+		int lifetimeMatchesPlayedInLast2Years = Random.Range(10, 50);
 
-		// Adjust stats based on skill level
-		float winRate = Mathf.Clamp(skillLevel / 9f, 0.2f, 1f); // Higher skill level increases win rate
-		float breakAndRunRate = Mathf.Clamp(skillLevel / 9f, 0.1f, 0.8f); // Higher skill level increases break-and-run rate
-		float pointsPerMatchRate = Mathf.Clamp(skillLevel / 9f, 0.5f, 1.5f); // Higher skill level increases points per match
+		int currentSeasonMatchesPlayed = Random.Range(10, 50);
+		int currentSeasonMatchesWon = Random.Range(0, currentSeasonMatchesPlayed);
+		int currentSeasonPointsAwarded = Random.Range(0, totalPointsEarned);
+		float currentSeasonPointsPerMatch = currentSeasonMatchesPlayed == 0 ? 0 : (float) currentSeasonPointsAwarded / currentSeasonMatchesPlayed;
 
-		// Randomize based on skill level
-		for (int i = 0; i < lifetimeGamesPlayed; i++)
-			{
-			bool wonGame = Random.Range(0f, 1f) < winRate; // Win or lose based on skill level
-			if (wonGame)
-				lifetimeGamesWon++;
-
-			int pointsScored = Mathf.RoundToInt(pointsToWin * Random.Range(0.7f, 1.2f)); // Scale points scored by skill level
-			totalPointsEarned += pointsScored;
-
-			// Simulate break-and-run success
-			bool breakAndRun = Random.Range(0f, 1f) < breakAndRunRate;
-			if (breakAndRun)
-				lifetimeMiniSlams++;
-
-			// Simulate 9-ball on the break
-			bool nineOnTheBreak = Random.Range(0f, 1f) < (breakAndRunRate / 2f); // Lower chance for lower skill levels
-			if (nineOnTheBreak)
-				lifetimeNineOnTheSnap++;
-
-			// Simulate shutouts
-			bool shutout = Random.Range(0f, 1f) < (winRate * 0.2f); // Lower chance for lower skill levels
-			if (shutout)
-				lifetimeShutouts++;
-			}
-
-		// Current season stats (randomized, adjusted by skill level)
-		int currentSeasonBreakAndRun = Mathf.RoundToInt(breakAndRunRate * 5); // Higher skill = more break-and-runs
-		float currentSeasonDefensiveShotAverage = Random.Range(0f, 1f); // This stat may not be directly affected by skill level
-		int currentSeasonMatchesPlayed = 16; // Fixed to 16
-		int currentSeasonMatchesWon = Mathf.RoundToInt(currentSeasonMatchesPlayed * winRate); // Wins scaled by skill level
-		int currentSeasonMiniSlams = Mathf.RoundToInt(lifetimeMiniSlams * skillLevel / 9f); // More mini slams for higher skill
-		int currentSeasonNineOnTheSnap = Mathf.RoundToInt(lifetimeNineOnTheSnap * skillLevel / 9f); // More 9-Balls on the break for higher skill
-		float currentSeasonPaPercentage = Random.Range(50f, 100f); // Player's performance average for the season
-		int currentSeasonPointsAwarded = Mathf.RoundToInt(pointsToWin * currentSeasonMatchesWon);
-		float currentSeasonPointsPerMatch = Mathf.RoundToInt((float) currentSeasonPointsAwarded / currentSeasonMatchesPlayed);
-		float currentSeasonPpm = currentSeasonPointsPerMatch * 0.9f + Random.Range(0f, 0.1f); // Points per match adjusted
-		int currentSeasonShutouts = Mathf.RoundToInt(lifetimeShutouts * 0.8f); // Reduced shutouts for current season
-
-		// Returning a new Player object
-		return new Player(playerName, skillLevel, lifetimeGamesPlayed, lifetimeGamesWon, totalPointsEarned)
-			{
-			TeamId = teamId,
-			TeamName = teamName,
-			CurrentSeasonBreakAndRun = currentSeasonBreakAndRun,
-			CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage,
-			CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed,
-			CurrentSeasonMatchesWon = currentSeasonMatchesWon,
-			CurrentSeasonMiniSlams = currentSeasonMiniSlams,
-			CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap,
-			CurrentSeasonPaPercentage = currentSeasonPaPercentage,
-			CurrentSeasonPointsAwarded = currentSeasonPointsAwarded,
-			CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch,
-			CurrentSeasonPpm = currentSeasonPpm,
-			CurrentSeasonShutouts = currentSeasonShutouts,
-			CurrentSeasonSkillLevel = skillLevel,
-			CurrentSeasonTotalPoints = totalPointsEarned,
-			LifetimeBreakAndRun = lifetimeMiniSlams, // Adjusted
-			LifetimeDefensiveShotAverage = currentSeasonDefensiveShotAverage,
-			LifetimeDefensiveShotAvg = currentSeasonDefensiveShotAverage,
-			LifetimeGamesPlayed = lifetimeGamesPlayed,
-			LifetimeGamesWon = lifetimeGamesWon,
-			LifetimeMatchesPlayed = lifetimeGamesPlayed, // Adjusted
-			LifetimeMatchesWon = lifetimeGamesWon,
-			LifetimeMiniSlams = lifetimeMiniSlams,
-			LifetimeNineOnTheSnap = lifetimeNineOnTheSnap,
-			LifetimeShutouts = lifetimeShutouts,
-			LifetimeMatchesPlayedInLast2Years = lifetimeGamesPlayed // Assuming all games played recently
-			};
+		return new Player(
+			teamId, teamName, playerName, skillLevel, currentSeasonMatchesPlayed, currentSeasonMatchesWon,
+			currentSeasonPointsAwarded, currentSeasonPointsPerMatch, Random.Range(0, 5), skillLevel, totalPointsEarned,
+			lifetimeGamesPlayed, lifetimeGamesWon, lifetimeMiniSlams, lifetimeNineOnTheSnap, lifetimeShutouts,
+			lifetimeMatchesPlayedInLast2Years, Random.Range(0, 5), Random.Range(0f, 1f)
+		);
 		}
 	}
-
