@@ -16,24 +16,38 @@ public class Player
 	public int CurrentSeasonMatchesWon { get; set; }
 	public int CurrentSeasonPointsAwarded { get; set; }
 	public float CurrentSeasonPointsPerMatch { get; set; }
-	public int CurrentSeasonShutouts { get; set; }
-	public int CurrentSeasonSkillLevel { get; set; }
-	public int CurrentSeasonTotalPoints { get; set; }
-	public float CurrentSeasonPpm { get; set; }
-	public int CurrentSeasonMiniSlams { get; set; }
-	public int CurrentSeasonNineOnTheSnap { get; set; }
-	public float CurrentSeasonPaPercentage { get; set; }
-	public float CurrentSeasonDefensiveShotAverage { get; set; }
 	public int CurrentSeasonBreakAndRun { get; set; }
+	public float CurrentSeasonDefensiveShotAverage { get; set; }
+	public float CurrentSeasonPaPercentage { get; set; }
+	public int CurrentSeasonShutouts { get; set; }
+	public int CurrentSeasonTotalPoints { get; set; }
+
 	public int LifetimeBreakAndRun { get; set; }
 	public float LifetimeDefensiveShotAverage { get; set; }
 
+	// Constructor for initializing all properties (21 parameters)
 	public Player(
-		int teamId, string teamName, string playerName, int skillLevel, int currentSeasonMatchesPlayed,
-		int currentSeasonMatchesWon, int currentSeasonPointsAwarded, float currentSeasonPointsPerMatch,
-		int currentSeasonShutouts, int currentSeasonSkillLevel, int currentSeasonTotalPoints, int lifetimeGamesPlayed,
-		int lifetimeGamesWon, int lifetimeMiniSlams, int lifetimeNineOnTheSnap, int lifetimeShutouts,
-		int lifetimeMatchesPlayedInLast2Years, int lifetimeBreakAndRun, float lifetimeDefensiveShotAverage)
+		int teamId,
+		string teamName,
+		string playerName,
+		int skillLevel,
+		int currentSeasonMatchesPlayed,
+		int currentSeasonMatchesWon,
+		int currentSeasonPointsAwarded,
+		float currentSeasonPointsPerMatch,
+		int currentSeasonBreakAndRun,
+		float currentSeasonDefensiveShotAverage,
+		int currentSeasonShutouts,
+		int lifetimeGamesPlayed,
+		int lifetimeGamesWon,
+		int lifetimeMiniSlams,
+		int lifetimeNineOnTheSnap,
+		int lifetimeShutouts,
+		int lifetimeMatchesPlayedInLast2Years,
+		int lifetimeMatchesPlayed,
+		int lifetimeMatchesWon,
+		int lifetimeBreakAndRun,
+		float lifetimeDefensiveShotAverage)
 		{
 		TeamId = teamId;
 		TeamName = teamName;
@@ -43,67 +57,42 @@ public class Player
 		CurrentSeasonMatchesWon = currentSeasonMatchesWon;
 		CurrentSeasonPointsAwarded = currentSeasonPointsAwarded;
 		CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch;
+		CurrentSeasonBreakAndRun = currentSeasonBreakAndRun;
+		CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage;
 		CurrentSeasonShutouts = currentSeasonShutouts;
-		CurrentSeasonSkillLevel = currentSeasonSkillLevel;
-		CurrentSeasonTotalPoints = currentSeasonTotalPoints;
 		LifetimeGamesPlayed = lifetimeGamesPlayed;
 		LifetimeGamesWon = lifetimeGamesWon;
 		LifetimeMiniSlams = lifetimeMiniSlams;
 		LifetimeNineOnTheSnap = lifetimeNineOnTheSnap;
 		LifetimeShutouts = lifetimeShutouts;
 		LifetimeMatchesPlayedInLast2Years = lifetimeMatchesPlayedInLast2Years;
+		LifetimeMatchesPlayed = lifetimeMatchesPlayed;
+		LifetimeMatchesWon = lifetimeMatchesWon;
 		LifetimeBreakAndRun = lifetimeBreakAndRun;
 		LifetimeDefensiveShotAverage = lifetimeDefensiveShotAverage;
 		}
 
-	// Calculate overall score using weighted statistics
+	// --- New Method: Calculate Overall Score ---
 	public float CalculateOverallScore(PlayerWeightSettings weightSettings)
 		{
-		float score = 0;
-
-		// Apply current season statistics weights
-		score += weightSettings.weightCurrentSeasonPointsAwarded * CurrentSeasonPointsAwarded;
-		score += weightSettings.weightCurrentSeasonMatchesWon * CurrentSeasonMatchesWon;
-		score += weightSettings.weightCurrentSeasonDefensiveShotAverage * CurrentSeasonDefensiveShotAverage;
-		score += weightSettings.weightCurrentSeasonSkillLevel * CurrentSeasonSkillLevel;
-		score += weightSettings.weightCurrentSeasonPpm * CurrentSeasonPpm;
-		score += weightSettings.weightCurrentSeasonShutouts * CurrentSeasonShutouts;
-		score += weightSettings.weightCurrentSeasonMiniSlams * CurrentSeasonMiniSlams;
-		score += weightSettings.weightCurrentSeasonNineOnTheSnap * CurrentSeasonNineOnTheSnap;
-		score += weightSettings.weightCurrentSeasonPaPercentage * CurrentSeasonPaPercentage;
-		score += weightSettings.weightCurrentSeasonBreakAndRun * CurrentSeasonBreakAndRun;
-
-		// Apply lifetime statistics weights
-		score += weightSettings.weightLifetimeGamesWon * LifetimeGamesWon;
-		score += weightSettings.weightLifetimeMiniSlams * LifetimeMiniSlams;
-		score += weightSettings.weightLifetimeNineOnTheSnap * LifetimeNineOnTheSnap;
-		score += weightSettings.weightLifetimeShutouts * LifetimeShutouts;
-		score += weightSettings.weightLifetimeBreakAndRun * LifetimeBreakAndRun;
-		score += weightSettings.weightLifetimeDefensiveShotAverage * LifetimeDefensiveShotAverage;
-		score += weightSettings.weightLifetimeMatchesPlayed * LifetimeMatchesPlayed;
-
+		// Weighted score calculation example.
+		// (You can adjust the weights or formula as needed.)
+		float score = (CurrentSeasonMatchesWon * 2) +
+					  (CurrentSeasonBreakAndRun * 5) +
+					  (LifetimeMiniSlams * 3) +
+					  (LifetimeNineOnTheSnap * 4) +
+					  (CurrentSeasonPaPercentage * 10) +
+					  (LifetimeDefensiveShotAverage * 8);
 		return score;
 		}
 
+	// Converts the player's statistics to CSV format for easy saving
 	public string ToCsv()
 		{
-		return $"{TeamName},{TeamId},{PlayerName},{LifetimeGamesPlayed},{LifetimeGamesWon},{CurrentSeasonPointsAwarded},{LifetimeGamesPlayed}, " +
-			$"{CurrentSeasonBreakAndRun},{CurrentSeasonDefensiveShotAverage},{CurrentSeasonMatchesPlayed},{CurrentSeasonMatchesWon}," +
-			$"{CurrentSeasonMiniSlams},{CurrentSeasonNineOnTheSnap},{CurrentSeasonPaPercentage},{CurrentSeasonPointsAwarded},{CurrentSeasonPointsPerMatch}," +
-			$"{CurrentSeasonPpm},{CurrentSeasonShutouts},{CurrentSeasonSkillLevel},{CurrentSeasonTotalPoints},{LifetimeBreakAndRun}," +
-			$"{LifetimeDefensiveShotAverage},{LifetimeGamesPlayed},{LifetimeGamesWon},{LifetimeMatchesPlayed},{LifetimeMatchesWon}," +
-			$"{LifetimeMiniSlams},{LifetimeNineOnTheSnap},{LifetimeShutouts},{LifetimeMatchesPlayedInLast2Years}";
-		}
-
-	public static Player FromCsv(string csvLine)
-		{
-		string[] values = csvLine.Split(',');
-
-		return new Player(
-			int.Parse(values[1]), values[0], values[2], int.Parse(values[3]), int.Parse(values[4]), int.Parse(values[5]),
-			int.Parse(values[6]), float.Parse(values[7]), int.Parse(values[8]), int.Parse(values[9]), int.Parse(values[10]),
-			int.Parse(values[11]), int.Parse(values[12]), int.Parse(values[13]), int.Parse(values[14]), int.Parse(values[15]),
-			int.Parse(values[16]), int.Parse(values[17]), int.Parse(values[18])
-		);
+		return $"{TeamName},{TeamId},{PlayerName},{LifetimeGamesPlayed},{LifetimeGamesWon},{CurrentSeasonPointsAwarded},{LifetimeGamesPlayed}," +
+			   $"{CurrentSeasonBreakAndRun},{CurrentSeasonDefensiveShotAverage},{CurrentSeasonMatchesPlayed},{CurrentSeasonMatchesWon},{LifetimeMiniSlams}," +
+			   $"{LifetimeNineOnTheSnap},{CurrentSeasonPaPercentage},{CurrentSeasonPointsAwarded},{CurrentSeasonPointsPerMatch},{CurrentSeasonShutouts}," +
+			   $"{SkillLevel},{CurrentSeasonTotalPoints},{LifetimeGamesPlayed},{LifetimeGamesWon},{LifetimeMatchesPlayed},{LifetimeMatchesWon}," +
+			   $"{LifetimeMiniSlams},{LifetimeNineOnTheSnap},{LifetimeShutouts},{LifetimeMatchesPlayedInLast2Years},{LifetimeBreakAndRun},{LifetimeDefensiveShotAverage}";
 		}
 	}

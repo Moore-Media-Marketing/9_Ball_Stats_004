@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91da056797d2b8444a698fcbe557c03a, type: 3}
+  m_Name: DefaultPlayerWeights
+  m_EditorClassIdentifier: 
+  weightCurrentSeasonPointsAwarded: 1
+  weightCurrentSeasonMatchesWon: 1
+  weightCurrentSeasonDefensiveShotAverage: 1
+  weightCurrentSeasonSkillLevel: 1
+  weightCurrentSeasonPpm: 1
+  weightCurrentSeasonShutouts: 1
+  weightCurrentSeasonMiniSlams: 1
+  weightCurrentSeasonNineOnTheSnap: 1
+  weightCurrentSeasonPaPercentage: 1
+  weightCurrentSeasonBreakAndRun: 1
+  weightLifetimeGamesWon: 1
+  weightLifetimeMiniSlams: 1
+  weightLifetimeNineOnTheSnap: 1
+  weightLifetimeShutouts: 1
+  weightLifetimeBreakAndRun: 1
+  weightLifetimeDefensiveShotAverage: 1
+  weightLifetimeMatchesPlayed: 1

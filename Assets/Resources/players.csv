@@ -1,31 +1,81 @@
 TeamName,TeamId,PlayerName,LifetimeGamesPlayed,LifetimeGamesWon,CurrentSeasonPointsAwarded,LifetimeGamesPlayed,CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonSkillLevel,CurrentSeasonTotalPoints,LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeGamesPlayed,LifetimeGamesWon,LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts,LifetimeMatchesPlayedInLast2Years
-Violet Vultures,1,Carol Morgan,210,200,0,210, 0,0,25,11,0,0,0,0,0,0,0,4,1,4,0.1220113,210,200,0,0,3,2,2,23
-Violet Vultures,1,Sharon Green,147,75,4,147, 0,0,30,27,0,0,0,4,0.1333333,0,2,6,36,2,0.1520371,147,75,0,0,1,4,0,37
-Violet Vultures,1,Jennifer Morris,113,46,33,113, 0,0,16,14,0,0,0,33,2.0625,0,3,8,36,4,0.8691123,113,46,0,0,1,0,0,10
-Wild Wolverines,2,Mary Harris,193,135,0,193, 0,0,37,28,0,0,0,0,0,0,2,5,27,2,0.4935231,193,135,0,0,3,4,3,38
-Wild Wolverines,2,Sandra Collins,297,294,31,297, 0,0,32,10,0,0,0,31,0.96875,0,0,6,35,0,0.1867895,297,294,0,0,3,0,0,11
-Wild Wolverines,2,Sharon Nelson,273,93,39,273, 0,0,48,4,0,0,0,39,0.8125,0,0,9,51,3,0.5120293,273,93,0,0,2,4,3,33
-Quantum Quetzals,3,Thomas Robinson,225,50,8,225, 0,0,41,24,0,0,0,8,0.1951219,0,4,4,27,3,0.3477871,225,50,0,0,3,0,1,23
-Quantum Quetzals,3,Nancy Allen,193,113,3,193, 0,0,29,10,0,0,0,3,0.1034483,0,2,7,51,3,0.7110552,193,113,0,0,4,3,2,26
-Quantum Quetzals,3,Paul Walker,234,100,7,234, 0,0,18,1,0,0,0,7,0.3888889,0,2,2,18,4,0.9592261,234,100,0,0,3,0,4,13
-Kinetic Kangaroos,4,Maria Lee,202,132,0,202, 0,0,41,8,0,0,0,0,0,0,2,4,0,3,0.14292,202,132,0,0,0,3,0,27
-Kinetic Kangaroos,4,Richard Stewart,102,95,12,102, 0,0,11,6,0,0,0,12,1.090909,0,0,9,32,4,0.7660564,102,95,0,0,0,2,3,30
-Kinetic Kangaroos,4,Donna Miller,121,44,4,121, 0,0,14,5,0,0,0,4,0.2857143,0,2,7,9,3,0.5151021,121,44,0,0,3,3,1,47
-Silent Serpents,5,Kimberly Johnson,294,32,16,294, 0,0,16,11,0,0,0,16,1,0,0,3,17,1,0.6327248,294,32,0,0,0,4,0,18
-Silent Serpents,5,Maria Martin,293,175,2,293, 0,0,37,17,0,0,0,2,0.05405406,0,3,3,6,3,0.9754504,293,175,0,0,4,4,4,46
-Silent Serpents,5,Paul Jackson,121,81,15,121, 0,0,33,15,0,0,0,15,0.4545455,0,3,7,46,2,0.6732374,121,81,0,0,4,3,1,14
-Cosmic Crusaders,6,Donald White,292,169,25,292, 0,0,10,1,0,0,0,25,2.5,0,0,8,27,1,0.9498874,292,169,0,0,1,0,1,36
-Cosmic Crusaders,6,Sandra Lopez,250,61,9,250, 0,0,19,0,0,0,0,9,0.4736842,0,0,9,37,0,0.3612078,250,61,0,0,4,4,1,48
-Cosmic Crusaders,6,Sarah Clark,277,84,0,277, 0,0,19,8,0,0,0,0,0,0,0,2,9,3,0.6072939,277,84,0,0,4,0,2,46
-Atomic Squirrels,7,Margaret Jackson,120,82,5,120, 0,0,14,1,0,0,0,5,0.3571429,0,2,6,22,4,0.4458291,120,82,0,0,1,4,0,47
-Atomic Squirrels,7,Carol Wilson,218,202,2,218, 0,0,19,8,0,0,0,2,0.1052632,0,0,9,4,4,0.08582628,218,202,0,0,3,4,3,42
-Atomic Squirrels,7,Daniel Edwards,218,189,3,218, 0,0,14,1,0,0,0,3,0.2142857,0,2,3,21,4,0.6075738,218,189,0,0,4,2,1,40
-Magma Monkeys,8,Mary Garcia,206,187,28,206, 0,0,24,6,0,0,0,28,1.166667,0,3,7,50,0,0.6019363,206,187,0,0,0,3,3,43
-Magma Monkeys,8,Charles Gonzalez,256,47,0,256, 0,0,33,17,0,0,0,0,0,0,4,4,6,4,0.4012573,256,47,0,0,0,2,4,38
-Magma Monkeys,8,Daniel Baker,173,101,5,173, 0,0,49,30,0,0,0,5,0.1020408,0,4,8,34,0,0.6689962,173,101,0,0,2,2,2,46
-Icy Iguanas,9,George Clark,139,134,24,139, 0,0,14,4,0,0,0,24,1.714286,0,1,9,33,2,0.6917958,139,134,0,0,4,3,3,37
-Icy Iguanas,9,David Morris,184,177,2,184, 0,0,11,5,0,0,0,2,0.1818182,0,2,2,5,2,0.2572388,184,177,0,0,4,1,4,39
-Icy Iguanas,9,Joseph Hall,148,89,6,148, 0,0,10,3,0,0,0,6,0.6,0,1,5,10,3,0.43955,148,89,0,0,0,0,1,31
-Turbo Turtles,10,Brian Hernandez,175,159,1,175, 0,0,36,9,0,0,0,1,0.02777778,0,1,8,3,4,0.8277168,175,159,0,0,3,4,2,44
-Turbo Turtles,10,Ryan Edwards,213,111,17,213, 0,0,32,0,0,0,0,17,0.53125,0,4,7,21,0,0.727877,213,111,0,0,1,3,2,34
-Turbo Turtles,10,Charles Carter,293,218,30,293, 0,0,29,18,0,0,0,30,1.034483,0,2,9,35,1,0.1040261,293,218,0,0,1,0,0,30
+Ruby Rhinos,1,Anthony Taylor,7,12,4,0,0,4,7,26,239,51,3,0,0,23,3,0.7228516
+Ruby Rhinos,1,Nancy King,6,37,27,0,0,4,6,14,210,162,4,2,1,23,2,0.829657
+Ruby Rhinos,1,Kenneth Allen,3,44,10,2,0.04545455,2,3,8,281,31,0,0,1,20,0,0.128427
+Ruby Rhinos,1,Kevin Young,7,27,8,0,0,0,7,4,148,70,2,0,3,15,2,0.3245541
+Ruby Rhinos,1,Nancy Wright,4,49,44,14,0.2857143,1,4,18,124,86,3,0,0,22,3,0.4478988
+Ruby Rhinos,1,Brian Green,3,44,5,7,0.1590909,4,3,12,125,45,0,0,1,32,2,0.2092468
+Ruby Rhinos,1,Helen Thompson,6,22,5,15,0.6818182,1,6,23,140,74,0,4,4,48,2,0.6499726
+Ruby Rhinos,1,Laura Morgan,5,44,37,2,0.04545455,0,5,23,269,146,1,0,4,33,3,0.7653075
+Plasma Pandas,2,Richard Taylor,7,12,9,20,1.666667,3,7,28,273,128,1,4,2,29,1,0.7339209
+Plasma Pandas,2,Jason Thompson,2,13,10,16,1.230769,0,2,17,136,125,2,2,1,17,3,0.3310536
+Plasma Pandas,2,Helen Lewis,6,32,16,0,0,4,6,7,254,159,1,4,1,33,3,0.9426222
+Plasma Pandas,2,Michelle Young,8,11,1,44,4,1,8,56,239,210,3,3,3,28,4,0.8026283
+Plasma Pandas,2,Robert Clark,6,10,9,33,3.3,2,6,35,154,30,2,4,2,35,4,0.5475757
+Plasma Pandas,2,William Taylor,6,18,15,4,0.2222222,3,6,10,257,132,3,0,1,15,3,0.5254605
+Plasma Pandas,2,Sandra Wilson,7,27,0,17,0.6296296,4,7,37,246,204,2,1,3,18,4,0.8036712
+Plasma Pandas,2,Michael Miller,2,19,9,4,0.2105263,2,2,5,252,189,2,3,1,26,4,0.973771
+Cosmic Crusaders,3,Ruth Gonzalez,6,30,7,12,0.4,0,6,15,261,207,1,2,2,40,4,0.2795725
+Cosmic Crusaders,3,Betty Robinson,8,21,1,12,0.5714286,2,8,14,117,31,3,0,3,49,0,0.8608695
+Cosmic Crusaders,3,Helen Baker,1,20,8,3,0.15,4,1,5,288,124,2,0,4,20,2,0.2728621
+Cosmic Crusaders,3,David Clark,3,34,3,8,0.2352941,3,3,23,181,138,1,2,4,21,1,0.2905974
+Cosmic Crusaders,3,Robert Johnson,1,42,40,7,0.1666667,4,1,10,195,139,3,1,3,14,0,0.4043694
+Cosmic Crusaders,3,Kenneth Mitchell,1,14,8,8,0.5714286,0,1,11,244,153,4,0,4,11,3,0.2222847
+Cosmic Crusaders,3,Laura Thomas,6,22,12,21,0.9545454,4,6,30,263,149,2,1,3,44,1,0.6764675
+Cosmic Crusaders,3,George Perez,4,47,2,13,0.2765957,4,4,18,233,111,2,0,4,47,0,0.104835
+Iron Eagles,4,Sharon King,5,41,7,20,0.4878049,1,5,25,201,38,4,0,0,18,4,0.6012674
+Iron Eagles,4,Jeff Allen,1,34,19,8,0.2352941,1,1,12,239,60,2,2,3,33,0,0.7526281
+Iron Eagles,4,Ruth Anderson,8,33,29,0,0,3,8,4,122,52,0,3,4,38,0,0.351062
+Iron Eagles,4,Jason Martin,2,30,1,1,0.03333334,4,2,4,287,103,0,4,1,33,4,0.9728172
+Iron Eagles,4,Michelle Lewis,5,47,31,6,0.1276596,4,5,9,102,60,4,4,1,24,1,0.1137109
+Iron Eagles,4,Charles Davis,9,12,0,3,0.25,1,9,8,248,143,0,0,4,14,1,0.982857
+Iron Eagles,4,Michelle King,9,12,0,6,0.5,1,9,59,105,64,0,1,0,30,0,0.2409004
+Iron Eagles,4,John Lewis,3,34,19,19,0.5588235,4,3,22,204,113,1,2,3,17,4,0.7708715
+Icy Iguanas,5,Maria Morgan,6,27,0,1,0.03703704,4,6,31,174,85,3,1,2,40,0,0.4713003
+Icy Iguanas,5,Paul Carter,8,44,27,32,0.7272727,0,8,38,149,124,2,0,2,11,3,0.676607
+Icy Iguanas,5,Christopher Thomas,4,47,3,0,0,1,4,14,233,115,3,0,0,38,4,0.008840084
+Icy Iguanas,5,Kimberly Baker,4,42,5,1,0.02380952,4,4,2,200,160,3,4,1,49,0,0.05598378
+Icy Iguanas,5,Jessica Wilson,8,27,20,31,1.148148,4,8,51,194,54,2,1,0,15,1,0.933612
+Icy Iguanas,5,Jennifer Nelson,3,47,7,1,0.0212766,4,3,2,230,133,4,4,2,49,2,0.2094069
+Icy Iguanas,5,Laura Evans,7,27,7,5,0.1851852,4,7,21,116,30,4,2,1,35,1,0.9812165
+Icy Iguanas,5,Patricia Brown,9,40,0,6,0.15,1,9,26,298,236,0,4,1,46,1,0.6410751
+Yellow Yetis,6,Daniel Wilson,6,17,14,3,0.1764706,3,6,7,143,126,4,4,2,28,1,0.6824354
+Yellow Yetis,6,Edward Johnson,1,38,22,0,0,3,1,1,171,167,3,3,2,25,2,0.9958435
+Yellow Yetis,6,Sarah Morris,2,13,8,5,0.3846154,0,2,8,247,170,0,3,1,38,4,0.4346544
+Yellow Yetis,6,Richard Smith,8,11,8,1,0.09090909,4,8,17,222,119,2,2,2,30,1,0.9541465
+Yellow Yetis,6,David Jones,2,24,6,2,0.08333334,3,2,10,155,82,3,1,4,46,1,0.904811
+Yellow Yetis,6,Lisa Clark,3,46,30,4,0.08695652,3,3,14,249,195,0,0,1,49,0,0.1825153
+Yellow Yetis,6,Donna Thomas,3,14,5,6,0.4285714,1,3,7,120,84,1,3,2,33,3,0.2896478
+Yellow Yetis,6,Sharon King,5,40,10,2,0.05,2,5,28,175,108,3,2,1,25,2,0.867649
+Yellow Yetis,7,Daniel Lopez,2,49,33,0,0,1,2,1,295,174,0,0,3,34,1,0.620104
+Yellow Yetis,7,Brian Martin,6,48,12,9,0.1875,0,6,18,189,101,3,0,0,16,3,0.4478104
+Yellow Yetis,7,Helen Robinson,6,32,11,19,0.59375,1,6,23,113,99,4,1,0,33,1,0.1442811
+Yellow Yetis,7,Kenneth Brown,5,40,7,4,0.1,0,5,7,269,99,2,4,0,14,4,0.5993378
+Yellow Yetis,7,Lisa Johnson,4,46,21,22,0.4782609,3,4,23,100,98,4,4,0,20,1,0.4654637
+Yellow Yetis,7,Barbara Hall,5,47,6,0,0,4,5,23,264,196,2,0,4,28,3,0.2460268
+Yellow Yetis,7,Nancy Evans,8,36,22,9,0.25,3,8,29,238,98,2,1,4,42,4,0.6842082
+Yellow Yetis,7,John King,3,20,6,13,0.65,4,3,16,272,235,4,0,4,12,2,0.6837724
+Laser Lemurs,8,Maria Sanchez,6,13,10,18,1.384615,1,6,36,267,135,1,3,4,17,1,0.06938601
+Laser Lemurs,8,Kevin Baker,1,10,9,1,0.1,1,1,4,122,75,0,3,2,47,3,0.239015
+Laser Lemurs,8,Brian Edwards,5,38,26,17,0.4473684,2,5,25,141,92,1,0,2,21,1,0.5202664
+Laser Lemurs,8,Maria Martin,3,29,1,18,0.6206896,2,3,23,244,47,4,4,0,44,1,0.2108343
+Laser Lemurs,8,Anthony Evans,6,27,9,21,0.7777778,0,6,29,264,55,3,4,2,16,3,0.01372612
+Laser Lemurs,8,Daniel Harris,2,46,39,0,0,1,2,5,201,74,2,3,1,31,0,0.1419731
+Laser Lemurs,8,Susan Smith,9,46,35,4,0.08695652,4,9,5,218,212,1,4,4,31,0,0.2314878
+Laser Lemurs,8,Michelle Adams,6,29,2,16,0.5517241,1,6,17,116,35,0,0,1,36,3,0.4604824
+Golden Geckos,9,Lisa Baker,6,15,4,3,0.2,3,6,26,194,33,2,2,4,15,4,0.2389352
+Golden Geckos,9,Nancy Johnson,7,41,37,30,0.7317073,0,7,47,106,58,3,0,1,35,1,0.7243975
+Golden Geckos,9,Maria Wilson,6,25,14,0,0,0,6,5,235,223,4,3,0,20,4,0.1684406
+Golden Geckos,9,Ryan Harris,8,36,13,10,0.2777778,0,8,12,108,63,2,1,0,12,2,0.538721
+Golden Geckos,9,Ruth Hernandez,4,42,2,6,0.1428571,2,4,27,284,259,0,2,1,23,1,0.6324306
+Golden Geckos,9,Charles Thompson,5,38,21,1,0.02631579,2,5,6,156,52,0,1,1,11,3,0.4358929
+Golden Geckos,9,Thomas Adams,9,38,7,29,0.7631579,0,9,66,152,62,3,2,0,27,3,0.2222807
+Golden Geckos,9,Robert Clark,7,31,30,1,0.03225806,4,7,3,287,137,1,1,2,34,2,0.8282683
+Phantom Phantoms,10,Steven Morris,2,27,19,2,0.07407407,2,2,4,208,98,4,4,2,43,4,0.2696407
+Phantom Phantoms,10,Kimberly Davis,5,11,1,21,1.909091,2,5,34,258,173,0,4,2,14,4,0.4862689
+Phantom Phantoms,10,Karen Rodriguez,5,20,2,0,0,2,5,1,184,66,1,4,3,41,1,0.5145401
+Phantom Phantoms,10,Michael Jones,7,41,17,5,0.1219512,1,7,42,230,77,2,0,2,11,3,0.8909415
+Phantom Phantoms,10,Sandra Wright,7,11,3,0,0,1,7,0,102,96,4,4,3,43,1,0.1623015
+Phantom Phantoms,10,Ruth Harris,5,22,2,14,0.6363636,0,5,30,277,50,2,4,2,31,4,0.2499917
+Phantom Phantoms,10,George Martinez,4,49,44,14,0.2857143,1,4,19,224,38,2,0,3,11,4,0.9118086
+Phantom Phantoms,10,Jessica Clark,1,33,7,0,0,4,1,1,122,37,1,2,2,45,0,0.5924714

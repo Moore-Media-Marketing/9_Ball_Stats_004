@@ -2,7 +2,7 @@ AdaptivePerformanceManager
 SampleDataGenerator
 DatabaseManager
 SettingsManager
-MatchupComparisonManager
+ComparisonManager
 UIManager
 GenerateGameObjectList
 Main Camera
