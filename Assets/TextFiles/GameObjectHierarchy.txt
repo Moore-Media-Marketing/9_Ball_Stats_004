@@ -346,12 +346,100 @@ Canvas
           Handle
     BackButton
       UpdateBackButtonText
-  Settings Panel
+  SettingsPanel
     HeaderText
-    Toggle
+    SampleDataGeneratorToggle
       Background
         Checkmark
       Label
+    CurrentSeasonWeightSettingsButton
+      Text (TMP)
+    LifetimeWeightSettingsButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  CurrentSeasonWeightSettingsPanel
+    HeaderText
+    CurrentSeasonPointsAwardedInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonMatchesWonInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonDefensiveShotAverageInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonSkillLevelInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonPpmInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonShutoutsInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonMiniSlamsInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonNineOnTheSnapInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonPaPercentageInputField
+      Text Area
+        Placeholder
+        Text
+    CurrentSeasonBreakAndRunInputField
+      Text Area
+        Placeholder
+        Text
+    SaveButton
+      Text (TMP)
+    BackButton
+      UpdateBackButtonText
+  LifetimeWeightSettingsPanel
+    HeaderText
+    LifetimeGamesWonInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeMiniSlamsInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeNineOnTheSnapInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeShutoutsInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeBreakAndRunInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeDefensiveShotAverageInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeMatchesPlayedInputField
+      Text Area
+        Placeholder
+        Text
+    LifetimeMatchesWonInputField
+      Text Area
+        Placeholder
+        Text
+    SaveButton
+      Text (TMP)
     BackButton
       UpdateBackButtonText
   OverlayFeedbackPanel

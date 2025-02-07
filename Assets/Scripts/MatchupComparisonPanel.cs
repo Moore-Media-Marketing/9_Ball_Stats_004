@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
+// --- Region: MatchupComparisonPanel --- //
 public class MatchupComparisonPanel:MonoBehaviour
 	{
 	// --- Panel References --- //
@@ -17,6 +16,7 @@ public class MatchupComparisonPanel:MonoBehaviour
 	public GameObject teamBPlayerScrollView;
 	public TMP_Text compareButtonText;
 	public TMP_Text backButtonText;
+	// --- End Region: Panel References --- //
 
 	// --- Player Toggle Prefab Reference --- //
 	public GameObject playerTogglePrefab;
@@ -37,10 +37,17 @@ public class MatchupComparisonPanel:MonoBehaviour
 	private void PopulateTeamDropdowns()
 		{
 		List<Team> teams = DatabaseManager.Instance.LoadTeams();
-		List<string> teamNames = new();
+		List<string> teamNames = new List<string>();
+
+		if (teams == null || teams.Count == 0)
+			{
+			Debug.LogError("No teams found!");
+			return;
+			}
 
 		foreach (var team in teams)
 			{
+			Debug.Log($"Loaded Team: {team.TeamName}");
 			teamNames.Add(team.TeamName);
 			}
 
@@ -108,3 +115,4 @@ public class MatchupComparisonPanel:MonoBehaviour
 		return totalScore;
 		}
 	}
+// --- End Region: MatchupComparisonPanel --- //

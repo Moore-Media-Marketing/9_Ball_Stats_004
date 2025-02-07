@@ -89,7 +89,7 @@ public class UIManager:MonoBehaviour
 	public TMP_Text overlayFeedbackText;
 
 	// --- Panel History --- //
-	private Stack<GameObject> panelHistory = new();
+	public Stack<GameObject> panelHistory = new();
 
 	// --- Initialization --- //
 	private void Awake()

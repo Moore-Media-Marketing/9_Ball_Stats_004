@@ -1,10 +1,12 @@
 using UnityEngine;
 
+// --- Region: ComparisonManager --- //
 public class ComparisonManager:MonoBehaviour
 	{
 	// Reference to the PlayerWeightSettings scriptable object
 	public PlayerWeightSettings weightSettings;
 
+	// --- Region: Compare Players --- //
 	// Method to compare two players
 	public void ComparePlayers(Player player1, Player player2)
 		{
@@ -32,7 +34,9 @@ public class ComparisonManager:MonoBehaviour
 			Debug.Log($"Both players, {player1.PlayerName} and {player2.PlayerName}, have identical scores of {player1Score}.");
 			}
 		}
+	// --- End Region: Compare Players --- //
 
+	// --- Region: Simulate Matchup --- //
 	// Method to simulate a matchup between two players and return the winner
 	public Player SimulateMatchup(Player player1, Player player2)
 		{
@@ -61,7 +65,9 @@ public class ComparisonManager:MonoBehaviour
 			return null;  // It's a draw if scores are the same
 			}
 		}
+	// --- End Region: Simulate Matchup --- //
 
+	// --- Region: Display Player Score --- //
 	// Helper method to display a player's overall score
 	public void DisplayPlayerScore(Player player)
 		{
@@ -74,4 +80,6 @@ public class ComparisonManager:MonoBehaviour
 		float score = player.CalculateOverallScore(weightSettings);
 		Debug.Log($"{player.PlayerName} has an overall score of {score}.");
 		}
+	// --- End Region: Display Player Score --- //
 	}
+// --- End Region: ComparisonManager --- //
