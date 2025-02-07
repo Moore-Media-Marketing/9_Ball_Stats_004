@@ -1,5 +1,6 @@
-using UnityEngine;
 using TMPro;
+
+using UnityEngine;
 
 public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 	{
@@ -8,6 +9,7 @@ public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 
 	// UI Input fields for current season weights.
 	public TMP_InputField inputCurrentSeasonPointsAwarded;
+
 	public TMP_InputField inputCurrentSeasonMatchesWon;
 	public TMP_InputField inputCurrentSeasonDefensiveShotAverage;
 	public TMP_InputField inputCurrentSeasonSkillLevel;

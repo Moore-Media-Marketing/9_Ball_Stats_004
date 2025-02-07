@@ -5,6 +5,7 @@ public class PlayerWeightSettings:ScriptableObject
 	{
 	// --- Region: Current Season Stats Weights ---
 	public float weightCurrentSeasonPointsAwarded = 1.0f;
+
 	public float weightCurrentSeasonMatchesWon = 1.0f;
 	public float weightCurrentSeasonDefensiveShotAverage = 1.0f;
 	public float weightCurrentSeasonSkillLevel = 1.0f;
@@ -17,6 +18,7 @@ public class PlayerWeightSettings:ScriptableObject
 
 	// --- Region: Lifetime Stats Weights ---
 	public float weightLifetimeGamesWon = 1.0f;
+
 	public float weightLifetimeMiniSlams = 1.0f;
 	public float weightLifetimeNineOnTheSnap = 1.0f;
 	public float weightLifetimeShutouts = 1.0f;
@@ -24,4 +26,12 @@ public class PlayerWeightSettings:ScriptableObject
 	public float weightLifetimeDefensiveShotAverage = 1.0f;
 	public float weightLifetimeMatchesPlayed = 1.0f;
 	public float weightLifetimeMatchesWon = 1.0f;
+
+	// --- Region: Additional Weights ---
+	public float PointsWeight = 1.0f;
+
+	public float DefensiveShotWeight = 1.0f;
+	public float MatchWinWeight = 1.0f;
+	public float NineOnSnapWeight = 1.0f;
+	public float BreakAndRunWeight = 1.0f;
 	}

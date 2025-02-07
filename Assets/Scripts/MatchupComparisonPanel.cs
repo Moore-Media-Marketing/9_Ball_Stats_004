@@ -2,8 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
-// --- Region: MatchupComparisonPanel --- //
+// --- MatchupComparisonPanel Class --- //
 public class MatchupComparisonPanel:MonoBehaviour
 	{
 	// --- Panel References --- //
@@ -11,12 +12,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 	public TMP_Text selectTeamAText;
 	public TMP_Dropdown teamADropdown;
 	public GameObject teamAPlayerScrollView;
-	public TMP_Text teamBTeamText;
+	public TMP_Text selectTeamBText;
 	public TMP_Dropdown teamBDropdown;
 	public GameObject teamBPlayerScrollView;
 	public TMP_Text compareButtonText;
 	public TMP_Text backButtonText;
-	// --- End Region: Panel References --- //
 
 	// --- Player Toggle Prefab Reference --- //
 	public GameObject playerTogglePrefab;
@@ -24,6 +24,9 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Matchup Result Panel --- //
 	public GameObject matchupResultPanel;
 	public TMP_Text matchupResultText;
+
+	// --- Cached Team Data --- //
+	private List<Player> players;
 
 	// --- Initialization --- //
 	private void Start()
@@ -36,20 +39,15 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Populate Team Dropdowns --- //
 	private void PopulateTeamDropdowns()
 		{
-		List<Team> teams = DatabaseManager.Instance.LoadTeams();
-		List<string> teamNames = new List<string>();
-
-		if (teams == null || teams.Count == 0)
+		players = DatabaseManager.Instance.LoadPlayers(); // Load all players from the CSV
+		if (players == null || players.Count == 0)
 			{
-			Debug.LogError("No teams found!");
+			Debug.LogError("No players found!");
 			return;
 			}
 
-		foreach (var team in teams)
-			{
-			Debug.Log($"Loaded Team: {team.TeamName}");
-			teamNames.Add(team.TeamName);
-			}
+		// Get a list of unique team names from the players list
+		List<string> teamNames = players.Select(p => p.TeamName).Distinct().ToList();
 
 		teamADropdown.ClearOptions();
 		teamADropdown.AddOptions(teamNames);
@@ -61,41 +59,64 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Select Team A --- //
 	public void OnSelectTeamA()
 		{
-		int selectedTeamId = teamADropdown.value + 1; // Assuming 1-based ID for teams
-		List<Player> teamAPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeamId);
+		int selectedTeamId = GetSelectedTeamId(teamADropdown.value);
+		List<Player> teamAPlayers = LoadPlayersByTeamId(selectedTeamId);
 		CreatePlayerToggles(teamAPlayerScrollView, teamAPlayers);
 		}
 
 	// --- Select Team B --- //
 	public void OnSelectTeamB()
 		{
-		int selectedTeamId = teamBDropdown.value + 1; // Assuming 1-based ID for teams
-		List<Player> teamBPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeamId);
+		int selectedTeamId = GetSelectedTeamId(teamBDropdown.value);
+		List<Player> teamBPlayers = LoadPlayersByTeamId(selectedTeamId);
 		CreatePlayerToggles(teamBPlayerScrollView, teamBPlayers);
+		}
+
+	// --- Load Players by Team ID --- //
+	private List<Player> LoadPlayersByTeamId(int teamId)
+		{
+		// Filter players by team ID from the loaded data
+		return players.Where(p => p.TeamId == teamId).ToList();
 		}
 
 	// --- Create Player Toggles --- //
 	private void CreatePlayerToggles(GameObject playerScrollView, List<Player> players)
 		{
-		foreach (Transform child in playerScrollView.transform)
+		if (players == null || players.Count == 0)
 			{
-			Destroy(child.gameObject); // Remove any existing toggles
+			Debug.LogWarning("No players found for the selected team.");
+			return;
 			}
 
+		// Clear existing player toggles
+		foreach (Transform child in playerScrollView.transform)
+			{
+			Destroy(child.gameObject);
+			}
+
+		// Create new toggles
 		foreach (Player player in players)
 			{
 			GameObject toggleObject = Instantiate(playerTogglePrefab, playerScrollView.transform);
 			TMP_Text playerNameText = toggleObject.GetComponentInChildren<TMP_Text>();
-			playerNameText.text = player.PlayerName;
-			// Add any additional toggle logic here
+
+			if (playerNameText != null)
+				{
+				playerNameText.text = player.PlayerName;
+				}
+			else
+				{
+				Debug.LogError("Player toggle prefab is missing a TMP_Text component.");
+				}
 			}
 		}
 
 	// --- Compare Teams --- //
 	public void CompareTeams()
 		{
-		List<Player> teamAPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(teamADropdown.value + 1);
-		List<Player> teamBPlayers = DatabaseManager.Instance.LoadPlayersFromCsv(teamBDropdown.value + 1);
+		List<Player> teamAPlayers = LoadPlayersByTeamId(GetSelectedTeamId(teamADropdown.value));
+		List<Player> teamBPlayers = LoadPlayersByTeamId(GetSelectedTeamId(teamBDropdown.value));
+
 		matchupResultPanel.SetActive(true);
 
 		int teamAScore = CalculateTotalScore(teamAPlayers);
@@ -107,6 +128,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 	// --- Calculate Total Score --- //
 	private int CalculateTotalScore(List<Player> players)
 		{
+		if (players == null || players.Count == 0)
+			{
+			return 0;
+			}
+
 		int totalScore = 0;
 		foreach (Player player in players)
 			{
@@ -114,5 +140,20 @@ public class MatchupComparisonPanel:MonoBehaviour
 			}
 		return totalScore;
 		}
+
+	// --- Get Selected Team ID --- //
+	private int GetSelectedTeamId(int dropdownIndex)
+		{
+		// Retrieve the team ID based on the dropdown index
+		string selectedTeamName = teamADropdown.options[dropdownIndex].text;
+		Player selectedPlayer = players.FirstOrDefault(p => p.TeamName == selectedTeamName);
+
+		if (selectedPlayer != null)
+			{
+			return selectedPlayer.TeamId;
+			}
+
+		Debug.LogError("Invalid team selection.");
+		return -1;
+		}
 	}
-// --- End Region: MatchupComparisonPanel --- //

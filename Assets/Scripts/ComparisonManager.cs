@@ -34,6 +34,7 @@ public class ComparisonManager:MonoBehaviour
 			Debug.Log($"Both players, {player1.PlayerName} and {player2.PlayerName}, have identical scores of {player1Score}.");
 			}
 		}
+
 	// --- End Region: Compare Players --- //
 
 	// --- Region: Simulate Matchup --- //
@@ -65,6 +66,7 @@ public class ComparisonManager:MonoBehaviour
 			return null;  // It's a draw if scores are the same
 			}
 		}
+
 	// --- End Region: Simulate Matchup --- //
 
 	// --- Region: Display Player Score --- //
@@ -80,6 +82,8 @@ public class ComparisonManager:MonoBehaviour
 		float score = player.CalculateOverallScore(weightSettings);
 		Debug.Log($"{player.PlayerName} has an overall score of {score}.");
 		}
+
 	// --- End Region: Display Player Score --- //
 	}
+
 // --- End Region: ComparisonManager --- //

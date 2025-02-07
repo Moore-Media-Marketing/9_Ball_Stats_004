@@ -1,22 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using TMPro; // Corrected: Using TextMeshPro for text and dropdown
+using TMPro;
 
 using UnityEngine;
 
 public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	{
-	// --- UI Elements --- //
+	// --- Region: UI Elements --- //
 	[Header("UI Elements")]
 	public TMP_Text headerText;
-
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 
 	public TMP_InputField lifetimeGamesWonInputField;
 	public TMP_InputField lifetimeGamesPlayedInputField;
-	public TMP_InputField lifetimeDefensiveShotAverageInputField; // Corrected variable name
+	public TMP_InputField lifetimeDefensiveShotAverageInputField;
 	public TMP_InputField matchesPlayedInLast2YearsInputField;
 	public TMP_InputField lifetimeBreakAndRunInputField;
 	public TMP_InputField nineOnTheSnapInputField;
@@ -27,66 +26,56 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	public TMP_Text saveToCSVButtonText;
 	public TMP_Text backButtonText;
 
-	private List<Team> teams = new();  // List of available teams
-	private List<Player> players = new();  // List of available players
+	private List<Team> teams = new();
+	private List<Player> players = new();
 
-	// --- Initialization --- //
+	// --- Region: Initialization --- //
 	private void Start()
 		{
-		// Setup initial UI and data loading
 		PopulateTeamDropdown();
-		PopulatePlayerDropdown();
-
-		// Add event listeners for dropdown changes
 		teamNameDropdown.onValueChanged.AddListener(OnTeamDropdownChanged);
 		playerNameDropdown.onValueChanged.AddListener(OnPlayerDropdownChanged);
 
-		// Add event listeners for the buttons
 		updateLifetimeButtonText.text = "Update Lifetime";
 		saveToCSVButtonText.text = "Save to CSV";
 		backButtonText.text = "Back";
 		}
 
-	// --- Dropdown Population --- //
+	// --- Region: Dropdown Population --- //
 	private void PopulateTeamDropdown()
 		{
-		teams = DatabaseManager.Instance.LoadTeams(); // Corrected method call
-		List<string> teamNames = teams.Select(t => t.TeamName).ToList();
-
+		teams = DatabaseManager.Instance.LoadTeams();
 		teamNameDropdown.ClearOptions();
-		teamNameDropdown.AddOptions(teamNames);
+		teamNameDropdown.AddOptions(teams.Select(t => t.TeamName).ToList());
+		if (teams.Count > 0) OnTeamDropdownChanged(0);
 		}
 
 	private void PopulatePlayerDropdown()
 		{
-		List<string> playerNames = players.Select(p => p.PlayerName).ToList();
-
 		playerNameDropdown.ClearOptions();
-		playerNameDropdown.AddOptions(playerNames);
+		playerNameDropdown.AddOptions(players.Select(p => p.PlayerName).ToList());
+		if (players.Count > 0) OnPlayerDropdownChanged(0);
 		}
 
-	// --- Dropdown Value Changed Handlers --- //
+	// --- Region: Dropdown Change Handlers --- //
 	private void OnTeamDropdownChanged(int selectedIndex)
 		{
-		// Handle team selection change (e.g., filter players based on team)
 		Team selectedTeam = teams[selectedIndex];
-		players = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeam.TeamId); // Corrected method call to filter by team
+		players = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeam.TeamId);
 		PopulatePlayerDropdown();
 		}
 
 	private void OnPlayerDropdownChanged(int selectedIndex)
 		{
-		// Handle player selection change
-		Player selectedPlayer = players[selectedIndex];
-		PopulatePlayerLifetimeData(selectedPlayer);
+		if (players.Count > 0) PopulatePlayerLifetimeData(players[selectedIndex]);
 		}
 
-	// --- Player Lifetime Data --- //
+	// --- Region: Player Data Population --- //
 	private void PopulatePlayerLifetimeData(Player player)
 		{
 		lifetimeGamesWonInputField.text = player.LifetimeGamesWon.ToString();
 		lifetimeGamesPlayedInputField.text = player.LifetimeGamesPlayed.ToString();
-		lifetimeDefensiveShotAverageInputField.text = player.LifetimeDefensiveShotAverage.ToString("F2"); // Corrected variable name
+		lifetimeDefensiveShotAverageInputField.text = player.LifetimeDefensiveShotAverage.ToString("F2");
 		matchesPlayedInLast2YearsInputField.text = player.LifetimeMatchesPlayedInLast2Years.ToString();
 		lifetimeBreakAndRunInputField.text = player.LifetimeBreakAndRun.ToString();
 		nineOnTheSnapInputField.text = player.LifetimeNineOnTheSnap.ToString();
@@ -94,41 +83,43 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 		lifetimeShutoutsInputField.text = player.LifetimeShutouts.ToString();
 		}
 
-	// --- Button Handlers --- //
+	// --- Region: Button Handlers --- //
 	public void OnUpdateLifetimeButtonClicked()
 		{
-		// Handle the Update Lifetime button logic here (e.g., save the data back to the player object)
 		int selectedPlayerIndex = playerNameDropdown.value;
+		if (players.Count == 0 || selectedPlayerIndex >= players.Count) return;
+
 		Player selectedPlayer = players[selectedPlayerIndex];
 
-		// Update player stats from input fields
-		selectedPlayer.LifetimeGamesWon = int.Parse(lifetimeGamesWonInputField.text);
-		selectedPlayer.LifetimeGamesPlayed = int.Parse(lifetimeGamesPlayedInputField.text);
-		selectedPlayer.LifetimeDefensiveShotAverage = float.Parse(lifetimeDefensiveShotAverageInputField.text); // Corrected variable name
-		selectedPlayer.LifetimeMatchesPlayedInLast2Years = int.Parse(matchesPlayedInLast2YearsInputField.text);
-		selectedPlayer.LifetimeBreakAndRun = int.Parse(lifetimeBreakAndRunInputField.text);
-		selectedPlayer.LifetimeNineOnTheSnap = int.Parse(nineOnTheSnapInputField.text);
-		selectedPlayer.LifetimeMiniSlams = int.Parse(lifetimeMiniSlamsInputField.text);
-		selectedPlayer.LifetimeShutouts = int.Parse(lifetimeShutoutsInputField.text);
+		if (int.TryParse(lifetimeGamesWonInputField.text, out int gamesWon))
+			selectedPlayer.LifetimeGamesWon = gamesWon;
+		if (int.TryParse(lifetimeGamesPlayedInputField.text, out int gamesPlayed))
+			selectedPlayer.LifetimeGamesPlayed = gamesPlayed;
+		if (float.TryParse(lifetimeDefensiveShotAverageInputField.text, out float defensiveAvg))
+			selectedPlayer.LifetimeDefensiveShotAverage = defensiveAvg;
+		if (int.TryParse(matchesPlayedInLast2YearsInputField.text, out int matchesPlayed))
+			selectedPlayer.LifetimeMatchesPlayedInLast2Years = matchesPlayed;
+		if (int.TryParse(lifetimeBreakAndRunInputField.text, out int breakAndRun))
+			selectedPlayer.LifetimeBreakAndRun = breakAndRun;
+		if (int.TryParse(nineOnTheSnapInputField.text, out int nineOnSnap))
+			selectedPlayer.LifetimeNineOnTheSnap = nineOnSnap;
+		if (int.TryParse(lifetimeMiniSlamsInputField.text, out int miniSlams))
+			selectedPlayer.LifetimeMiniSlams = miniSlams;
+		if (int.TryParse(lifetimeShutoutsInputField.text, out int shutouts))
+			selectedPlayer.LifetimeShutouts = shutouts;
 
-		// Optionally, save these updated values to CSV here.
 		Debug.Log($"Updated lifetime data for player: {selectedPlayer.PlayerName}");
 		}
 
 	public void OnSaveToCSVButtonClicked()
 		{
-		// Save the updated player data to the CSV (or database)
-		DatabaseManager.Instance.SavePlayersToCsv(players); // Corrected method call
+		DatabaseManager.Instance.SavePlayersToCsv(players);
 		Debug.Log("Player data saved to CSV.");
 		}
 
 	public void OnBackButtonClicked()
 		{
-		// Navigate back to the previous screen (e.g., close panel)
-		UIManager.Instance.GoBackToPreviousPanel(); // Handle going back in your UIManager
+		UIManager.Instance.GoBackToPreviousPanel();
 		Debug.Log("Back button clicked. Navigating back...");
 		}
-
-	// --- CSV Helpers --- //
-	// Helper methods for loading data from CSV files and saving the updated data
 	}

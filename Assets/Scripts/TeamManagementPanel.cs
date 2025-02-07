@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 // --- Region: TeamManagementPanel --- //
 public class TeamManagementPanel:MonoBehaviour
@@ -34,23 +36,23 @@ public class TeamManagementPanel:MonoBehaviour
 
 		if (!string.IsNullOrEmpty(teamName))
 			{
-			List<Team> teams = DatabaseManager.Instance.LoadTeams(); // Load teams from in-memory storage
+			List<Team> teams = LoadTeamsFromCsv(); // Load teams from CSV
 			Team existingTeam = teams.FirstOrDefault(t => t.TeamName == teamName); // Changed 'Name' to 'TeamName'
 
 			if (existingTeam != null)
 				{
 				// Update existing team
 				existingTeam.TeamName = teamName; // Changed 'Name' to 'TeamName'
-				DatabaseManager.Instance.SaveTeams(teams); // Save updated teams to in-memory list
+				SaveTeamsToCsv(teams); // Save updated teams to CSV
 				Debug.Log("Team updated: " + teamName);
 				}
 			else
 				{
 				// Add new team
 				int newTeamId = teams.Any() ? teams.Max(t => t.TeamId) + 1 : 1; // Auto-generate team ID
-				Team newTeam = new Team(newTeamId, teamName);
+				Team newTeam = new(newTeamId, teamName);
 				teams.Add(newTeam);
-				DatabaseManager.Instance.SaveTeams(teams); // Save new team to in-memory list
+				SaveTeamsToCsv(teams); // Save new team to CSV
 				Debug.Log("Team added: " + teamName);
 				}
 
@@ -71,13 +73,13 @@ public class TeamManagementPanel:MonoBehaviour
 
 		if (!string.IsNullOrEmpty(teamName))
 			{
-			List<Team> teams = DatabaseManager.Instance.LoadTeams();
+			List<Team> teams = LoadTeamsFromCsv(); // Load teams from CSV
 			Team teamToDelete = teams.FirstOrDefault(t => t.TeamName == teamName); // Changed 'Name' to 'TeamName'
 
 			if (teamToDelete != null)
 				{
 				teams.Remove(teamToDelete);
-				DatabaseManager.Instance.SaveTeams(teams); // Remove team from list
+				SaveTeamsToCsv(teams); // Remove team from CSV
 				Debug.Log("Team deleted: " + teamName);
 				}
 			else
@@ -98,7 +100,7 @@ public class TeamManagementPanel:MonoBehaviour
 	// --- Region: Populate Team Dropdown --- //
 	private void PopulateTeamDropdown()
 		{
-		List<Team> teams = DatabaseManager.Instance.LoadTeams();
+		List<Team> teams = LoadTeamsFromCsv(); // Load teams from CSV
 		List<string> teamNames = teams.Select(t => t.TeamName).ToList();
 		teamDropdown.ClearOptions();
 		teamDropdown.AddOptions(teamNames); // Populate dropdown with current team names
@@ -111,5 +113,20 @@ public class TeamManagementPanel:MonoBehaviour
 		// Implement navigation back to previous screen
 		}
 	// --- End Region: Back Button --- //
+
+	// --- Region: Load Teams from CSV --- //
+	private List<Team> LoadTeamsFromCsv()
+		{
+		// Replace with your method to load teams from the CSV
+		return CsvHelper.LoadTeamsFromCsv();
+		}
+
+	// --- Region: Save Teams to CSV --- //
+	private void SaveTeamsToCsv(List<Team> teams)
+		{
+		// Replace with your method to save teams to the CSV
+		CsvHelper.SaveTeamsToCsv(teams);
+		}
+	// --- End Region: Save Teams to CSV --- //
 	}
 // --- End Region: TeamManagementPanel --- //

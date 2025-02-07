@@ -1,5 +1,6 @@
-using UnityEngine;
 using TMPro;
+
+using UnityEngine;
 
 public class LifetimeWeightSettingsPanel:MonoBehaviour
 	{
@@ -8,6 +9,7 @@ public class LifetimeWeightSettingsPanel:MonoBehaviour
 
 	// UI Input fields for lifetime weights.
 	public TMP_InputField inputLifetimeGamesWon;
+
 	public TMP_InputField inputLifetimeMiniSlams;
 	public TMP_InputField inputLifetimeNineOnTheSnap;
 	public TMP_InputField inputLifetimeShutouts;

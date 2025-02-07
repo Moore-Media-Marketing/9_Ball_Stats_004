@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 
 using TMPro;
@@ -38,7 +37,15 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Ensure the CSV file exists (create it if it doesn't)
 		if (!File.Exists(matchupFilePath))
 			{
-			File.WriteAllText(matchupFilePath, "Id,Result,TeamAWinProbability,TeamBWinProbability\n");  // Add headers if file is new
+			try
+				{
+				File.WriteAllText(matchupFilePath, "Id,Result,TeamAWinProbability,TeamBWinProbability\n");  // Add headers if file is new
+				Debug.Log("Matchup CSV file initialized.");
+				}
+			catch (IOException ex)
+				{
+				Debug.LogError($"Failed to create matchup CSV file: {ex.Message}");
+				}
 			}
 
 		// Initialize the Back Button text
@@ -93,9 +100,9 @@ public class MatchupResultsPanel:MonoBehaviour
 			int newId = GetNextMatchupId();
 			var line = $"{newId},{result},{teamAWinProbability},{teamBWinProbability}";
 			File.AppendAllLines(matchupFilePath, new[] { line });  // Append new matchup to the CSV
-			Debug.Log("Matchup result saved to CSV.");
+			Debug.Log($"Matchup result saved: ID {newId}, Winner {result}");
 			}
-		catch (System.Exception ex)
+		catch (IOException ex)
 			{
 			Debug.LogError($"Error saving matchup to CSV: {ex.Message}");
 			}
@@ -108,12 +115,23 @@ public class MatchupResultsPanel:MonoBehaviour
 
 		if (File.Exists(matchupFilePath))
 			{
-			var lines = File.ReadAllLines(matchupFilePath);
-			if (lines.Length > 1)  // If there are already entries (skipping header)
+			try
 				{
-				var lastLine = lines[^1];
-				var lastId = int.Parse(lastLine.Split(',')[0]);  // Extract the ID from the last line
-				nextId = lastId + 1;
+				var lines = File.ReadAllLines(matchupFilePath);
+				if (lines.Length > 1)  // If there are already entries (skipping header)
+					{
+					var lastLine = lines[^1];
+					var lastId = int.Parse(lastLine.Split(',')[0]);  // Extract the ID from the last line
+					nextId = lastId + 1;
+					}
+				}
+			catch (IOException ex)
+				{
+				Debug.LogError($"Error reading matchup CSV: {ex.Message}");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"Unexpected error processing matchup CSV: {ex.Message}");
 				}
 			}
 

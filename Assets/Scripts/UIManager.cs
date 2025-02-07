@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using TMPro;
 
@@ -13,7 +14,6 @@ public class UIManager:MonoBehaviour
 	// --- Panel References --- //
 	[Header("Home Panel")]
 	public GameObject homePanel;
-
 	public TMP_Text homeHeaderText;
 	public TMP_Text manageTeamsButtonText;
 	public TMP_Text createPlayerButtonText;
@@ -28,7 +28,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Team Management Panel")]
 	public GameObject teamManagementPanel;
-
 	public TMP_Text teamManagementHeaderText;
 	public TMP_Text teamNameText;
 	public TMP_InputField teamNameInputField;
@@ -46,7 +45,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Player Management Panel")]
 	public GameObject playerManagementPanel;
-
 	public TMP_Text playerManagementHeaderText;
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
@@ -62,7 +60,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Matchup Comparison Panel")]
 	public GameObject matchupComparisonPanel;
-
 	public TMP_Text matchupComparisonHeaderText;
 	public TMP_Text selectTeamAText;
 	public TMP_Dropdown teamADropdown;
@@ -77,7 +74,6 @@ public class UIManager:MonoBehaviour
 
 	[Header("Settings Panel")]
 	public GameObject settingsPanel;
-
 	public TMP_Text settingsHeaderText;
 	public Toggle settingsToggle;
 	public TMP_Text settingsBackButtonText;
@@ -85,11 +81,10 @@ public class UIManager:MonoBehaviour
 
 	[Header("Overlay Feedback Panel")]
 	public GameObject overlayFeedbackPanel;
-
 	public TMP_Text overlayFeedbackText;
 
 	// --- Panel History --- //
-	public Stack<GameObject> panelHistory = new();
+	public Stack<GameObject> panelHistory = new Stack<GameObject>();
 
 	// --- Initialization --- //
 	private void Awake()
@@ -165,6 +160,7 @@ public class UIManager:MonoBehaviour
 		panelHistory.Push(homePanel); // Save previous panel
 		homePanel.SetActive(false);
 		teamManagementPanel.SetActive(true);
+		PopulateTeamDropdown(); // Populate team dropdown
 		}
 
 	public void ShowPlayerManagementPanel()
@@ -205,26 +201,117 @@ public class UIManager:MonoBehaviour
 
 	// --- Button Actions --- //
 	private void OnAddUpdateTeam()
-		{ /* Add or Update Team logic here */ }
+		{
+		string teamName = teamNameInputField.text;
+		if (!string.IsNullOrEmpty(teamName))
+			{
+			List<Team> teams = DatabaseManager.Instance.LoadTeams();
+			Team existingTeam = teams.FirstOrDefault(t => t.TeamName == teamName);
+
+			if (existingTeam != null)
+				{
+				// Update existing team
+				existingTeam.TeamName = teamName;
+				DatabaseManager.Instance.SaveTeams(teams);
+				Debug.Log("Team updated: " + teamName);
+				}
+			else
+				{
+				// Add new team
+				int newTeamId = teams.Any() ? teams.Max(t => t.TeamId) + 1 : 1;
+				Team newTeam = new Team(newTeamId, teamName);
+				teams.Add(newTeam);
+				DatabaseManager.Instance.SaveTeams(teams);
+				Debug.Log("Team added: " + teamName);
+				}
+
+			PopulateTeamDropdown();
+			teamNameInputField.text = string.Empty;
+			}
+		else
+			{
+			Debug.Log("Please enter a valid team name.");
+			}
+		}
 
 	private void ClearTeamNameInput()
-		{ teamNameInputField.text = ""; }
+		{
+		teamNameInputField.text = "";
+		}
 
 	private void OnModifyTeamName()
-		{ /* Modify Team Name logic here */ }
+		{
+		string teamName = teamNameInputField.text;
+		if (!string.IsNullOrEmpty(teamName))
+			{
+			List<Team> teams = DatabaseManager.Instance.LoadTeams();
+			Team teamToModify = teams.FirstOrDefault(t => t.TeamName == teamName);
+
+			if (teamToModify != null)
+				{
+				// Modify team name logic here if needed
+				Debug.Log("Team modified: " + teamName);
+				}
+			else
+				{
+				Debug.Log("Team not found: " + teamName);
+				}
+			}
+		}
 
 	private void OnDeleteTeam()
-		{ /* Delete Team logic here */ }
+		{
+		string teamName = teamNameInputField.text;
+		if (!string.IsNullOrEmpty(teamName))
+			{
+			List<Team> teams = DatabaseManager.Instance.LoadTeams();
+			Team teamToDelete = teams.FirstOrDefault(t => t.TeamName == teamName);
+
+			if (teamToDelete != null)
+				{
+				teams.Remove(teamToDelete);
+				DatabaseManager.Instance.SaveTeams(teams);
+				Debug.Log("Team deleted: " + teamName);
+				}
+			else
+				{
+				Debug.Log("Team not found: " + teamName);
+				}
+
+			PopulateTeamDropdown();
+			teamNameInputField.text = string.Empty;
+			}
+		else
+			{
+			Debug.Log("Please enter a valid team name.");
+			}
+		}
+
+	private void PopulateTeamDropdown()
+		{
+		List<Team> teams = DatabaseManager.Instance.LoadTeams();
+		List<string> teamNames = teams.Select(t => t.TeamName).ToList();
+		teamDropdown.ClearOptions();
+		teamDropdown.AddOptions(teamNames);
+		}
 
 	private void OnAddPlayer()
-		{ /* Add Player logic here */ }
+		{
+		// Add player logic here
+		}
 
 	private void OnDeletePlayer()
-		{ /* Delete Player logic here */ }
+		{
+		// Delete player logic here
+		}
 
 	private void OnAddPlayerDetails()
-		{ /* Add Player Details logic here */ }
+		{
+		// Add player details logic here
+		}
 
 	private void OnCompareMatchups()
-		{ /* Compare Matchups logic here */ }
+		{
+		// Compare matchups logic here
+		}
 	}

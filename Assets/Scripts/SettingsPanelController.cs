@@ -5,12 +5,14 @@ public class SettingsPanelController:MonoBehaviour
 	{
 	[Header("UI References")]
 	public Toggle sampleDataGeneratorToggle;
+
 	public Button currentSeasonWeightSettingsButton;
 	public Button lifetimeWeightSettingsButton;
 	public Button backButton;
 
 	[Header("Panels")]
 	public GameObject currentSeasonWeightSettingsPanel;
+
 	public GameObject lifetimeWeightSettingsPanel;
 
 	[Header("Sample Data Generator")]
