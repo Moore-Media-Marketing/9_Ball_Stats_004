@@ -4,44 +4,132 @@ using UnityEngine;
 
 public class SampleDataGenerator:MonoBehaviour
 	{
-	// Reference to PlayerWeightSettings ScriptableObject.
+	public int numberOfTeams = 10;
+	public int numberOfPlayersPerTeam = 8;
 	public PlayerWeightSettings weightSettings;
-	private object skillLevelToPoints;
 
-	// Method to generate random player stats with adjustable weights
-	public void GenerateAndSavePlayers()
+	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William" };
+	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth" };
+	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown" };
+	private static readonly string[] teamNames = { "Sharks", "Tigers", "Wolves", "Eagles", "Lions" };
+
+	private Dictionary<int, int> skillLevelToPoints = new()
+	{
+		{ 1, 10 }, { 2, 20 }, { 3, 30 }, { 4, 40 }, { 5, 50 },
+		{ 6, 60 }, { 7, 70 }, { 8, 80 }, { 9, 90 }
+	};
+
+	private void Start()
 		{
-		// Load teams from DatabaseManager (assuming this will provide a list of teams)
-		List<Team> teams = DatabaseManager.Instance.LoadTeams();
-
-		// Create a list to hold generated players
-		List<Player> generatedPlayers = new();
-
-		// Generate players for each team (for demonstration, we'll generate 5 players per team)
-		foreach (var team in teams)
-			{
-			for (int i = 0; i < 5; i++)  // Generate 5 players for each team
-				{
-				string playerName = $"Player_{i + 1}_{team.TeamName}";  // Fix the naming to correctly represent the player
-				Player player = GenerateRandomPlayer(playerName, team.TeamName, team.TeamId);  // Pass teamId to player
-				generatedPlayers.Add(player);
-				}
-			}
-
-		// Save generated players to the CSV file via DatabaseManager
-		DatabaseManager.Instance.SavePlayersToCsv(generatedPlayers);
+		// Generate sample teams and players when the game starts
+		GenerateSampleTeamsAndPlayers();
 		}
 
-	// Method to generate random player stats with adjustable weights
-	public Player GenerateRandomPlayer(string playerName, string teamName, int teamId)
+	private void GenerateSampleTeamsAndPlayers()
 		{
-		// Generate random skill level between 1 and 9
-		int skillLevel = UnityEngine.Random.Range(1, 10);
+		try
+			{
+			Debug.Log("Generating sample teams and players...");
+			List<Player> players = new();
+			int teamId = 1;
+			HashSet<string> existingTeamNames = new(); // To check for duplicate team names
 
-		// Generate the player's stats
-		PlayerStats stats = GenerateRandomPlayerStats(skillLevel, GetSkillLevelToPoints());
+			// Iterate over the predefined team names
+			foreach (string teamName in teamNames)
+				{
+				if (existingTeamNames.Contains(teamName))
+					{
+					Debug.LogWarning($"Team name '{teamName}' already exists. Skipping...");
+					continue; // Skip team creation if duplicate is found
+					}
 
-		// Adjust stats based on weight settings from PlayerWeightSettings
+				existingTeamNames.Add(teamName);
+
+				// Generate players for the current team
+				for (int j = 0; j < numberOfPlayersPerTeam; j++)
+					{
+					string firstName = (Random.Range(0, 2) == 0)
+						? firstNamesMale[Random.Range(0, firstNamesMale.Length)]
+						: firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
+
+					string lastName = lastNames[Random.Range(0, lastNames.Length)];
+					string playerName = $"{firstName} {lastName}"; // Concatenate first and last name
+
+					int skillLevel = WeightedRandomSkillLevel(); // Get weighted random skill level
+					PlayerStats stats = GenerateRandomPlayerStats(skillLevel); // Generate random stats for player
+
+					// Create player and add to the list
+					Player player = new(playerName, teamName, skillLevel, stats, teamId);
+					players.Add(player);
+					}
+				teamId++;
+				}
+
+			// Save players to CSV
+			try
+				{
+				DatabaseManager.Instance.SavePlayersToCsv(players); // Save to database
+				Debug.Log("Sample data generated and saved successfully.");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError("Error saving player data to CSV: " + ex.Message);
+				}
+			}
+		catch (System.Exception ex)
+			{
+			Debug.LogError("Error generating sample data: " + ex.Message);
+			}
+		}
+
+	private int WeightedRandomSkillLevel()
+		{
+		// Weighted random skill level where higher skill levels are more likely
+		int[] weightDistribution = { 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // Weighted favoring higher numbers
+		return weightDistribution[Random.Range(0, weightDistribution.Length)];
+		}
+
+	private PlayerStats GenerateRandomPlayerStats(int skillLevel)
+		{
+		PlayerStats stats = new()
+			{
+			// Current season stats
+			CurrentSeasonMatchesPlayed = Random.Range(5, 30),
+			CurrentSeasonMatchesWon = Random.Range(0, 30),
+			CurrentSeasonBreakAndRun = Random.Range(0, 10),
+			CurrentSeasonDefensiveShotAverage = Random.Range(0f, 1f),
+			CurrentSeasonMiniSlams = Random.Range(0, 5),
+			CurrentSeasonNineOnTheSnap = Random.Range(0, 3),
+			CurrentSeasonPaPercentage = Random.Range(50f, 100f),
+			CurrentSeasonPointsAwarded = Random.Range(0, 100),
+			CurrentSeasonPpm = Random.Range(0f, 5f),
+			CurrentSeasonShutouts = Random.Range(0, 5),
+			CurrentSeasonTotalPoints = skillLevelToPoints.ContainsKey(skillLevel) ? skillLevelToPoints[skillLevel] : 0,
+
+			// Lifetime stats
+			LifetimeGamesPlayed = Random.Range(50, 200),
+			LifetimeGamesWon = Random.Range(30, 150),
+			LifetimeMatchesPlayed = Random.Range(100, 300),
+			LifetimeMatchesWon = Random.Range(50, 200),
+			LifetimeMiniSlams = Random.Range(0, 10),
+			LifetimeNineOnTheSnap = Random.Range(0, 5),
+			LifetimeShutouts = Random.Range(0, 10),
+			LifetimeDefensiveShotAverage = Random.Range(0f, 1f),
+			LifetimeBreakAndRun = Random.Range(0, 20),
+			LifetimePointsAwarded = Random.Range(100, 500),
+			LifetimePpm = Random.Range(0f, 5f),
+			LifetimeTotalPoints = Random.Range(0, 500),
+			LifetimeMatchesPlayedInLast2Years = Random.Range(20, 100)
+			};
+
+		// Apply weight adjustments based on the PlayerWeightSettings
+		ApplyWeightAdjustments(ref stats);
+		return stats;
+		}
+
+	private void ApplyWeightAdjustments(ref PlayerStats stats)
+		{
+		// Adjust stats based on weight settings for both current season and lifetime stats
 		stats.CurrentSeasonPointsAwarded *= (int) weightSettings.weightCurrentSeasonPointsAwarded;
 		stats.CurrentSeasonMatchesWon *= (int) weightSettings.weightCurrentSeasonMatchesWon;
 		stats.CurrentSeasonDefensiveShotAverage *= weightSettings.weightCurrentSeasonDefensiveShotAverage;
@@ -53,62 +141,16 @@ public class SampleDataGenerator:MonoBehaviour
 		stats.CurrentSeasonPaPercentage *= weightSettings.weightCurrentSeasonPaPercentage;
 		stats.CurrentSeasonBreakAndRun *= (int) weightSettings.weightCurrentSeasonBreakAndRun;
 
-		stats.LifetimeGamesWon *= (int) weightSettings.weightLifetimeGamesWon;
-		stats.LifetimeMiniSlams *= (int) weightSettings.weightLifetimeMiniSlams;
-		stats.LifetimeNineOnTheSnap *= (int) weightSettings.weightLifetimeNineOnTheSnap;
-		stats.LifetimeShutouts *= (int) weightSettings.weightLifetimeShutouts;
-		stats.LifetimeBreakAndRun *= (int) weightSettings.weightLifetimeBreakAndRun;
+		// Lifetime Stats, explicitly casting to int for the required fields
+		stats.LifetimeGamesWon = (int) (stats.LifetimeGamesWon * weightSettings.weightLifetimeGamesWon);
+		stats.LifetimeMiniSlams = (int) (stats.LifetimeMiniSlams * weightSettings.weightLifetimeMiniSlams);
+		stats.LifetimeNineOnTheSnap = (int) (stats.LifetimeNineOnTheSnap * weightSettings.weightLifetimeNineOnTheSnap);
+		stats.LifetimeShutouts = (int) (stats.LifetimeShutouts * weightSettings.weightLifetimeShutouts);
+		stats.LifetimeBreakAndRun = (int) (stats.LifetimeBreakAndRun * weightSettings.weightLifetimeBreakAndRun);
+
+		// The following are floats, no casting needed:
 		stats.LifetimeDefensiveShotAverage *= weightSettings.weightLifetimeDefensiveShotAverage;
-		stats.LifetimeMatchesPlayed *= (int) weightSettings.weightLifetimeMatchesPlayed;
-		stats.LifetimeMatchesWon *= (int) weightSettings.weightLifetimeMatchesWon;
-
-		// Return the newly created player with correct teamId
-		return new Player(playerName, teamName, skillLevel, stats, teamId);  // Pass teamId here
-		}
-
-	private object GetSkillLevelToPoints()
-		{
-		return skillLevelToPoints;
-		}
-
-	// Method to generate random stats based on skill level and handicap system
-	private PlayerStats GenerateRandomPlayerStats(int skillLevel, object skillLevelToPoints)
-		{
-		PlayerStats stats = new()
-			{
-			// Generate random values for current season stats
-			CurrentSeasonMatchesPlayed = UnityEngine.Random.Range(5, 30)
-			};
-		stats.CurrentSeasonMatchesWon = UnityEngine.Random.Range(0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonBreakAndRun = UnityEngine.Random.Range(0, 10);
-		stats.CurrentSeasonDefensiveShotAverage = UnityEngine.Random.Range(0f, 1f);
-		stats.CurrentSeasonMiniSlams = UnityEngine.Random.Range(0, 5);
-		stats.CurrentSeasonNineOnTheSnap = UnityEngine.Random.Range(0, 3);
-		stats.CurrentSeasonPaPercentage = UnityEngine.Random.Range(50f, 100f);
-		stats.CurrentSeasonPointsAwarded = UnityEngine.Random.Range(0, 100);
-		stats.CurrentSeasonPointsPerMatch = UnityEngine.Random.Range(1f, 10f);
-		stats.CurrentSeasonPpm = UnityEngine.Random.Range(0f, 5f);
-		stats.CurrentSeasonShutouts = UnityEngine.Random.Range(0, 5);
-
-		// Apply handicap system for points based on skill level
-		stats.CurrentSeasonTotalPoints = (int) skillLevelToPoints.GetType().GetProperty("skillLevel").GetValue(skillLevelToPoints);
-
-		// Generate random values for lifetime stats
-		stats.LifetimeGamesPlayed = UnityEngine.Random.Range(50, 200);
-		stats.LifetimeGamesWon = UnityEngine.Random.Range(30, 150);
-		stats.LifetimeMatchesPlayed = UnityEngine.Random.Range(100, 300);
-		stats.LifetimeMatchesWon = UnityEngine.Random.Range(50, 200);
-		stats.LifetimeMiniSlams = UnityEngine.Random.Range(0, 10);
-		stats.LifetimeNineOnTheSnap = UnityEngine.Random.Range(0, 5);
-		stats.LifetimeShutouts = UnityEngine.Random.Range(0, 10);
-		stats.LifetimeDefensiveShotAverage = UnityEngine.Random.Range(0f, 1f);
-		stats.LifetimeBreakAndRun = UnityEngine.Random.Range(0, 20);
-		stats.LifetimePointsAwarded = UnityEngine.Random.Range(100, 500);
-		stats.LifetimePointsPerMatch = UnityEngine.Random.Range(1f, 10f);
-		stats.LifetimePpm = UnityEngine.Random.Range(0f, 5f);
-		stats.LifetimeTotalPoints = UnityEngine.Random.Range(0, 500);
-		stats.LifetimeMatchesPlayedInLast2Years = UnityEngine.Random.Range(20, 100);
-
-		return stats;
+		stats.LifetimeMatchesPlayed = (int) (stats.LifetimeMatchesPlayed * weightSettings.weightLifetimeMatchesPlayed);
+		stats.LifetimeMatchesWon = (int) (stats.LifetimeMatchesWon * weightSettings.weightLifetimeMatchesWon);
 		}
 	}

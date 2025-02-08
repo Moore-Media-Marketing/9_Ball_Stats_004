@@ -4,33 +4,62 @@ using UnityEngine;
 
 public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 	{
-	// Reference to the PlayerWeightSettings ScriptableObject.
+	// --- Region: References --- //
+	[Header("Player Weight Settings")]
+	[Tooltip("Reference to the PlayerWeightSettings ScriptableObject.")]
 	public PlayerWeightSettings weightSettings;
 
-	// UI Input fields for current season weights.
+	// UI Input fields for current season weights
+	[Header("Current Season Weight Input Fields")]
+	[Tooltip("Input field for the number of points awarded in the current season.")]
 	public TMP_InputField inputCurrentSeasonPointsAwarded;
 
+	[Tooltip("Input field for the number of matches won in the current season.")]
 	public TMP_InputField inputCurrentSeasonMatchesWon;
+
+	[Tooltip("Input field for the current season's defensive shot average.")]
 	public TMP_InputField inputCurrentSeasonDefensiveShotAverage;
+
+	[Tooltip("Input field for the current season's skill level.")]
 	public TMP_InputField inputCurrentSeasonSkillLevel;
+
+	[Tooltip("Input field for the current season's PPM (Points per Match).")]
 	public TMP_InputField inputCurrentSeasonPpm;
+
+	[Tooltip("Input field for the number of shutouts in the current season.")]
 	public TMP_InputField inputCurrentSeasonShutouts;
+
+	[Tooltip("Input field for the number of mini slams in the current season.")]
 	public TMP_InputField inputCurrentSeasonMiniSlams;
+
+	[Tooltip("Input field for the number of 'Nine On The Snap' occurrences in the current season.")]
 	public TMP_InputField inputCurrentSeasonNineOnTheSnap;
+
+	[Tooltip("Input field for the current season's PA (Percentage Accuracy).")]
 	public TMP_InputField inputCurrentSeasonPaPercentage;
+
+	[Tooltip("Input field for the number of break and runs in the current season.")]
 	public TMP_InputField inputCurrentSeasonBreakAndRun;
 
+	// --- End Region: References --- //
+
+	// --- Region: Initialize Panel --- //
 	private void Start()
 		{
+		// Check if the weightSettings reference is missing
 		if (weightSettings == null)
 			{
 			Debug.LogError("PlayerWeightSettings reference is missing on the Current Season panel!");
 			return;
 			}
+
+		// Load the current season settings into the UI
 		LoadSettingsIntoUI();
 		}
+	// --- End Region: Initialize Panel --- //
 
-	// Populate the input fields with current season weight values.
+	// --- Region: Load Settings into UI --- //
+	// Populate the input fields with current season weight values from the PlayerWeightSettings
 	private void LoadSettingsIntoUI()
 		{
 		inputCurrentSeasonPointsAwarded.text = weightSettings.weightCurrentSeasonPointsAwarded.ToString();
@@ -44,16 +73,20 @@ public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 		inputCurrentSeasonPaPercentage.text = weightSettings.weightCurrentSeasonPaPercentage.ToString();
 		inputCurrentSeasonBreakAndRun.text = weightSettings.weightCurrentSeasonBreakAndRun.ToString();
 		}
+	// --- End Region: Load Settings into UI --- //
 
+	// --- Region: Save Settings --- //
 	// Called from the Save button's OnClick event.
 	public void SaveSettings()
 		{
+		// Check if the weightSettings reference is missing
 		if (weightSettings == null)
 			{
 			Debug.LogError("PlayerWeightSettings reference is missing on the Current Season panel!");
 			return;
 			}
 
+		// Parse the input fields and save the values to the weightSettings object
 		if (float.TryParse(inputCurrentSeasonPointsAwarded.text, out float value))
 			weightSettings.weightCurrentSeasonPointsAwarded = value;
 		if (float.TryParse(inputCurrentSeasonMatchesWon.text, out value))
@@ -75,6 +108,8 @@ public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 		if (float.TryParse(inputCurrentSeasonBreakAndRun.text, out value))
 			weightSettings.weightCurrentSeasonBreakAndRun = value;
 
+		// Log that the settings have been saved
 		Debug.Log("Current Season weight settings saved.");
 		}
+	// --- End Region: Save Settings --- //
 	}

@@ -5,6 +5,7 @@ public class SettingsPanelController:MonoBehaviour
 	{
 	[Header("UI References")]
 	public Toggle sampleDataGeneratorToggle;
+
 	public Button currentSeasonWeightSettingsButton;
 	public Button lifetimeWeightSettingsButton;
 	public Button backButton;
@@ -16,18 +17,21 @@ public class SettingsPanelController:MonoBehaviour
 	[Header("Sample Data Generator")]
 	public GameObject sampleDataGenerator;
 
+	private SampleDataGenerator generatorScript;
+
 	private void Start()
 		{
 		// Ensure UI references are assigned
-		if (sampleDataGeneratorToggle == null || sampleDataGenerator == null)
+		ValidateUIReferences();
+
+		// Cache the SampleDataGenerator script reference for efficiency
+		if (sampleDataGenerator != null)
 			{
-			Debug.LogError("SettingsPanelController: Missing Sample Data Toggle or Generator reference!");
-			return;
-			}
-		if (currentSeasonWeightSettingsButton == null || lifetimeWeightSettingsButton == null || backButton == null)
-			{
-			Debug.LogError("SettingsPanelController: Missing button references!");
-			return;
+			generatorScript = sampleDataGenerator.GetComponent<SampleDataGenerator>();
+			if (generatorScript == null)
+				{
+				Debug.LogError("SettingsPanelController: SampleDataGenerator script not found!");
+				}
 			}
 
 		// Initialize toggle state
@@ -35,9 +39,21 @@ public class SettingsPanelController:MonoBehaviour
 
 		// Add listeners
 		sampleDataGeneratorToggle.onValueChanged.AddListener(OnSampleDataToggleChanged);
-		currentSeasonWeightSettingsButton.onClick.AddListener(OpenCurrentSeasonWeightSettings);
-		lifetimeWeightSettingsButton.onClick.AddListener(OpenLifetimeWeightSettings);
+		currentSeasonWeightSettingsButton.onClick.AddListener(() => OpenSettingsPanel(currentSeasonWeightSettingsPanel));
+		lifetimeWeightSettingsButton.onClick.AddListener(() => OpenSettingsPanel(lifetimeWeightSettingsPanel));
 		backButton.onClick.AddListener(GoBack);
+		}
+
+	private void ValidateUIReferences()
+		{
+		if (sampleDataGeneratorToggle == null || sampleDataGenerator == null)
+			{
+			Debug.LogError("SettingsPanelController: Missing Sample Data Toggle or Generator reference!");
+			}
+		if (currentSeasonWeightSettingsButton == null || lifetimeWeightSettingsButton == null || backButton == null)
+			{
+			Debug.LogError("SettingsPanelController: Missing button references!");
+			}
 		}
 
 	private void OnEnable()
@@ -58,11 +74,11 @@ public class SettingsPanelController:MonoBehaviour
 			}
 		if (currentSeasonWeightSettingsButton != null)
 			{
-			currentSeasonWeightSettingsButton.onClick.RemoveListener(OpenCurrentSeasonWeightSettings);
+			currentSeasonWeightSettingsButton.onClick.RemoveListener(() => OpenSettingsPanel(currentSeasonWeightSettingsPanel));
 			}
 		if (lifetimeWeightSettingsButton != null)
 			{
-			lifetimeWeightSettingsButton.onClick.RemoveListener(OpenLifetimeWeightSettings);
+			lifetimeWeightSettingsButton.onClick.RemoveListener(() => OpenSettingsPanel(lifetimeWeightSettingsPanel));
 			}
 		if (backButton != null)
 			{
@@ -70,7 +86,6 @@ public class SettingsPanelController:MonoBehaviour
 			}
 		}
 
-	// --- Toggle Sample Data Generation --- //
 	private void OnSampleDataToggleChanged(bool isOn)
 		{
 		if (sampleDataGenerator != null)
@@ -78,56 +93,48 @@ public class SettingsPanelController:MonoBehaviour
 			sampleDataGenerator.SetActive(isOn);
 			}
 
-		if (isOn)
+		if (generatorScript != null)
 			{
-			GenerateSampleData();
-			}
-		else
-			{
-			ClearSampleData();
+			if (isOn)
+				{
+				ActivateSampleDataGenerator();
+				}
+			else
+				{
+				DeactivateSampleDataGenerator();
+				}
 			}
 
 		Debug.Log("Sample Data Generator is now " + (isOn ? "ENABLED" : "DISABLED"));
 		}
 
-	// --- Generate Sample Data using DatabaseManager --- //
-	private void GenerateSampleData()
+	private void ActivateSampleDataGenerator()
 		{
-		if (DatabaseManager.Instance != null)
+		if (generatorScript != null)
 			{
-			Debug.Log("Generating sample data...");
-			DatabaseManager.Instance.GenerateSampleData(); // Call the method in DatabaseManager
-			}
-		else
-			{
-			Debug.LogError("DatabaseManager instance is null! Cannot generate sample data.");
+			generatorScript.enabled = true;
+			Debug.Log("Sample Data Generator script has been enabled.");
 			}
 		}
 
-	// --- Clear Sample Data --- //
-	private void ClearSampleData()
+	private void DeactivateSampleDataGenerator()
 		{
-		if (DatabaseManager.Instance != null)
+		if (generatorScript != null)
 			{
-			Debug.Log("Clearing sample data...");
-			DatabaseManager.Instance.ClearSampleData(); // Call method in DatabaseManager
-			}
-		else
-			{
-			Debug.LogError("DatabaseManager instance is null! Cannot clear sample data.");
+			generatorScript.enabled = false;
+			Debug.Log("Sample Data Generator script has been disabled.");
 			}
 		}
 
-	// --- Open Current Season Weight Settings Panel --- //
-	private void OpenCurrentSeasonWeightSettings()
+	private void OpenSettingsPanel(GameObject settingsPanel)
 		{
 		if (UIManager.Instance != null)
 			{
 			UIManager.Instance.panelHistory.Add(UIManager.Instance.settingsPanel);
 			UIManager.Instance.settingsPanel.SetActive(false);
-			if (currentSeasonWeightSettingsPanel != null)
+			if (settingsPanel != null)
 				{
-				currentSeasonWeightSettingsPanel.SetActive(true);
+				settingsPanel.SetActive(true);
 				}
 			}
 		else
@@ -136,25 +143,6 @@ public class SettingsPanelController:MonoBehaviour
 			}
 		}
 
-	// --- Open Lifetime Weight Settings Panel --- //
-	private void OpenLifetimeWeightSettings()
-		{
-		if (UIManager.Instance != null)
-			{
-			UIManager.Instance.panelHistory.Add(UIManager.Instance.settingsPanel);
-			UIManager.Instance.settingsPanel.SetActive(false);
-			if (lifetimeWeightSettingsPanel != null)
-				{
-				lifetimeWeightSettingsPanel.SetActive(true);
-				}
-			}
-		else
-			{
-			Debug.LogError("SettingsPanelController: UIManager instance is null!");
-			}
-		}
-
-	// --- Go Back using UIManager --- //
 	private void GoBack()
 		{
 		if (UIManager.Instance != null)

@@ -18,7 +18,7 @@ public class TeamManagementPanel:MonoBehaviour
 	public TMP_Text backButtonText;
 
 	private List<Team> teams = new();
-	private int selectedTeamId = -1; // Stores selected team ID for modifications
+	private int selectedTeamId = -1;
 
 	private void Start()
 		{
@@ -65,7 +65,7 @@ public class TeamManagementPanel:MonoBehaviour
 			}
 
 		teamDropdown.AddOptions(teamNames);
-		teamDropdown.value = 0; // Set default selection
+		teamDropdown.value = 0; // Default to the first team
 		}
 
 	private void AddOrUpdateTeam()
@@ -97,7 +97,7 @@ public class TeamManagementPanel:MonoBehaviour
 			Team teamToUpdate = teams.Find(t => t.TeamId == selectedTeamId);
 			if (teamToUpdate != null)
 				{
-				teamToUpdate.TeamName = newTeamName;
+				teamToUpdate.UpdateTeamName(newTeamName);
 				Debug.Log($"Updated team {selectedTeamId} to {newTeamName}");
 				}
 			}

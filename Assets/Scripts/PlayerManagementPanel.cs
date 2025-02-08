@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using TMPro;  // For using TMP components
+using TMPro;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,20 +10,36 @@ using UnityEngine.UI;
 public class PlayerManagementPanel:MonoBehaviour
 	{
 	// --- Region: Panel References --- //
+	[Header("Dropdowns")]
+	[Tooltip("Dropdown to select a team.")]
 	public TMP_Dropdown teamNameDropdown;
 
+	[Tooltip("Dropdown to select a player.")]
 	public TMP_Dropdown playerNameDropdown;
+
+	[Header("Player Input")]
+	[Tooltip("Input field for new player name.")]
 	public TMP_InputField playerNameInputField;
+
+	[Header("Buttons")]
+	[Tooltip("Button to add a new player.")]
 	public Button addPlayerButton;
+
+	[Tooltip("Button to delete a selected player.")]
 	public Button deletePlayerButton;
+
+	[Tooltip("Button to add player details.")]
 	public Button addPlayerDetailsButton;
+
+	[Tooltip("Button to go back to the previous menu.")]
 	public Button backButton;
-	public Button saveToCSVButton;  // New button for saving to CSV
-									// --- End Region: Panel References --- //
+
+	[Tooltip("Button to save data to CSV.")]
+	public Button saveToCSVButton;
+	// --- End Region: Panel References --- //
 
 	// --- Region: CSV Data References --- //
 	private string teamsCsvPath;
-
 	private string playersCsvPath;
 	private List<Team> teams;
 	private List<Player> players;
@@ -33,30 +49,32 @@ public class PlayerManagementPanel:MonoBehaviour
 	private void Start()
 		{
 		// Define file paths for the CSVs
-		teamsCsvPath = System.IO.Path.Combine(Application.persistentDataPath, "teams.csv");
-		playersCsvPath = System.IO.Path.Combine(Application.persistentDataPath, "players.csv");
+		teamsCsvPath = Path.Combine(Application.persistentDataPath, "teams.csv");
+		playersCsvPath = Path.Combine(Application.persistentDataPath, "players.csv");
 
 		teams = LoadTeamsFromCSV();
 		players = LoadPlayersFromCSV();
 
+		// Register button click listeners
 		addPlayerButton.onClick.AddListener(OnAddPlayer);
 		deletePlayerButton.onClick.AddListener(OnDeletePlayer);
 		addPlayerDetailsButton.onClick.AddListener(OnAddPlayerDetails);
 		backButton.onClick.AddListener(OnBackButton);
-		saveToCSVButton.onClick.AddListener(OnSaveToCSV); // Link save to CSV functionality
+		saveToCSVButton.onClick.AddListener(OnSaveToCSV);
 
+		// Populate the dropdowns
 		PopulateTeamDropdown();
 		PopulatePlayerDropdown();
 		}
-
 	// --- End Region: Initialize Panel --- //
 
 	// --- Region: Add Player --- //
 	private void OnAddPlayer()
 		{
 		string playerName = playerNameInputField.text;
-		int teamId = teamNameDropdown.value + 1; // Get selected team's ID (simple mapping)
+		int teamId = teamNameDropdown.value + 1; // Team ID is 1-indexed
 
+		// Check if the player name is valid
 		if (!string.IsNullOrEmpty(playerName))
 			{
 			Player newPlayer = new()
@@ -64,16 +82,15 @@ public class PlayerManagementPanel:MonoBehaviour
 				Name = playerName,
 				TeamId = teamId
 				};
-			players.Add(newPlayer); // Add player to the list
+			players.Add(newPlayer);
 			Debug.Log($"Player {playerName} added to Team {teamNameDropdown.options[teamNameDropdown.value].text}");
-			PopulatePlayerDropdown(); // Refresh player dropdown
+			PopulatePlayerDropdown();
 			}
 		else
 			{
 			Debug.Log("Please enter a valid player name.");
 			}
 		}
-
 	// --- End Region: Add Player --- //
 
 	// --- Region: Delete Player --- //
@@ -81,57 +98,53 @@ public class PlayerManagementPanel:MonoBehaviour
 		{
 		string playerName = playerNameDropdown.options[playerNameDropdown.value].text;
 		Player playerToDelete = players.FirstOrDefault(p => p.Name == playerName);
+
+		// Delete the player if found
 		if (playerToDelete != null)
 			{
-			players.Remove(playerToDelete); // Remove player from list
+			players.Remove(playerToDelete);
 			Debug.Log($"Player {playerName} deleted.");
-			PopulatePlayerDropdown(); // Refresh player dropdown
+			PopulatePlayerDropdown();
 			}
 		else
 			{
 			Debug.Log("Player not found.");
 			}
 		}
-
 	// --- End Region: Delete Player --- //
 
 	// --- Region: Add Player Details --- //
 	private void OnAddPlayerDetails()
 		{
 		string playerName = playerNameDropdown.options[playerNameDropdown.value].text;
-		// Logic to show player details input panel (expand as needed)
 		Debug.Log($"Adding details for player: {playerName}");
 		}
-
 	// --- End Region: Add Player Details --- //
 
 	// --- Region: Populate Team Dropdown --- //
 	private void PopulateTeamDropdown()
 		{
-		teamNameDropdown.ClearOptions();  // Clear current dropdown options
+		teamNameDropdown.ClearOptions();
 		List<string> teamNames = teams.Select(t => t.Name).ToList();
 		teamNameDropdown.AddOptions(teamNames);
 		}
-
 	// --- End Region: Populate Team Dropdown --- //
 
 	// --- Region: Populate Player Dropdown --- //
 	private void PopulatePlayerDropdown()
 		{
-		playerNameDropdown.ClearOptions();  // Clear current dropdown options
+		playerNameDropdown.ClearOptions();
 		List<string> playerNames = players.Select(p => p.Name).ToList();
 		playerNameDropdown.AddOptions(playerNames);
 		}
-
 	// --- End Region: Populate Player Dropdown --- //
 
 	// --- Region: Back Button --- //
 	private void OnBackButton()
 		{
-		// Show the home panel or previous panel
+		// Log back button action (could navigate to the home panel)
 		Debug.Log("Back button clicked.");
 		}
-
 	// --- End Region: Back Button --- //
 
 	// --- Region: Save Data to CSV --- //
@@ -141,7 +154,6 @@ public class PlayerManagementPanel:MonoBehaviour
 		SavePlayersToCSV(players);
 		Debug.Log("Data saved to CSV files.");
 		}
-
 	// --- End Region: Save Data to CSV --- //
 
 	// --- Region: Load Teams from CSV --- //
@@ -154,7 +166,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			foreach (var line in lines)
 				{
 				var columns = line.Split(',');
-				if (columns.Length == 2) // Assuming 2 columns: Id, Name
+				if (columns.Length == 2) // Assuming two columns: Id, Name
 					{
 					loadedTeams.Add(new Team
 						{
@@ -166,7 +178,6 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		return loadedTeams;
 		}
-
 	// --- End Region: Load Teams from CSV --- //
 
 	// --- Region: Load Players from CSV --- //
@@ -179,7 +190,7 @@ public class PlayerManagementPanel:MonoBehaviour
 			foreach (var line in lines)
 				{
 				var columns = line.Split(',');
-				if (columns.Length == 3) // Assuming 3 columns: Id, Name, TeamId
+				if (columns.Length == 3) // Assuming three columns: Id, Name, TeamId
 					{
 					loadedPlayers.Add(new Player
 						{
@@ -192,7 +203,6 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		return loadedPlayers;
 		}
-
 	// --- End Region: Load Players from CSV --- //
 
 	// --- Region: Save Teams to CSV --- //
@@ -205,7 +215,6 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		File.WriteAllLines(teamsCsvPath, lines);
 		}
-
 	// --- End Region: Save Teams to CSV --- //
 
 	// --- Region: Save Players to CSV --- //
@@ -218,25 +227,24 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 		File.WriteAllLines(playersCsvPath, lines);
 		}
-
 	// --- End Region: Save Players to CSV --- //
 
 	// --- Region: Player Class --- //
+	[System.Serializable]
 	public class Player
 		{
 		public int Id { get; set; }
 		public string Name { get; set; }
 		public int TeamId { get; set; }  // Foreign key to the team
 		}
-
 	// --- End Region: Player Class --- //
 
 	// --- Region: Team Class --- //
+	[System.Serializable]
 	public class Team
 		{
 		public int Id { get; set; }
 		public string Name { get; set; }
 		}
-
 	// --- End Region: Team Class --- //
 	}

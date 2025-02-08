@@ -2,6 +2,7 @@ AppLogic.cs
 CSVManager.cs
 CurrentSeasonWeightSettingsPanel.cs
 DatabaseManager.cs
+HomePanel.cs
 LifetimeWeightSettingsPanel.cs
 OverlayFeedbackPanel.cs
 Player.cs
@@ -10,6 +11,7 @@ PlayerLifetimeDataInputPanel.cs
 PlayerManagementPanel.cs
 PlayerStats.cs
 PlayerWeightSettings.cs
+SampleDataGenerator.cs
 SettingsManager.cs
 SettingsPanelController.cs
 Team.cs

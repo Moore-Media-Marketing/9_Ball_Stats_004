@@ -12,35 +12,49 @@ public class HomePanel:MonoBehaviour
 
 	private void Start()
 		{
-		manageTeamsButton.onClick.AddListener(OnManageTeamsClicked);
-		createPlayerButton.onClick.AddListener(OnCreatePlayerClicked);
-		comparisonButton.onClick.AddListener(OnComparisonClicked);
-		settingsButton.onClick.AddListener(OnSettingsClicked);
-		exitButton.onClick.AddListener(OnExitClicked);
+		// Add listeners to buttons if they are not null
+		if (manageTeamsButton != null)
+			manageTeamsButton.onClick.AddListener(OnManageTeamsClicked);
+
+		if (createPlayerButton != null)
+			createPlayerButton.onClick.AddListener(OnCreatePlayerClicked);
+
+		if (comparisonButton != null)
+			comparisonButton.onClick.AddListener(OnComparisonClicked);
+
+		if (settingsButton != null)
+			settingsButton.onClick.AddListener(OnSettingsClicked);
+
+		if (exitButton != null)
+			exitButton.onClick.AddListener(OnExitClicked);
 		}
 
 	// Navigate to Team Management Panel
 	private void OnManageTeamsClicked()
 		{
-		UIManager.Instance.ShowTeamManagementPanel();
+		if (UIManager.Instance != null)
+			UIManager.Instance.ShowTeamManagementPanel();
 		}
 
 	// Navigate to Player Management Panel
 	private void OnCreatePlayerClicked()
 		{
-		UIManager.Instance.ShowPlayerManagementPanel();
+		if (UIManager.Instance != null)
+			UIManager.Instance.ShowPlayerManagementPanel();
 		}
 
 	// Navigate to Comparison Panel
 	private void OnComparisonClicked()
 		{
-		UIManager.Instance.ShowComparisonPanel();
+		if (UIManager.Instance != null)
+			UIManager.Instance.ShowComparisonPanel();
 		}
 
 	// Navigate to Settings Panel
 	private void OnSettingsClicked()
 		{
-		UIManager.Instance.ShowSettingsPanel();
+		if (UIManager.Instance != null)
+			UIManager.Instance.ShowSettingsPanel();
 		}
 
 	// Exit the app

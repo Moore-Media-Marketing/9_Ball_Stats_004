@@ -2,7 +2,6 @@ public class PlayerStats
 	{
 	// Current Season Stats
 	public int CurrentSeasonMatchesPlayed { get; set; }
-
 	public int CurrentSeasonMatchesWon { get; set; }
 	public int CurrentSeasonBreakAndRun { get; set; }
 	public float CurrentSeasonDefensiveShotAverage { get; set; }
@@ -18,7 +17,6 @@ public class PlayerStats
 
 	// Lifetime Stats
 	public int LifetimeGamesPlayed { get; set; }
-
 	public int LifetimeGamesWon { get; set; }
 	public int LifetimeMatchesPlayed { get; set; }
 	public int LifetimeMatchesWon { get; set; }
@@ -61,5 +59,25 @@ public class PlayerStats
 		LifetimeDefensiveShotAverage = 0;
 		LifetimeBreakAndRun = 0;
 		LifetimeMatchesPlayedInLast2Years = 0;
+		}
+
+	// Method to update current season stats after a match
+	public void UpdateSeasonStats(bool wonMatch)
+		{
+		CurrentSeasonMatchesPlayed++;
+		if (wonMatch)
+			{
+			CurrentSeasonMatchesWon++;
+			}
+		}
+
+	// Method to update lifetime stats after a match
+	public void UpdateLifetimeStats(bool wonMatch)
+		{
+		LifetimeGamesPlayed++;
+		if (wonMatch)
+			{
+			LifetimeGamesWon++;
+			}
 		}
 	}
