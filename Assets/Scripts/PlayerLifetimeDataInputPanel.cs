@@ -63,7 +63,7 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	private void OnTeamDropdownChanged(int selectedIndex)
 		{
 		Team selectedTeam = teams[selectedIndex];
-		players = DatabaseManager.Instance.LoadPlayersFromCsv(selectedTeam.TeamId); // Now passing TeamId
+		players = DatabaseManager.Instance.LoadPlayersByTeam(selectedTeam.TeamId); // Now passing TeamId
 		PopulatePlayerDropdown();
 		}
 

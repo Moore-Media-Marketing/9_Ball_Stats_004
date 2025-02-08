@@ -2,14 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
-using System.Linq;
 
 public class TeamManagementPanel:MonoBehaviour
 	{
-	private DatabaseManager databaseManager;
-
-	// UI references
+	[Header("UI Elements")]
 	public TMP_Text headerText;
 	public TMP_Text teamNameText;
 	public TMP_InputField teamNameInputField;
@@ -19,151 +15,172 @@ public class TeamManagementPanel:MonoBehaviour
 	public Button modifyTeamNameButton;
 	public Button deleteButton;
 	public Button backButton;
+	public TMP_Text backButtonText;
 
-	// Temporary variables for managing UI input
-	private Team currentSelectedTeam;
+	private List<Team> teams = new();
+	private int selectedTeamId = -1; // Stores selected team ID for modifications
 
 	private void Start()
 		{
-		// Initialize DatabaseManager
-		databaseManager = DatabaseManager.Instance;
-
-		// Setup Button Listeners
-		addUpdateTeamButton.onClick.AddListener(OnAddUpdateTeamButtonClick);
-		clearTeamNameButton.onClick.AddListener(OnClearTeamNameButtonClick);
-		modifyTeamNameButton.onClick.AddListener(OnModifyTeamNameButtonClick);
-		deleteButton.onClick.AddListener(OnDeleteButtonClick);
-		backButton.onClick.AddListener(OnBackButtonClick);
-
-		// Setup Dropdown Listener
-		teamDropdown.onValueChanged.AddListener(OnTeamDropdownChanged);
-
-		// Initialize the dropdown with existing teams
-		LoadTeamsIntoDropdown();
+		PopulateTeamDropdown();
+		SetupButtonListeners();
 		}
 
-	#region UI Management
-	// Add or Update a Team
-	public void OnAddUpdateTeamButtonClick()
+	private void SetupButtonListeners()
 		{
-		string teamName = teamNameInputField.text;
+		if (addUpdateTeamButton != null) addUpdateTeamButton.onClick.AddListener(AddOrUpdateTeam);
+		if (clearTeamNameButton != null) clearTeamNameButton.onClick.AddListener(ClearTeamName);
+		if (modifyTeamNameButton != null) modifyTeamNameButton.onClick.AddListener(ModifySelectedTeam);
+		if (deleteButton != null) deleteButton.onClick.AddListener(DeleteSelectedTeam);
+		if (backButton != null) backButton.onClick.AddListener(HandleBackButton);
+		if (teamDropdown != null) teamDropdown.onValueChanged.AddListener(OnTeamSelected);
+		}
 
-		if (string.IsNullOrEmpty(teamName))
+	private void PopulateTeamDropdown()
+		{
+		if (teamDropdown == null)
+			{
+			Debug.LogError("TeamDropdown reference is missing! Assign it in the Unity Inspector.");
+			return;
+			}
+
+		if (DatabaseManager.Instance == null)
+			{
+			Debug.LogError("DatabaseManager instance is missing!");
+			return;
+			}
+
+		teams = DatabaseManager.Instance.LoadTeams();
+		if (teams == null || teams.Count == 0)
+			{
+			Debug.LogWarning("No teams found in the database!");
+			return;
+			}
+
+		teamDropdown.ClearOptions();
+		List<string> teamNames = new();
+		foreach (var team in teams)
+			{
+			teamNames.Add(team.TeamName);
+			}
+
+		teamDropdown.AddOptions(teamNames);
+		teamDropdown.value = 0; // Set default selection
+		}
+
+	private void AddOrUpdateTeam()
+		{
+		if (DatabaseManager.Instance == null)
+			{
+			Debug.LogError("DatabaseManager instance is missing!");
+			return;
+			}
+
+		string newTeamName = teamNameInputField.text.Trim();
+		if (string.IsNullOrEmpty(newTeamName))
 			{
 			Debug.LogWarning("Team name cannot be empty.");
 			return;
 			}
 
-		// Check if team already exists
-		List<Team> existingTeams = databaseManager.LoadTeams();
-		if (existingTeams.Any(t => t.TeamName == teamName))
+		if (selectedTeamId == -1)
 			{
-			Debug.LogWarning("A team with this name already exists.");
+			// Adding a new team
+			int newTeamId = teams.Count + 1;
+			Team newTeam = new(newTeamId, newTeamName);
+			teams.Add(newTeam);
+			Debug.Log($"Added new team: {newTeamName}");
+			}
+		else
+			{
+			// Updating existing team
+			Team teamToUpdate = teams.Find(t => t.TeamId == selectedTeamId);
+			if (teamToUpdate != null)
+				{
+				teamToUpdate.TeamName = newTeamName;
+				Debug.Log($"Updated team {selectedTeamId} to {newTeamName}");
+				}
+			}
+
+		DatabaseManager.Instance.SaveTeams(teams);
+		PopulateTeamDropdown();
+		ClearTeamName();
+		}
+
+	private void ClearTeamName()
+		{
+		if (teamNameInputField != null)
+			{
+			teamNameInputField.text = "";
+			}
+		selectedTeamId = -1; // Reset selected ID
+		}
+
+	private void ModifySelectedTeam()
+		{
+		if (teamDropdown == null || DatabaseManager.Instance == null)
+			{
+			Debug.LogError("TeamDropdown or DatabaseManager is missing!");
 			return;
 			}
 
-		// Add new or update existing team
-		if (currentSelectedTeam == null)
-			{
-			// Add new team
-			Team newTeam = new(0, teamName);  // Assuming 0 for TeamId (to be updated after saving)
-			databaseManager.SaveTeams(new List<Team> { newTeam });
-			Debug.Log($"Team added: {teamName}");
-			}
-		else
-			{
-			// Update existing team
-			currentSelectedTeam.UpdateTeamName(teamName);
-			databaseManager.SaveTeams(new List<Team> { currentSelectedTeam });
-			Debug.Log($"Team updated: {teamName}");
-			}
-
-		LoadTeamsIntoDropdown(); // Refresh dropdown list after adding/updating
-		}
-
-	// Clear the team name input field
-	public void OnClearTeamNameButtonClick()
-		{
-		teamNameInputField.text = string.Empty;
-		currentSelectedTeam = null;
-		Debug.Log("Cleared team name input.");
-		}
-
-	// Modify the selected team name
-	public void OnModifyTeamNameButtonClick()
-		{
-		if (currentSelectedTeam != null)
-			{
-			teamNameInputField.text = currentSelectedTeam.TeamName;
-			}
-		else
+		if (teamDropdown.value < 0 || teams.Count == 0)
 			{
 			Debug.LogWarning("No team selected for modification.");
+			return;
+			}
+
+		selectedTeamId = teams[teamDropdown.value].TeamId;
+		if (teamNameInputField != null)
+			{
+			teamNameInputField.text = teams[teamDropdown.value].TeamName;
 			}
 		}
 
-	// Delete the selected team
-	public void OnDeleteButtonClick()
+	private void DeleteSelectedTeam()
 		{
-		if (currentSelectedTeam != null)
+		if (teamDropdown == null || DatabaseManager.Instance == null)
 			{
-			databaseManager.DeleteTeam(currentSelectedTeam); // Assuming DeleteTeam method exists in DatabaseManager
-			Debug.Log($"Team deleted: {currentSelectedTeam.TeamName}");
-			LoadTeamsIntoDropdown(); // Refresh dropdown list after deleting
-			OnClearTeamNameButtonClick(); // Clear the input field after deletion
+			Debug.LogError("TeamDropdown or DatabaseManager is missing!");
+			return;
 			}
-		else
+
+		if (teamDropdown.value < 0 || teams.Count == 0)
 			{
 			Debug.LogWarning("No team selected for deletion.");
+			return;
 			}
+
+		int teamIdToDelete = teams[teamDropdown.value].TeamId;
+		DatabaseManager.Instance.DeleteTeam(teamIdToDelete);
+		PopulateTeamDropdown();
+		Debug.Log($"Deleted team with ID {teamIdToDelete}");
 		}
 
-	// Update the back button text and handle back action
-	public void OnBackButtonClick()
+	private void OnTeamSelected(int index)
 		{
-		Debug.Log("Back button clicked.");
-		// Logic to navigate back to previous screen or menu
-		// If it's a scene change, use the following:
-		// SceneManager.LoadScene("PreviousSceneName");
+		if (index < 0 || index >= teams.Count)
+			{
+			return;
+			}
 
-		// If it's navigating between UI panels:
-		gameObject.SetActive(false);  // Hide current panel
-									  // Optionally, show the previous panel (if needed)
+		selectedTeamId = teams[index].TeamId;
+		if (teamNameInputField != null)
+			{
+			teamNameInputField.text = teams[index].TeamName;
+			}
 		}
-	#endregion
 
-	#region Dropdown & Team Management
-	// Load teams into the dropdown menu
-	private void LoadTeamsIntoDropdown()
+	private void HandleBackButton()
 		{
-		teamDropdown.ClearOptions();
-		List<Team> teams = databaseManager.LoadTeams();
-
-		// Add the teams to the dropdown
-		List<string> teamNames = new();
-		foreach (Team team in teams)
-			{
-			teamNames.Add(team.TeamName);  // Referencing the property correctly
-			}
-
-		teamDropdown.AddOptions(teamNames);
+		Debug.Log("Back button clicked. Returning to the previous screen...");
 		}
 
-	// Handle dropdown selection change
-	private void OnTeamDropdownChanged(int index)
+	public void UpdateBackButtonText(string newText)
 		{
-		List<Team> teams = databaseManager.LoadTeams();
-
-		if (index >= 0 && index < teams.Count)
+		if (backButtonText != null)
 			{
-			currentSelectedTeam = teams[index];
-			teamNameInputField.text = currentSelectedTeam.TeamName;
-			Debug.Log($"Selected team: {currentSelectedTeam.TeamName}");
-			}
-		else
-			{
-			currentSelectedTeam = null;
+			backButtonText.text = newText;
 			}
 		}
-	#endregion
 	}

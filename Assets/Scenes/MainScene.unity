@@ -8943,7 +8943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f6cd44d3e5ff6e4ab52c0f25994088e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sampleDataEnabled: 0
+  sampleDataEnabled: 1
 --- !u!1 &431149852
 GameObject:
   m_ObjectHideFlags: 0
@@ -17619,6 +17619,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &991679433 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5586954189099093330, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
+  m_PrefabInstance: {fileID: 1060276292}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &992197987
 GameObject:
   m_ObjectHideFlags: 0
@@ -19844,6 +19855,7 @@ MonoBehaviour:
   modifyTeamNameButton: {fileID: 1952035564}
   deleteButton: {fileID: 1543668958}
   backButton: {fileID: 1060276294}
+  backButtonText: {fileID: 991679433}
 --- !u!1 &1075463345
 GameObject:
   m_ObjectHideFlags: 0
