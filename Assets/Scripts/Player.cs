@@ -1,70 +1,67 @@
+using System;
+
 public class Player
 	{
+	// Properties
 	public string PlayerName { get; set; }
+	public int PlayerId { get; set; }
 	public int SkillLevel { get; set; }
-	public int TeamId { get; set; }
 	public string TeamName { get; set; }
-	public int LifetimeGamesWon { get; set; }
-	public int LifetimeGamesPlayed { get; set; }
-	public float LifetimeDefensiveShotAverage { get; set; }
-	public int LifetimeMatchesPlayedInLast2Years { get; set; }
-	public int LifetimeMiniSlams { get; set; }
-	public int LifetimeShutouts { get; set; }
-	public int LifetimeBreakAndRun { get; set; } // **Added missing property**
-	public int LifetimeNineOnTheSnap { get; set; } // **Added missing property**
-	public int CurrentSeasonPointsAwarded { get; set; }
 	public int CurrentSeasonMatchesPlayed { get; set; }
 	public int CurrentSeasonMatchesWon { get; set; }
+	public float CurrentSeasonDefensiveShotAverage { get; set; }
+	public int CurrentSeasonMiniSlams { get; set; }
+	public int CurrentSeasonNineOnTheSnap { get; set; }
+	public int CurrentSeasonPointsAwarded { get; set; }
+	public int CurrentSeasonPointsPerMatch { get; set; }
+	public int LifetimeMatchesPlayed { get; set; }
+	public int LifetimeMatchesWon { get; set; }
+	public int LifetimeMiniSlams { get; set; }
+	public int LifetimeNineOnTheSnap { get; set; }
+	public int LifetimeShutouts { get; set; }
 
-	// Constructor to initialize the player
-	public Player(string playerName, int skillLevel, int teamId, string teamName, int lifetimeGamesWon, int lifetimeGamesPlayed,
-				  float lifetimeDefensiveShotAverage, int lifetimeMatchesPlayedInLast2Years, int lifetimeMiniSlams,
-				  int lifetimeShutouts, int lifetimeBreakAndRun, int lifetimeNineOnTheSnap, // **Added these two**
-				  int currentSeasonPointsAwarded, int currentSeasonMatchesPlayed, int currentSeasonMatchesWon)
+	// Constructor with 16 parameters
+	public Player(string playerName, int playerId, int skillLevel, string teamName,
+				  int currentSeasonMatchesPlayed, int currentSeasonMatchesWon,
+				  float currentSeasonDefensiveShotAverage, int currentSeasonMiniSlams,
+				  int currentSeasonNineOnTheSnap, int currentSeasonPointsAwarded,
+				  int currentSeasonPointsPerMatch, int lifetimeMatchesPlayed,
+				  int lifetimeMatchesWon, int lifetimeMiniSlams, int lifetimeNineOnTheSnap,
+				  int lifetimeShutouts)
 		{
 		PlayerName = playerName;
+		PlayerId = playerId;
 		SkillLevel = skillLevel;
-		TeamId = teamId;
 		TeamName = teamName;
-		LifetimeGamesWon = lifetimeGamesWon;
-		LifetimeGamesPlayed = lifetimeGamesPlayed;
-		LifetimeDefensiveShotAverage = lifetimeDefensiveShotAverage;
-		LifetimeMatchesPlayedInLast2Years = lifetimeMatchesPlayedInLast2Years;
-		LifetimeMiniSlams = lifetimeMiniSlams;
-		LifetimeShutouts = lifetimeShutouts;
-		LifetimeBreakAndRun = lifetimeBreakAndRun; // **Initialize new property**
-		LifetimeNineOnTheSnap = lifetimeNineOnTheSnap; // **Initialize new property**
-		CurrentSeasonPointsAwarded = currentSeasonPointsAwarded;
 		CurrentSeasonMatchesPlayed = currentSeasonMatchesPlayed;
 		CurrentSeasonMatchesWon = currentSeasonMatchesWon;
+		CurrentSeasonDefensiveShotAverage = currentSeasonDefensiveShotAverage;
+		CurrentSeasonMiniSlams = currentSeasonMiniSlams;
+		CurrentSeasonNineOnTheSnap = currentSeasonNineOnTheSnap;
+		CurrentSeasonPointsAwarded = currentSeasonPointsAwarded;
+		CurrentSeasonPointsPerMatch = currentSeasonPointsPerMatch;
+		LifetimeMatchesPlayed = lifetimeMatchesPlayed;
+		LifetimeMatchesWon = lifetimeMatchesWon;
+		LifetimeMiniSlams = lifetimeMiniSlams;
+		LifetimeNineOnTheSnap = lifetimeNineOnTheSnap;
+		LifetimeShutouts = lifetimeShutouts;
 		}
 
-	// Method to convert a player to CSV
+	// CSV handling methods (if needed)
 	public string ToCsv()
 		{
-		return $"{PlayerName},{SkillLevel},{TeamId},{TeamName},{LifetimeGamesWon},{LifetimeGamesPlayed}," +
-			   $"{LifetimeDefensiveShotAverage},{LifetimeMatchesPlayedInLast2Years},{LifetimeMiniSlams},{LifetimeShutouts}," +
-			   $"{LifetimeBreakAndRun},{LifetimeNineOnTheSnap}," + // **Added to CSV output**
-			   $"{CurrentSeasonPointsAwarded},{CurrentSeasonMatchesPlayed},{CurrentSeasonMatchesWon}";
+		return $"{PlayerId},{PlayerName},{SkillLevel},{TeamName},{CurrentSeasonMatchesPlayed},{CurrentSeasonMatchesWon},{CurrentSeasonDefensiveShotAverage},{CurrentSeasonMiniSlams},{CurrentSeasonNineOnTheSnap},{CurrentSeasonPointsAwarded},{CurrentSeasonPointsPerMatch},{LifetimeMatchesPlayed},{LifetimeMatchesWon},{LifetimeMiniSlams},{LifetimeNineOnTheSnap},{LifetimeShutouts}";
 		}
 
-	// Static method to parse a CSV line and create a Player object
-	public static Player FromCsv(string csvLine)
+	public static Player FromCsv(string csv)
 		{
-		string[] values = csvLine.Split(',');
-
-		return new Player(values[0], int.Parse(values[1]), int.Parse(values[2]), values[3],
-						  int.Parse(values[4]), int.Parse(values[5]), float.Parse(values[6]),
-						  int.Parse(values[7]), int.Parse(values[8]), int.Parse(values[9]),
-						  int.Parse(values[10]), int.Parse(values[11]), int.Parse(values[12]), // **Parsing new properties**
-						  int.Parse(values[13]), int.Parse(values[14]), int.Parse(values[15]));
-		}
-
-	// --- New Method: CalculateOverallScore --- //
-	public int CalculateOverallScore(PlayerWeightSettings weightSettings)
-		{
-		// Example of calculating the overall score: you can adjust this based on your stats
-		int score = CurrentSeasonPointsAwarded + (LifetimeGamesWon * 2) - (LifetimeGamesPlayed / 10);
-		return score;
+		var values = csv.Split(',');
+		return new Player(
+			values[1], int.Parse(values[0]), int.Parse(values[2]), values[3],
+			int.Parse(values[4]), int.Parse(values[5]), float.Parse(values[6]),
+			int.Parse(values[7]), int.Parse(values[8]), int.Parse(values[9]),
+			int.Parse(values[10]), int.Parse(values[11]), int.Parse(values[12]),
+			int.Parse(values[13]), int.Parse(values[14]), int.Parse(values[15])
+		);
 		}
 	}

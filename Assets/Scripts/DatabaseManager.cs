@@ -2,124 +2,80 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using UnityEngine;
-
-public class DatabaseManager:MonoBehaviour
+public class DatabaseManager
 	{
-	// Singleton pattern for global access to the DatabaseManager
-	public static DatabaseManager Instance { get; private set; }
+	private string teamsFilePath = "Teams.csv";
+	private string playersFilePath = "Players.csv";
 
-	private string filePath = "teamsandplayers.csv";
-
-	// --- Initialize Singleton --- //
-	private void Awake()
+	// Method to load teams from CSV
+	public List<Team> LoadTeams()
 		{
-		// Check if instance already exists
-		if (Instance != null && Instance != this)
-			{
-			Destroy(this.gameObject);
-			}
-		else
-			{
-			Instance = this;
-			}
-		}
-
-	// --- Load Players from CSV File --- //
-	public List<Player> LoadPlayers()
-		{
-		List<Player> players = new List<Player>();
+		var teams = new List<Team>();
 		try
 			{
-			// Check if the file exists
-			if (File.Exists(filePath))
+			using (var reader = new StreamReader(teamsFilePath))
+			using (var csv = new CsvReader(reader, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
 				{
-				string[] allLines = File.ReadAllLines(filePath);
-				foreach (string line in allLines)
-					{
-					// Skip header or empty lines
-					if (string.IsNullOrEmpty(line) || line.StartsWith("PlayerName"))
-						continue;
-
-					players.Add(Player.FromCsv(line));
-					}
-				Debug.Log("Players loaded successfully.");
-				}
-			else
-				{
-				Debug.LogError($"File {filePath} not found!");
+				teams = csv.GetRecords<Team>().ToList();
 				}
 			}
 		catch (Exception ex)
 			{
-			Debug.LogError("Error loading players: " + ex.Message);
+			Debug.LogError("Error loading teams: " + ex.Message);
+			}
+		return teams;
+		}
+
+	// Method to save teams to CSV
+	public void SaveTeams(List<Team> teams)
+		{
+		try
+			{
+			using (var writer = new StreamWriter(teamsFilePath))
+			using (var csv = new CsvWriter(writer, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
+				{
+				csv.WriteRecords(teams);
+				}
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error saving teams: " + ex.Message);
+			}
+		}
+
+	// Method to load players from CSV
+	public List<Player> LoadPlayersFromCsv(string filePath)
+		{
+		var players = new List<Player>();
+		try
+			{
+			using (var reader = new StreamReader(filePath))
+			using (var csv = new CsvReader(reader, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
+				{
+				players = csv.GetRecords<Player>().ToList();
+				}
+			}
+		catch (Exception ex)
+			{
+			Debug.LogError("Error loading players from CSV: " + ex.Message);
 			}
 		return players;
 		}
 
-	// --- Save Players to CSV File --- //
-	public void SavePlayers(List<Player> players)
+	// Method to save players to CSV
+	public void SavePlayersToCsv(string filePath, List<Player> players)
 		{
 		try
 			{
-			// Prepare the CSV content with a header
-			List<string> lines = new List<string>
-			{
-				"PlayerName,SkillLevel,TeamId,TeamName,LifetimeGamesWon,LifetimeGamesPlayed,LifetimeDefensiveShotAverage," +
-				"LifetimeMatchesPlayedInLast2Years,LifetimeMiniSlams,LifetimeShutouts,LifetimeBreakAndRun,LifetimeNineOnTheSnap," +
-				"CurrentSeasonPointsAwarded,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon"
-			};
-
-			// Add each player to the CSV content
-			foreach (Player player in players)
+			using (var writer = new StreamWriter(filePath))
+			using (var csv = new CsvWriter(writer, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
 				{
-				lines.Add(player.ToCsv());
+				csv.WriteRecords(players);
 				}
-
-			// Write the data to the CSV file
-			File.WriteAllLines(filePath, lines);
-			Debug.Log("Players saved successfully.");
 			}
 		catch (Exception ex)
 			{
-			Debug.LogError("Error saving players: " + ex.Message);
-			}
-		}
-
-	// --- Update Player Data --- //
-	public void UpdatePlayer(Player updatedPlayer)
-		{
-		try
-			{
-			List<Player> players = LoadPlayers();
-			for (int i = 0; i < players.Count; i++)
-				{
-				if (players[i].TeamId == updatedPlayer.TeamId && players[i].PlayerName == updatedPlayer.PlayerName)
-					{
-					players[i] = updatedPlayer;
-					break;
-					}
-				}
-			SavePlayers(players);
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error updating player data: " + ex.Message);
-			}
-		}
-
-	// --- Delete Player Data --- //
-	public void DeletePlayer(Player playerToDelete)
-		{
-		try
-			{
-			List<Player> players = LoadPlayers();
-			players.RemoveAll(player => player.TeamId == playerToDelete.TeamId && player.PlayerName == playerToDelete.PlayerName);
-			SavePlayers(players);
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error deleting player: " + ex.Message);
+			Debug.LogError("Error saving players to CSV: " + ex.Message);
 			}
 		}
 	}
