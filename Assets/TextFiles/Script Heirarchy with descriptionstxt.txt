@@ -1,0 +1,34 @@
+AppLogic.cs
+Description: Manages the core logic of the game or application. It handles the game's flow, including the interactions between players, teams, and other game elements. This script likely contains functions that update game states, trigger events, and handle user inputs related to game mechanics.
+2. CSVManager.cs
+Description: Handles reading and writing player data to and from CSV files. It provides functionality to load player data from a CSV file and save player data back into a CSV format, parsing the CSV content into objects like players and their associated stats.
+3. CurrentSeasonWeightSettingsPanel.cs
+Description: Manages the user interface (UI) related to the current season’s weight settings. It allows users to modify or view weight-related settings or statistics for players during the ongoing season. This script likely connects to the UI components for user input and displays the appropriate data.
+4. DatabaseManager.cs
+Description: Handles the saving and loading of game-related data from a database or local storage. This script might interact with CSV files or a more complex database system. It is responsible for saving teams, players, and their stats, and loading this data when needed in the game.
+5. LifetimeWeightSettingsPanel.cs
+Description: Manages the UI panel related to lifetime weight settings. Similar to the current season weight panel, this one handles weight statistics across the entire career of a player. It allows users to view or adjust lifetime statistics for a player.
+6. OverlayFeedbackPanel.cs
+Description: Provides on-screen feedback to users, typically through overlays that display messages or notifications. This script might be used to display results, tips, alerts, or other contextual feedback during gameplay or interactions.
+7. Player.cs
+Description: Represents a player in the game. This script contains properties such as player name, team name, skill level, and various statistics. The Player class is crucial for managing player data and might hold a reference to player-specific stats and abilities.
+8. PlayerCurrentSeasonDataInputPanel.cs
+Description: Handles the input panel for entering or modifying data related to a player’s current season. This script would manage UI fields that allow users to input or edit the player's current season stats, like matches played, goals scored, or performance data.
+9. PlayerLifetimeDataInputPanel.cs
+Description: Similar to the current season input panel, but for the lifetime data of a player. This script manages the input UI for editing or entering long-term statistics, like total career matches, wins, and other lifetime statistics for a player.
+10. PlayerManagementPanel.cs
+Description: A UI panel responsible for managing a player’s overall data. This could include creating, editing, or deleting player profiles. The script would interact with the Player class to update or display relevant player information in a user-friendly manner.
+11. PlayerStats.cs
+Description: Represents the statistics of a player. This script holds the data related to a player’s performance, including their lifetime stats (matches played, games won, etc.), as well as current season statistics. It might include methods to calculate or update specific performance metrics.
+12. PlayerWeightSettings.cs
+Description: Contains the weight settings of a player, possibly related to how player statistics (like skill level, strength, or performance) are weighted in the game. This could be used for balancing, gameplay mechanics, or rating systems.
+13. SettingsManager.cs
+Description: Manages application settings and configurations, including user preferences, game settings, and display options. This script handles saving and loading settings, ensuring that settings are applied across sessions or game states.
+14. SettingsPanelController.cs
+Description: Controls the settings UI panel. This script enables interaction with the settings menu, allowing users to adjust settings such as graphics, audio, controls, or other preferences. It communicates with the SettingsManager to update and save these preferences.
+15. Team.cs
+Description: Represents a team in the game, including properties such as team name, team members (players), team stats, and other relevant team data. This class manages team-specific data and interactions, like adding or removing players, and computing team-level statistics.
+16. TeamManagementPanel.cs
+Description: A UI panel used to manage teams. It allows the user to create, edit, or delete teams and possibly manage team rosters by adding or removing players. This script would interact with the Team class to display and modify team data in a user-friendly interface.
+17. UIManager.cs
+Description: Handles the overall user interface of the game or application. This script coordinates different UI elements, ensuring that the proper panels are displayed, and handles interactions between the UI and the underlying game logic. It can control the visibility of menus, panels, and user feedback.

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 335a2b84619de0d49933de130addbfbe
+timeCreated: 1530067780
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121713
+  packageName: EasyCsv
+  packageVersion: 1.01
+  assetPath: Assets/RedScarf/EasyCsv/Demo/Read And Write.unity
+  uploadId: 280835

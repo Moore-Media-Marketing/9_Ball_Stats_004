@@ -1,317 +1,113 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using TMPro;
-
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UIManager:MonoBehaviour
 	{
-	// --- Singleton Pattern --- //
+	// Singleton instance
 	public static UIManager Instance { get; private set; }
 
-	// --- Panel References --- //
-	[Header("Home Panel")]
+	// Panels
+	[Header("Panels")]
 	public GameObject homePanel;
-	public TMP_Text homeHeaderText;
-	public TMP_Text manageTeamsButtonText;
-	public TMP_Text createPlayerButtonText;
-	public TMP_Text comparisonButtonText;
-	public TMP_Text settingsButtonText;
-	public TMP_Text exitButtonText;
-	public Button manageTeamsButton;
-	public Button createPlayerButton;
-	public Button comparisonButton;
-	public Button settingsButton;
-	public Button exitButton;
-
-	[Header("Team Management Panel")]
-	public GameObject teamManagementPanel;
-	public TMP_Text teamManagementHeaderText;
-	public TMP_Text teamNameText;
-	public TMP_InputField teamNameInputField;
-	public TMP_Text addUpdateTeamButtonText;
-	public TMP_Text clearTeamNameButtonText;
-	public TMP_Dropdown teamDropdown;
-	public TMP_Text modifyTeamNameButtonText;
-	public TMP_Text deleteButtonText;
-	public TMP_Text backButtonText;
-	public Button addUpdateTeamButton;
-	public Button clearTeamNameButton;
-	public Button modifyTeamNameButton;
-	public Button deleteButton;
-	public Button backButton;
-
-	[Header("Player Management Panel")]
-	public GameObject playerManagementPanel;
-	public TMP_Text playerManagementHeaderText;
-	public TMP_Dropdown teamNameDropdown;
-	public TMP_Dropdown playerNameDropdown;
-	public TMP_InputField playerNameInputField;
-	public TMP_Text addPlayerButtonText;
-	public TMP_Text deletePlayerButtonText;
-	public TMP_Text addPlayerDetailsButtonText;
-	public TMP_Text backButtonPlayerManagementText;
-	public Button addPlayerButton;
-	public Button deletePlayerButton;
-	public Button addPlayerDetailsButton;
-	public Button backButtonPlayerManagement;
-
-	[Header("Matchup Comparison Panel")]
-	public GameObject matchupComparisonPanel;
-	public TMP_Text matchupComparisonHeaderText;
-	public TMP_Text selectTeamAText;
-	public TMP_Dropdown teamADropdown;
-	public GameObject teamAPlayerScrollView;
-	public TMP_Text teamBHeaderText;
-	public TMP_Dropdown teamBDropdown;
-	public GameObject teamBPlayerScrollView;
-	public TMP_Text compareButtonText;
-	public TMP_Text backButtonMatchupComparisonText;
-	public Button compareButton;
-	public Button backButtonMatchupComparison;
-
-	[Header("Settings Panel")]
 	public GameObject settingsPanel;
-	public TMP_Text settingsHeaderText;
-	public Toggle settingsToggle;
-	public TMP_Text settingsBackButtonText;
-	public Button settingsBackButton;
+	public GameObject playerManagementPanel;
+	public GameObject teamManagementPanel;
+	public GameObject comparisonPanel;
 
-	[Header("Overlay Feedback Panel")]
-	public GameObject overlayFeedbackPanel;
-	public TMP_Text overlayFeedbackText;
+	// Panel History (a list of panels for backtracking or history)
+	public List<GameObject> panelHistory = new();
 
-	// --- Panel History --- //
-	public Stack<GameObject> panelHistory = new Stack<GameObject>();
-
-	// --- Initialization --- //
+	// Awake method to initialize the instance
 	private void Awake()
 		{
+		// Check if there's already an instance
 		if (Instance == null)
 			{
-			Instance = this;
-			DontDestroyOnLoad(gameObject); // Keep the instance between scenes
+			Instance = this; // Assign the current instance to the static Instance
+			DontDestroyOnLoad(gameObject); // Keep the instance between scenes if needed
 			}
 		else
 			{
-			Destroy(gameObject); // Destroy duplicates
+			Destroy(gameObject); // Destroy duplicate instances
 			}
 		}
 
 	private void Start()
 		{
-		InitializePanels();
-		InitializeButtonListeners();
+		// Show the home panel at the start
+		ShowHomePanel();
 		}
 
-	// --- Panel Initialization --- //
-	private void InitializePanels()
-		{
-		homePanel.SetActive(true);
-		teamManagementPanel.SetActive(false);
-		playerManagementPanel.SetActive(false);
-		matchupComparisonPanel.SetActive(false);
-		settingsPanel.SetActive(false);
-		overlayFeedbackPanel.SetActive(false);
-		}
-
-	// --- Button Listeners --- //
-	private void InitializeButtonListeners()
-		{
-		manageTeamsButton.onClick.AddListener(ShowTeamManagementPanel);
-		createPlayerButton.onClick.AddListener(ShowPlayerManagementPanel);
-		comparisonButton.onClick.AddListener(ShowMatchupComparisonPanel);
-		settingsButton.onClick.AddListener(ShowSettingsPanel);
-		exitButton.onClick.AddListener(Application.Quit);
-
-		addUpdateTeamButton.onClick.AddListener(OnAddUpdateTeam);
-		clearTeamNameButton.onClick.AddListener(ClearTeamNameInput);
-		modifyTeamNameButton.onClick.AddListener(OnModifyTeamName);
-		deleteButton.onClick.AddListener(OnDeleteTeam);
-		backButton.onClick.AddListener(() => GoBackToPreviousPanel());
-
-		addPlayerButton.onClick.AddListener(OnAddPlayer);
-		deletePlayerButton.onClick.AddListener(OnDeletePlayer);
-		addPlayerDetailsButton.onClick.AddListener(OnAddPlayerDetails);
-		backButtonPlayerManagement.onClick.AddListener(() => GoBackToPreviousPanel());
-
-		compareButton.onClick.AddListener(OnCompareMatchups);
-		backButtonMatchupComparison.onClick.AddListener(() => GoBackToPreviousPanel());
-
-		settingsBackButton.onClick.AddListener(() => GoBackToPreviousPanel());
-		}
-
-	// --- Panel Control Functions --- //
+	// --- Show Home Panel --- //
 	public void ShowHomePanel()
 		{
-		panelHistory.Push(homePanel); // Save current panel to history
 		homePanel.SetActive(true);
-		teamManagementPanel.SetActive(false);
-		playerManagementPanel.SetActive(false);
-		matchupComparisonPanel.SetActive(false);
-		settingsPanel.SetActive(false);
-		overlayFeedbackPanel.SetActive(false);
+		panelHistory.Add(homePanel); // Add to panel history
+		DeactivateOtherPanels(homePanel); // Hide other panels
 		}
 
-	public void ShowTeamManagementPanel()
-		{
-		panelHistory.Push(homePanel); // Save previous panel
-		homePanel.SetActive(false);
-		teamManagementPanel.SetActive(true);
-		PopulateTeamDropdown(); // Populate team dropdown
-		}
-
-	public void ShowPlayerManagementPanel()
-		{
-		panelHistory.Push(homePanel); // Save previous panel
-		homePanel.SetActive(false);
-		playerManagementPanel.SetActive(true);
-		}
-
-	public void ShowMatchupComparisonPanel()
-		{
-		panelHistory.Push(homePanel); // Save previous panel
-		homePanel.SetActive(false);
-		matchupComparisonPanel.SetActive(true);
-		}
-
+	// --- Show Settings Panel --- //
 	public void ShowSettingsPanel()
 		{
-		panelHistory.Push(homePanel); // Save previous panel
-		homePanel.SetActive(false);
 		settingsPanel.SetActive(true);
+		panelHistory.Add(settingsPanel); // Add to panel history
+		DeactivateOtherPanels(settingsPanel); // Hide other panels
 		}
 
+	// --- Show Player Management Panel --- //
+	public void ShowPlayerManagementPanel()
+		{
+		playerManagementPanel.SetActive(true);
+		panelHistory.Add(playerManagementPanel); // Add to panel history
+		DeactivateOtherPanels(playerManagementPanel); // Hide other panels
+		}
+
+	// --- Show Team Management Panel --- //
+	public void ShowTeamManagementPanel()
+		{
+		teamManagementPanel.SetActive(true);
+		panelHistory.Add(teamManagementPanel); // Add to panel history
+		DeactivateOtherPanels(teamManagementPanel); // Hide other panels
+		}
+
+	// --- Show Comparison Panel --- //
+	public void ShowComparisonPanel()
+		{
+		comparisonPanel.SetActive(true);
+		panelHistory.Add(comparisonPanel); // Add to panel history
+		DeactivateOtherPanels(comparisonPanel); // Hide other panels
+		}
+
+	// --- Go Back to Previous Panel --- //
 	public void GoBackToPreviousPanel()
 		{
-		if (panelHistory.Count > 0)
+		if (panelHistory.Count > 1)
 			{
-			var previousPanel = panelHistory.Pop();
-			homePanel.SetActive(false);
-			teamManagementPanel.SetActive(false);
-			playerManagementPanel.SetActive(false);
-			matchupComparisonPanel.SetActive(false);
-			settingsPanel.SetActive(false);
-			overlayFeedbackPanel.SetActive(false);
+			// Pop the current panel from history
+			GameObject currentPanel = panelHistory.Last();
+			panelHistory.RemoveAt(panelHistory.Count - 1);
+
+			// Show the previous panel
+			GameObject previousPanel = panelHistory.Last();
 			previousPanel.SetActive(true);
-			}
-		}
-
-	// --- Button Actions --- //
-	private void OnAddUpdateTeam()
-		{
-		string teamName = teamNameInputField.text;
-		if (!string.IsNullOrEmpty(teamName))
-			{
-			List<Team> teams = DatabaseManager.Instance.LoadTeams();
-			Team existingTeam = teams.FirstOrDefault(t => t.TeamName == teamName);
-
-			if (existingTeam != null)
-				{
-				// Update existing team
-				existingTeam.TeamName = teamName;
-				DatabaseManager.Instance.SaveTeams(teams);
-				Debug.Log("Team updated: " + teamName);
-				}
-			else
-				{
-				// Add new team
-				int newTeamId = teams.Any() ? teams.Max(t => t.TeamId) + 1 : 1;
-				Team newTeam = new Team(newTeamId, teamName);
-				teams.Add(newTeam);
-				DatabaseManager.Instance.SaveTeams(teams);
-				Debug.Log("Team added: " + teamName);
-				}
-
-			PopulateTeamDropdown();
-			teamNameInputField.text = string.Empty;
+			currentPanel.SetActive(false); // Hide the current panel
 			}
 		else
 			{
-			Debug.Log("Please enter a valid team name.");
+			Debug.LogWarning("No previous panel in history.");
 			}
 		}
 
-	private void ClearTeamNameInput()
+	// --- Deactivate all panels except the given one --- //
+	private void DeactivateOtherPanels(GameObject activePanel)
 		{
-		teamNameInputField.text = "";
-		}
-
-	private void OnModifyTeamName()
-		{
-		string teamName = teamNameInputField.text;
-		if (!string.IsNullOrEmpty(teamName))
-			{
-			List<Team> teams = DatabaseManager.Instance.LoadTeams();
-			Team teamToModify = teams.FirstOrDefault(t => t.TeamName == teamName);
-
-			if (teamToModify != null)
-				{
-				// Modify team name logic here if needed
-				Debug.Log("Team modified: " + teamName);
-				}
-			else
-				{
-				Debug.Log("Team not found: " + teamName);
-				}
-			}
-		}
-
-	private void OnDeleteTeam()
-		{
-		string teamName = teamNameInputField.text;
-		if (!string.IsNullOrEmpty(teamName))
-			{
-			List<Team> teams = DatabaseManager.Instance.LoadTeams();
-			Team teamToDelete = teams.FirstOrDefault(t => t.TeamName == teamName);
-
-			if (teamToDelete != null)
-				{
-				teams.Remove(teamToDelete);
-				DatabaseManager.Instance.SaveTeams(teams);
-				Debug.Log("Team deleted: " + teamName);
-				}
-			else
-				{
-				Debug.Log("Team not found: " + teamName);
-				}
-
-			PopulateTeamDropdown();
-			teamNameInputField.text = string.Empty;
-			}
-		else
-			{
-			Debug.Log("Please enter a valid team name.");
-			}
-		}
-
-	private void PopulateTeamDropdown()
-		{
-		List<Team> teams = DatabaseManager.Instance.LoadTeams();
-		List<string> teamNames = teams.Select(t => t.TeamName).ToList();
-		teamDropdown.ClearOptions();
-		teamDropdown.AddOptions(teamNames);
-		}
-
-	private void OnAddPlayer()
-		{
-		// Add player logic here
-		}
-
-	private void OnDeletePlayer()
-		{
-		// Delete player logic here
-		}
-
-	private void OnAddPlayerDetails()
-		{
-		// Add player details logic here
-		}
-
-	private void OnCompareMatchups()
-		{
-		// Compare matchups logic here
+		// Deactivate all panels except the active one
+		if (homePanel != activePanel) homePanel.SetActive(false);
+		if (settingsPanel != activePanel) settingsPanel.SetActive(false);
+		if (playerManagementPanel != activePanel) playerManagementPanel.SetActive(false);
+		if (teamManagementPanel != activePanel) teamManagementPanel.SetActive(false);
+		if (comparisonPanel != activePanel) comparisonPanel.SetActive(false);
 		}
 	}

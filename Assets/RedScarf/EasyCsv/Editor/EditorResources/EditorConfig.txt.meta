@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e508ffafeb0b345409d1aa80b925eabe
+timeCreated: 1530096550
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121713
+  packageName: EasyCsv
+  packageVersion: 1.01
+  assetPath: Assets/RedScarf/EasyCsv/Editor/EditorResources/EditorConfig.txt
+  uploadId: 280835

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7422f0d2c20a5e64d85fc0ff3b675115
+timeCreated: 1530175087
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121713
+  packageName: EasyCsv
+  packageVersion: 1.01
+  assetPath: Assets/RedScarf/EasyCsv/Document/Readme.doc
+  uploadId: 280835

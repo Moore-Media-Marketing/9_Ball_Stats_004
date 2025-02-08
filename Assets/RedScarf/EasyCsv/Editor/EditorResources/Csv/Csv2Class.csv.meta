@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 969e2bc8bfe639f4fa3b007a2474b391
+timeCreated: 1530172285
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121713
+  packageName: EasyCsv
+  packageVersion: 1.01
+  assetPath: Assets/RedScarf/EasyCsv/Editor/EditorResources/Csv/Csv2Class.csv
+  uploadId: 280835

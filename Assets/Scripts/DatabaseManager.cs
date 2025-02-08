@@ -1,81 +1,140 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
-public class DatabaseManager
+using UnityEngine;
+
+public class DatabaseManager:MonoBehaviour
 	{
-	private string teamsFilePath = "Teams.csv";
-	private string playersFilePath = "Players.csv";
+	public static DatabaseManager Instance { get; private set; }
 
-	// Method to load teams from CSV
+	// Paths for CSV files
+	private string playersDataFilePath = "Assets/PlayerData.csv";
+	private string teamsDataFilePath = "Assets/TeamsData.csv";
+
+	private void Awake()
+		{
+		if (Instance == null)
+			{
+			Instance = this;
+			DontDestroyOnLoad(gameObject); // Keep the instance between scenes
+			}
+		else
+			{
+			Destroy(gameObject); // Destroy duplicates
+			}
+		}
+
+	// Load teams from CSV
 	public List<Team> LoadTeams()
 		{
-		var teams = new List<Team>();
-		try
+		List<Team> teams = new();
+
+		if (File.Exists(teamsDataFilePath))
 			{
-			using (var reader = new StreamReader(teamsFilePath))
-			using (var csv = new CsvReader(reader, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
+			var lines = File.ReadAllLines(teamsDataFilePath);
+			for (int i = 1; i < lines.Length; i++) // Skip header line
 				{
-				teams = csv.GetRecords<Team>().ToList();
+				var line = lines[i].Split(',');
+				int teamId = int.Parse(line[0]);
+				string teamName = line[1];
+
+				teams.Add(new Team(teamId, teamName));
 				}
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error loading teams: " + ex.Message);
 			}
 		return teams;
 		}
 
-	// Method to save teams to CSV
-	public void SaveTeams(List<Team> teams)
+	// Load players from CSV
+	public List<Player> LoadPlayersFromCsv(int teamId)
 		{
-		try
-			{
-			using (var writer = new StreamWriter(teamsFilePath))
-			using (var csv = new CsvWriter(writer, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
-				{
-				csv.WriteRecords(teams);
-				}
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error saving teams: " + ex.Message);
-			}
-		}
+		List<Player> players = new();
 
-	// Method to load players from CSV
-	public List<Player> LoadPlayersFromCsv(string filePath)
-		{
-		var players = new List<Player>();
-		try
+		if (File.Exists(playersDataFilePath))
 			{
-			using (var reader = new StreamReader(filePath))
-			using (var csv = new CsvReader(reader, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
+			var lines = File.ReadAllLines(playersDataFilePath);
+			for (int i = 1; i < lines.Length; i++) // Skip header line
 				{
-				players = csv.GetRecords<Player>().ToList();
+				var line = lines[i].Split(',');
+				string playerName = line[0];
+				string teamName = line[1];
+				int skillLevel = int.Parse(line[2]);
+				int lifetimeGamesWon = int.Parse(line[3]);
+				int lifetimeGamesPlayed = int.Parse(line[4]);
+
+				PlayerStats stats = new()
+					{
+					LifetimeGamesWon = lifetimeGamesWon,
+					LifetimeGamesPlayed = lifetimeGamesPlayed
+					};
+
+				// Find the correct team ID based on the name
+				int v = LoadTeams().FirstOrDefault(t => t.TeamName == teamName)?.TeamId ?? 0;
+
+				players.Add(new Player(playerName, teamName, skillLevel, stats,  v));
 				}
 			}
-		catch (Exception ex)
-			{
-			Debug.LogError("Error loading players from CSV: " + ex.Message);
-			}
+
 		return players;
 		}
 
-	// Method to save players to CSV
-	public void SavePlayersToCsv(string filePath, List<Player> players)
+	// Save players to CSV
+	public void SavePlayersToCsv(List<Player> players)
 		{
-		try
+		List<string> lines = new()
 			{
-			using (var writer = new StreamWriter(filePath))
-			using (var csv = new CsvWriter(writer, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
-				{
-				csv.WriteRecords(players);
-				}
-			}
-		catch (Exception ex)
+			"PlayerName,TeamName,SkillLevel,LifetimeGamesWon,LifetimeGamesPlayed"
+		};
+
+		foreach (var player in players)
 			{
-			Debug.LogError("Error saving players to CSV: " + ex.Message);
+			string line = $"{player.PlayerName},{player.TeamName},{player.SkillLevel}," +
+						  $"{player.Stats.LifetimeGamesWon},{player.Stats.LifetimeGamesPlayed}";
+			lines.Add(line);
 			}
+
+		File.WriteAllLines(playersDataFilePath, lines);
+		Debug.Log("Players data saved to CSV.");
+		}
+
+	// Save teams to CSV
+	public void SaveTeams(List<Team> teams)
+		{
+		List<string> lines = new()
+			{
+			"TeamId,TeamName"
+		};
+
+		foreach (var team in teams)
+			{
+			string line = $"{team.TeamId},{team.TeamName}";
+			lines.Add(line);
+			}
+
+		File.WriteAllLines(teamsDataFilePath, lines);
+		Debug.Log("Teams data saved to CSV.");
+		}
+
+	// Delete a team by ID
+	public void DeleteTeam(int teamId)
+		{
+		List<Team> teams = LoadTeams();
+		Team teamToDelete = teams.FirstOrDefault(t => t.TeamId == teamId);
+		if (teamToDelete != null)
+			{
+			teams.Remove(teamToDelete);
+			SaveTeams(teams);
+			Debug.Log($"Team {teamToDelete.TeamName} deleted.");
+			}
+		else
+			{
+			Debug.Log($"Team with ID {teamId} not found.");
+			}
+		}
+
+	internal void DeleteTeam(Team currentSelectedTeam)
+		{
+		throw new NotImplementedException();
 		}
 	}

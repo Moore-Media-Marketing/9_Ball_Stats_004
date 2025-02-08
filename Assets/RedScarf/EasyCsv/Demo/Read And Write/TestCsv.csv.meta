@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 485837ac971baf349ac0fb2fa3317717
+timeCreated: 1529049237
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121713
+  packageName: EasyCsv
+  packageVersion: 1.01
+  assetPath: Assets/RedScarf/EasyCsv/Demo/Read And Write/TestCsv.csv
+  uploadId: 280835

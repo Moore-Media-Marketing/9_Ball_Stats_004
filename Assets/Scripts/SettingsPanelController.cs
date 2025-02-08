@@ -54,7 +54,7 @@ public class SettingsPanelController:MonoBehaviour
 		{
 		if (UIManager.Instance != null)
 			{
-			UIManager.Instance.panelHistory.Push(UIManager.Instance.settingsPanel);
+			UIManager.Instance.panelHistory.Add(UIManager.Instance.settingsPanel);  // Changed from Push to Add
 			UIManager.Instance.settingsPanel.SetActive(false);
 			currentSeasonWeightSettingsPanel.SetActive(true);
 			}
@@ -69,7 +69,7 @@ public class SettingsPanelController:MonoBehaviour
 		{
 		if (UIManager.Instance != null)
 			{
-			UIManager.Instance.panelHistory.Push(UIManager.Instance.settingsPanel);
+			UIManager.Instance.panelHistory.Add(UIManager.Instance.settingsPanel);  // Changed from Push to Add
 			UIManager.Instance.settingsPanel.SetActive(false);
 			lifetimeWeightSettingsPanel.SetActive(true);
 			}
