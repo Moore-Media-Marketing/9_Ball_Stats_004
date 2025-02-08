@@ -33,14 +33,12 @@ public class DatabaseManager:MonoBehaviour
 		playersCsvManager = new CSVManager(playersDataFilePath);
 		teamsCsvManager = new CSVManager(teamsDataFilePath);
 
-		// Load the initial data
-		LoadTeamsAndPlayers(); // Ensure this is correct
+		LoadTeamsAndPlayers();
 		}
 
 	// --- Load Teams and Players --- //
 	public void LoadTeamsAndPlayers()
 		{
-		// Load Teams data
 		teams = LoadDataFromCSV<Team>(teamsCsvManager, values =>
 		{
 			int teamId = int.Parse(values[0]);
@@ -48,12 +46,12 @@ public class DatabaseManager:MonoBehaviour
 			return new Team(teamId, teamName);
 		});
 
-		// Load Players data
 		players = LoadDataFromCSV<Player>(playersCsvManager, values =>
 		{
 			string playerName = values[0];
 			string teamName = values[1];
 			int skillLevel = int.Parse(values[2]);
+
 			PlayerStats stats = new()
 				{
 				LifetimeGamesWon = int.Parse(values[3]),
@@ -92,112 +90,123 @@ public class DatabaseManager:MonoBehaviour
 		List<T> data = new();
 		try
 			{
-			data = csvManager.LoadDataFromCSV(map); // Use CSVManager's LoadData method
+			data = csvManager.LoadDataFromCSV(map);
 			}
-		catch (System.Exception ex)
+		catch (Exception ex)
 			{
 			Debug.LogError($"Error loading data from CSV: {ex.Message}");
 			}
 		return data;
 		}
 
-	// --- Save Teams to CSV --- //
-	public void SaveTeams(List<Team> teams)
+	// --- Add Team --- //
+	public void AddTeam(string teamName)
 		{
-		List<string> lines = new() { "TeamId,TeamName" }; // Ensure CSV Header
-
-		foreach (var team in teams)
+		if (teams.Any(t => t.TeamName == teamName))
 			{
-			lines.Add($"{team.TeamId},{team.TeamName}");
+			Debug.LogWarning("Team already exists.");
+			return;
 			}
 
-		try
+		int newTeamId = teams.Count > 0 ? teams.Max(t => t.TeamId) + 1 : 1;
+		teams.Add(new Team(newTeamId, teamName));
+		SaveTeams();
+		}
+
+	// --- Modify Team Name --- //
+	public void ModifyTeam(int teamId, string newTeamName)
+		{
+		Team team = teams.FirstOrDefault(t => t.TeamId == teamId);
+		if (team != null)
 			{
-			File.WriteAllLines(teamsDataFilePath, lines);
-			Debug.Log("Teams saved to CSV.");
-			}
-		catch (System.Exception ex)
-			{
-			Debug.LogError("Error saving teams to CSV: " + ex.Message);
+			team.TeamName = newTeamName;
+			SaveTeams();
 			}
 		}
 
-	// --- Save Players to CSV --- //
-	public void SavePlayersToCsv(List<Player> players)
-		{
-		playersCsvManager.SavePlayersToCSV(players); // Assuming this method is defined in CSVManager
-		}
-
-	// --- Load Players by Team ID --- //
-	public List<Player> LoadPlayersByTeam(int teamId)
-		{
-		List<Player> playersByTeam = players.Where(p => p.TeamId == teamId).ToList();
-		Debug.Log($"Loaded {playersByTeam.Count} players for team with ID {teamId}.");
-		return playersByTeam;
-		}
-
-	// --- Delete Team by ID --- //
+	// --- Delete Team (Moves Players to Unassigned) --- //
 	public void DeleteTeam(int teamId)
 		{
 		Team teamToDelete = teams.FirstOrDefault(t => t.TeamId == teamId);
 		if (teamToDelete != null)
 			{
 			teams.Remove(teamToDelete);
-			players.RemoveAll(p => p.TeamId == teamId);
-			SaveTeams(teams);
-			SavePlayersToCsv(players);
-			Debug.Log($"Team with ID {teamId} and its players have been deleted.");
-			}
-		else
-			{
-			Debug.LogWarning($"Team with ID {teamId} not found.");
-			}
-		}
-
-	// --- Load Teams --- //
-	public List<Team> LoadTeams()
-		{
-		try
-			{
-			teams = LoadDataFromCSV<Team>(teamsCsvManager, values =>
-			{
-				int teamId = int.Parse(values[0]);
-				string teamName = values[1];
-				return new Team(teamId, teamName);
-			});
-			return teams;
-			}
-		catch (Exception ex)
-			{
-			Debug.LogError($"Error loading teams: {ex.Message}");
-			return new List<Team>(); // Return an empty list if something goes wrong
+			foreach (var player in players.Where(p => p.TeamId == teamId))
+				{
+				player.TeamId = -1;
+				player.TeamName = "Unassigned";
+				}
+			SaveTeams();
+			SavePlayers();
 			}
 		}
 
-	// --- Save Player --- //
-	public void SavePlayer(Player selectedPlayer)
+	// --- Add Player --- //
+	public void AddPlayer(string playerName, string teamName, int skillLevel)
 		{
-		try
-			{
-			var playerLine = $"{selectedPlayer.PlayerName},{selectedPlayer.TeamName},{selectedPlayer.SkillLevel}," +
-							 $"{selectedPlayer.Stats.LifetimeGamesWon},{selectedPlayer.Stats.LifetimeGamesPlayed}," +
-							 $"{selectedPlayer.Stats.LifetimeBreakAndRun},{selectedPlayer.Stats.LifetimeDefensiveShotAverage}," +
-							 $"{selectedPlayer.Stats.LifetimeMatchesPlayed},{selectedPlayer.Stats.LifetimeMatchesWon}," +
-							 $"{selectedPlayer.Stats.LifetimeMiniSlams},{selectedPlayer.Stats.LifetimeNineOnTheSnap}," +
-							 $"{selectedPlayer.Stats.LifetimeShutouts},{selectedPlayer.Stats.CurrentSeasonBreakAndRun}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonDefensiveShotAverage},{selectedPlayer.Stats.CurrentSeasonMatchesPlayed}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonMatchesWon},{selectedPlayer.Stats.CurrentSeasonMiniSlams}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonNineOnTheSnap},{selectedPlayer.Stats.CurrentSeasonPaPercentage}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonPointsAwarded},{selectedPlayer.Stats.CurrentSeasonPointsPerMatch}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonPpm},{selectedPlayer.Stats.CurrentSeasonShutouts}," +
-							 $"{selectedPlayer.Stats.CurrentSeasonSkillLevel},{selectedPlayer.Stats.CurrentSeasonTotalPoints}";
+		int teamId = teams.FirstOrDefault(t => t.TeamName == teamName)?.TeamId ?? -1;
+		players.Add(new Player(playerName, teamName, skillLevel, new PlayerStats(), teamId));
+		SavePlayers();
+		}
 
-			File.AppendAllText(playersDataFilePath, playerLine + "\n");
-			Debug.Log($"Player {selectedPlayer.PlayerName} saved.");
-			}
-		catch (Exception ex)
+	// --- Assign Player to Another Team --- //
+	public void AssignPlayerToTeam(string playerName, string newTeamName)
+		{
+		Player player = players.FirstOrDefault(p => p.PlayerName == playerName);
+		if (player != null)
 			{
-			Debug.LogError($"Error saving player: {ex.Message}");
+			player.TeamName = newTeamName;
+			player.TeamId = teams.FirstOrDefault(t => t.TeamName == newTeamName)?.TeamId ?? -1;
+			SavePlayers();
+			}
+		}
+
+	// --- Delete Player --- //
+	public void DeletePlayer(string playerName)
+		{
+		players.RemoveAll(p => p.PlayerName == playerName);
+		SavePlayers();
+		}
+
+	// --- Save Teams to CSV --- //
+	private void SaveTeams()
+		{
+		List<string> lines = new() { "TeamId,TeamName" };
+
+		foreach (var team in teams)
+			{
+			lines.Add($"{team.TeamId},{team.TeamName}");
+			}
+
+		File.WriteAllLines(teamsDataFilePath, lines);
+		}
+
+	// --- Save Players to CSV --- //
+	private void SavePlayers()
+		{
+		playersCsvManager.SavePlayersToCSV(players);
+		}
+
+	// --- Get All Players --- //
+	public List<Player> GetAllPlayers()
+		{
+		return new List<Player>(players);
+		}
+
+	// --- Get All Teams --- //
+	public List<Team> GetAllTeams()
+		{
+		return new List<Team>(teams);
+		}
+
+	// --- Update Player Stats --- //
+	public void UpdatePlayerStats(string playerName, PlayerStats newStats)
+		{
+		Player player = players.FirstOrDefault(p => p.PlayerName == playerName);
+		if (player != null)
+			{
+			player.Stats = newStats;
+			SavePlayers();
 			}
 		}
 	}

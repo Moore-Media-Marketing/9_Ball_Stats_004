@@ -44,16 +44,18 @@ public class TeamManagementPanel:MonoBehaviour
 			return;
 			}
 
-		if (DatabaseManager.Instance == null)
+		if (PlayersAndTeamsManager.Instance == null)
 			{
-			Debug.LogError("DatabaseManager instance is missing!");
+			Debug.LogError("PlayersAndTeamsManager instance is missing!");
 			return;
 			}
 
-		teams = DatabaseManager.Instance.LoadTeams();
+		teams = PlayersAndTeamsManager.Instance.GetAllTeams();
+
 		if (teams == null || teams.Count == 0)
 			{
-			Debug.LogWarning("No teams found in the database!");
+			Debug.LogWarning("No teams found!");
+			teamDropdown.ClearOptions();
 			return;
 			}
 
@@ -70,9 +72,9 @@ public class TeamManagementPanel:MonoBehaviour
 
 	private void AddOrUpdateTeam()
 		{
-		if (DatabaseManager.Instance == null)
+		if (PlayersAndTeamsManager.Instance == null)
 			{
-			Debug.LogError("DatabaseManager instance is missing!");
+			Debug.LogError("PlayersAndTeamsManager instance is missing!");
 			return;
 			}
 
@@ -86,23 +88,16 @@ public class TeamManagementPanel:MonoBehaviour
 		if (selectedTeamId == -1)
 			{
 			// Adding a new team
-			int newTeamId = teams.Count + 1;
-			Team newTeam = new(newTeamId, newTeamName);
-			teams.Add(newTeam);
+			PlayersAndTeamsManager.Instance.AddTeam(newTeamName);
 			Debug.Log($"Added new team: {newTeamName}");
 			}
 		else
 			{
 			// Updating existing team
-			Team teamToUpdate = teams.Find(t => t.TeamId == selectedTeamId);
-			if (teamToUpdate != null)
-				{
-				teamToUpdate.UpdateTeamName(newTeamName);
-				Debug.Log($"Updated team {selectedTeamId} to {newTeamName}");
-				}
+			PlayersAndTeamsManager.Instance.ModifyTeam(selectedTeamId, newTeamName);
+			Debug.Log($"Updated team ID {selectedTeamId} to {newTeamName}");
 			}
 
-		DatabaseManager.Instance.SaveTeams(teams);
 		PopulateTeamDropdown();
 		ClearTeamName();
 		}
@@ -118,9 +113,9 @@ public class TeamManagementPanel:MonoBehaviour
 
 	private void ModifySelectedTeam()
 		{
-		if (teamDropdown == null || DatabaseManager.Instance == null)
+		if (teamDropdown == null || PlayersAndTeamsManager.Instance == null)
 			{
-			Debug.LogError("TeamDropdown or DatabaseManager is missing!");
+			Debug.LogError("TeamDropdown or PlayersAndTeamsManager is missing!");
 			return;
 			}
 
@@ -139,9 +134,9 @@ public class TeamManagementPanel:MonoBehaviour
 
 	private void DeleteSelectedTeam()
 		{
-		if (teamDropdown == null || DatabaseManager.Instance == null)
+		if (teamDropdown == null || PlayersAndTeamsManager.Instance == null)
 			{
-			Debug.LogError("TeamDropdown or DatabaseManager is missing!");
+			Debug.LogError("TeamDropdown or PlayersAndTeamsManager is missing!");
 			return;
 			}
 
@@ -152,7 +147,7 @@ public class TeamManagementPanel:MonoBehaviour
 			}
 
 		int teamIdToDelete = teams[teamDropdown.value].TeamId;
-		DatabaseManager.Instance.DeleteTeam(teamIdToDelete);
+		PlayersAndTeamsManager.Instance.DeleteTeam(teamIdToDelete);
 		PopulateTeamDropdown();
 		Debug.Log($"Deleted team with ID {teamIdToDelete}");
 		}
