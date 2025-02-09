@@ -1,8 +1,7 @@
-using System;
-
-// --- Player Stats Class --- //
+// --- PlayerStats Class --- //
 public class PlayerStats
 	{
+	// Lifetime Stats
 	public int LifetimeGamesWon { get; set; }
 	public int LifetimeGamesPlayed { get; set; }
 	public int LifetimeBreakAndRun { get; set; }
@@ -13,6 +12,7 @@ public class PlayerStats
 	public int LifetimeNineOnTheSnap { get; set; }
 	public int LifetimeShutouts { get; set; }
 
+	// Current Season Stats
 	public int CurrentSeasonBreakAndRun { get; set; }
 	public float CurrentSeasonDefensiveShotAverage { get; set; }
 	public int CurrentSeasonMatchesPlayed { get; set; }
@@ -26,32 +26,4 @@ public class PlayerStats
 	public int CurrentSeasonShutouts { get; set; }
 	public int CurrentSeasonSkillLevel { get; set; }
 	public int CurrentSeasonTotalPoints { get; set; }
-
-	// Constructor to initialize all stats to zero
-	public PlayerStats()
-		{
-		LifetimeGamesWon = 0;
-		LifetimeGamesPlayed = 0;
-		LifetimeBreakAndRun = 0;
-		LifetimeDefensiveShotAverage = 0;
-		LifetimeMatchesPlayed = 0;
-		LifetimeMatchesWon = 0;
-		LifetimeMiniSlams = 0;
-		LifetimeNineOnTheSnap = 0;
-		LifetimeShutouts = 0;
-
-		CurrentSeasonBreakAndRun = 0;
-		CurrentSeasonDefensiveShotAverage = 0;
-		CurrentSeasonMatchesPlayed = 0;
-		CurrentSeasonMatchesWon = 0;
-		CurrentSeasonMiniSlams = 0;
-		CurrentSeasonNineOnTheSnap = 0;
-		CurrentSeasonPaPercentage = 0;
-		CurrentSeasonPointsAwarded = 0;
-		CurrentSeasonPointsPerMatch = 0;
-		CurrentSeasonPpm = 0;
-		CurrentSeasonShutouts = 0;
-		CurrentSeasonSkillLevel = 0;
-		CurrentSeasonTotalPoints = 0;
-		}
 	}

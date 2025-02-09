@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
@@ -11,7 +10,6 @@ public class UIManager:MonoBehaviour
 	// Panels
 	[Header("Panels")]
 	public GameObject homePanel;
-
 	public GameObject settingsPanel;
 	public GameObject playerManagementPanel;
 	public GameObject teamManagementPanel;
@@ -21,7 +19,7 @@ public class UIManager:MonoBehaviour
 	public List<GameObject> panelHistory = new();
 
 	// Awake method to initialize the instance
-	private void Awake()
+	public void Awake()
 		{
 		// Check if there's already an instance
 		if (Instance == null)
@@ -35,7 +33,7 @@ public class UIManager:MonoBehaviour
 			}
 		}
 
-	private void Start()
+	public void Start()
 		{
 		// Show the home panel at the start
 		ShowHomePanel();
@@ -87,11 +85,11 @@ public class UIManager:MonoBehaviour
 		if (panelHistory.Count > 1)
 			{
 			// Pop the current panel from history
-			GameObject currentPanel = panelHistory.Last();
+			GameObject currentPanel = panelHistory[^1];
 			panelHistory.RemoveAt(panelHistory.Count - 1);
 
 			// Show the previous panel
-			GameObject previousPanel = panelHistory.Last();
+			GameObject previousPanel = panelHistory[^1];
 			previousPanel.SetActive(true);
 			currentPanel.SetActive(false); // Hide the current panel
 			}
@@ -102,7 +100,7 @@ public class UIManager:MonoBehaviour
 		}
 
 	// --- Deactivate all panels except the given one --- //
-	private void DeactivateOtherPanels(GameObject activePanel)
+	public void DeactivateOtherPanels(GameObject activePanel)
 		{
 		// Deactivate all panels except the active one
 		if (homePanel != activePanel) homePanel.SetActive(false);

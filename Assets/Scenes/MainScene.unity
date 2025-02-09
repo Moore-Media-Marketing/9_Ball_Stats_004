@@ -8331,7 +8331,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 385777182}
-  - component: {fileID: 385777183}
   m_Layer: 0
   m_Name: GenerateGameObjectList
   m_TagString: Untagged
@@ -8354,18 +8353,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &385777183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385777181}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c47b38f74f1a01409ef762bc9de54ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &389607007
 GameObject:
   m_ObjectHideFlags: 0
@@ -8908,7 +8895,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 424554393}
-  - component: {fileID: 424554394}
   m_Layer: 0
   m_Name: SettingsManager
   m_TagString: Untagged
@@ -8931,19 +8917,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &424554394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 424554392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f6cd44d3e5ff6e4ab52c0f25994088e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sampleDataEnabled: 1
 --- !u!1 &431149852
 GameObject:
   m_ObjectHideFlags: 0
@@ -10405,17 +10378,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4508288276580310167, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
   m_PrefabInstance: {fileID: 542383966}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &542383968 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8629925173166221986, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
-  m_PrefabInstance: {fileID: 542383966}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &548782613
 GameObject:
   m_ObjectHideFlags: 0
@@ -12016,6 +11978,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b720771a96978ef4b9a169176bd5f52b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playersDataFilePath: Assets/PlayerData.csv
+  teamsDataFilePath: Assets/TeamsData.csv
 --- !u!1 &684864055
 GameObject:
   m_ObjectHideFlags: 0
@@ -14297,7 +14261,6 @@ GameObject:
   - component: {fileID: 811180198}
   - component: {fileID: 811180197}
   - component: {fileID: 811180196}
-  - component: {fileID: 811180199}
   m_Layer: 5
   m_Name: PlayerLifetimeDataInputPanel
   m_TagString: Untagged
@@ -14402,32 +14365,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811180194}
   m_CullTransparentMesh: 1
---- !u!114 &811180199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 811180194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4b7729b751f9ca4fb3631f863c221e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  headerText: {fileID: 1951393590}
-  teamNameDropdown: {fileID: 647432626433678614}
-  playerNameDropdown: {fileID: 647432626851626498}
-  lifetimeGamesWonInputField: {fileID: 1502863894}
-  lifetimeGamesPlayedInputField: {fileID: 1213567585}
-  lifetimeDefensiveShotAverageInputField: {fileID: 1464591979}
-  matchesPlayedInLast2YearsInputField: {fileID: 2005610822}
-  lifetimeBreakAndRunInputField: {fileID: 1136461355}
-  nineOnTheSnapInputField: {fileID: 1075463347}
-  lifetimeMiniSlamsInputField: {fileID: 993022971}
-  lifetimeShutoutsInputField: {fileID: 244721463}
-  updateLifetimeButtonText: {fileID: 1993866048}
-  saveToCSVButtonText: {fileID: 1468088617}
-  backButtonText: {fileID: 1369497535}
 --- !u!1 &815630420
 GameObject:
   m_ObjectHideFlags: 0
@@ -19856,6 +19793,7 @@ MonoBehaviour:
   deleteButton: {fileID: 1543668958}
   backButton: {fileID: 1060276294}
   backButtonText: {fileID: 991679433}
+  selectedTeamId: -1
 --- !u!1 &1075463345
 GameObject:
   m_ObjectHideFlags: 0
@@ -20983,7 +20921,6 @@ GameObject:
   - component: {fileID: 1137479540}
   - component: {fileID: 1137479539}
   - component: {fileID: 1137479538}
-  - component: {fileID: 1137479541}
   m_Layer: 5
   m_Name: CurrentSeasonWeightSettingsPanel
   m_TagString: Untagged
@@ -21087,29 +21024,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1137479536}
   m_CullTransparentMesh: 1
---- !u!114 &1137479541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1137479536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4e85875ff340f04bba68c3659c1fc3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weightSettings: {fileID: 11400000, guid: c7af0d97b71944e4ea0db3b2cd18339a, type: 2}
-  inputCurrentSeasonPointsAwarded: {fileID: 1062543585}
-  inputCurrentSeasonMatchesWon: {fileID: 1784664916}
-  inputCurrentSeasonDefensiveShotAverage: {fileID: 2132638188}
-  inputCurrentSeasonSkillLevel: {fileID: 1918783753}
-  inputCurrentSeasonPpm: {fileID: 626567635}
-  inputCurrentSeasonShutouts: {fileID: 927506690}
-  inputCurrentSeasonMiniSlams: {fileID: 590679989}
-  inputCurrentSeasonNineOnTheSnap: {fileID: 179430566}
-  inputCurrentSeasonPaPercentage: {fileID: 1538438632}
-  inputCurrentSeasonBreakAndRun: {fileID: 1950147026}
 --- !u!1 &1140473668
 GameObject:
   m_ObjectHideFlags: 0
@@ -25406,14 +25320,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 736dc22078042ff47b4b2bf92edf0d58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headerText: {fileID: 1651958952}
   teamNameDropdown: {fileID: 1578168937}
   playerNameDropdown: {fileID: 178714921}
   playerNameInputField: {fileID: 975669118}
   addPlayerButton: {fileID: 1286751244}
   deletePlayerButton: {fileID: 1236643909}
-  addPlayerDetailsButton: {fileID: 1286751244}
-  backButton: {fileID: 215483377}
+  addPlayerDetailsButton: {fileID: 1825992370}
   saveToCSVButton: {fileID: 927963816}
+  backButton: {fileID: 215483377}
 --- !u!1 &1303979895
 GameObject:
   m_ObjectHideFlags: 0
@@ -25591,17 +25506,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4508288276580310167, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
   m_PrefabInstance: {fileID: 1309106236}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1309106238 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8629925173166221986, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
-  m_PrefabInstance: {fileID: 1309106236}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1310154560
 GameObject:
   m_ObjectHideFlags: 0
@@ -26718,17 +26622,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364188015}
   m_CullTransparentMesh: 1
---- !u!114 &1369497535 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5586954189099093330, guid: e0d8d90b3ad3a304696387e15990e321, type: 3}
-  m_PrefabInstance: {fileID: 320832054915039523}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1370233023
 GameObject:
   m_ObjectHideFlags: 0
@@ -28138,7 +28031,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1451573024}
-  - component: {fileID: 1451573025}
   m_Layer: 0
   m_Name: SampleDataGenerator
   m_TagString: Untagged
@@ -28161,21 +28053,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1451573025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1451573023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05e8bb361bcf58c4795d2638cdf52ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numberOfTeams: 10
-  numberOfPlayersPerTeam: 8
-  weightSettings: {fileID: 11400000, guid: c7af0d97b71944e4ea0db3b2cd18339a, type: 2}
 --- !u!1 &1452380120
 GameObject:
   m_ObjectHideFlags: 0
@@ -34986,7 +34863,6 @@ GameObject:
   - component: {fileID: 1849975078}
   - component: {fileID: 1849975077}
   - component: {fileID: 1849975076}
-  - component: {fileID: 1849975079}
   m_Layer: 5
   m_Name: SettingsPanel
   m_TagString: Untagged
@@ -35082,25 +34958,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849975074}
   m_CullTransparentMesh: 1
---- !u!114 &1849975079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1849975074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45edaba3d9b3ef04a9186511d184adc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sampleDataGeneratorToggle: {fileID: 1687860837}
-  currentSeasonWeightSettingsButton: {fileID: 735656060}
-  lifetimeWeightSettingsButton: {fileID: 1986277164}
-  backButton: {fileID: 1309106238}
-  currentSeasonWeightSettingsPanel: {fileID: 1137479536}
-  lifetimeWeightSettingsPanel: {fileID: 1927865773}
-  sampleDataGenerator: {fileID: 1451573023}
 --- !u!1 &1850729731
 GameObject:
   m_ObjectHideFlags: 0
@@ -36879,7 +36736,6 @@ GameObject:
   - component: {fileID: 1927865778}
   - component: {fileID: 1927865777}
   - component: {fileID: 1927865776}
-  - component: {fileID: 1927865779}
   m_Layer: 5
   m_Name: LifetimeWeightSettingsPanel
   m_TagString: Untagged
@@ -36981,27 +36837,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1927865773}
   m_CullTransparentMesh: 1
---- !u!114 &1927865779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927865773}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96c2795f43e44f74d986904f1bc40128, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weightSettings: {fileID: 11400000, guid: c7af0d97b71944e4ea0db3b2cd18339a, type: 2}
-  inputLifetimeGamesWon: {fileID: 96938938}
-  inputLifetimeMiniSlams: {fileID: 769267507}
-  inputLifetimeNineOnTheSnap: {fileID: 2025765763}
-  inputLifetimeShutouts: {fileID: 2116994217}
-  inputLifetimeBreakAndRun: {fileID: 1400878863}
-  inputLifetimeDefensiveShotAverage: {fileID: 1085930635}
-  inputLifetimeMatchesPlayed: {fileID: 803302693}
-  inputLifetimeMatchesWon: {fileID: 161005770}
 --- !u!1 &1929699525
 GameObject:
   m_ObjectHideFlags: 0
@@ -40638,7 +40473,6 @@ GameObject:
   - component: {fileID: 2103155837}
   - component: {fileID: 2103155836}
   - component: {fileID: 2103155835}
-  - component: {fileID: 2103155838}
   m_Layer: 5
   m_Name: PlayerCurrentSeasonDataInputPanel
   m_TagString: Untagged
@@ -40746,35 +40580,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2103155833}
   m_CullTransparentMesh: 1
---- !u!114 &2103155838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2103155833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8827dbfc1f2ee7e41a979fe304aa02dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  headerText: {fileID: 935067192}
-  teamNameDropdown: {fileID: 1258114306}
-  playerNameDropdown: {fileID: 1940359552}
-  gamesWonInputField: {fileID: 1668742384}
-  gamesPlayedInputField: {fileID: 1161955007}
-  totalPointsInputField: {fileID: 1083603789}
-  ppmInputField: {fileID: 452738795}
-  paPercentInputField: {fileID: 1209275486}
-  breakAndRunInputField: {fileID: 777377019}
-  miniSlamsInputField: {fileID: 1268446501}
-  nineOnTheSnapInputField: {fileID: 1122446400}
-  shutoutsInputField: {fileID: 340483708}
-  skillLevelDropdown: {fileID: 1295443467}
-  addPlayerButton: {fileID: 292610115}
-  removePlayerButton: {fileID: 1039987664}
-  saveToCSVButton: {fileID: 47008140}
-  backButton: {fileID: 542383968}
 --- !u!1 &2105701591
 GameObject:
   m_ObjectHideFlags: 0
@@ -43025,7 +42830,6 @@ GameObject:
   - component: {fileID: 1236473283015140488}
   - component: {fileID: 6865354118298097337}
   - component: {fileID: 7258122293521025500}
-  - component: {fileID: 7258122293521025501}
   m_Layer: 5
   m_Name: OverlayFeedbackPanel
   m_TagString: Untagged
@@ -47732,22 +47536,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7258122293521025501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1134816541928465951}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 167cd836215ba69488eb5c995f78ee47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  feedbackText: {fileID: 7209015205795078366}
-  feedbackPanel: {fileID: 1134816541928465951}
-  okButton: {fileID: 697756811}
-  cancelButton: {fileID: 1920475072}
 --- !u!224 &7320014035906701394
 RectTransform:
   m_ObjectHideFlags: 0
