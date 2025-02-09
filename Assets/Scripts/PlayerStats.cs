@@ -1,14 +1,18 @@
+/// <summary>
+/// Represents player statistics, including lifetime and current season data.
+/// </summary>
 public class PlayerStats
 	{
 	// --- Lifetime Stats --- //
-	public int LifetimeGamesWon { get; set; }  // Lifetime Games Won
-	public int LifetimeGamesPlayed { get; set; } // Lifetime Games Played
-	public float LifetimeDefensiveShotAverage { get; set; } // Lifetime Defensive Shot Average
-	public int LifetimeMatchesPlayed { get; set; } // Lifetime Matches Played
+	public int LifetimeGamesWon { get; set; } // Total games won in lifetime
+	public int LifetimeGamesPlayed { get; set; } // Total games played in lifetime
+	public int LifetimeMatchesWon { get; set; } // Total matches won in lifetime
+	public int LifetimeMatchesPlayed { get; set; } // Total matches played in lifetime
 	public int LifetimeBreakAndRun { get; set; } // Lifetime Break and Run occurrences
 	public int LifetimeNineOnTheSnap { get; set; } // Lifetime Nine on the Snap occurrences
 	public int LifetimeMiniSlams { get; set; } // Lifetime Mini Slams occurrences
 	public int LifetimeShutouts { get; set; } // Lifetime Shutouts
+	public float LifetimeDefensiveShotAverage { get; set; } // Defensive Shot Average in lifetime
 
 	// --- Current Season Stats --- //
 	public int CurrentSeasonMatchesPlayed { get; set; } // Matches played in current season
@@ -18,19 +22,55 @@ public class PlayerStats
 	public int CurrentSeasonMiniSlams { get; set; } // Current season Mini Slams
 	public int CurrentSeasonNineOnTheSnap { get; set; } // Current season Nine on the Snap
 	public int CurrentSeasonShutouts { get; set; } // Current season Shutouts
-	public float CurrentSeasonPaPercentage { get; set; } // Current season PA Percentage
+	public float CurrentSeasonPaPercentage { get; set; } // PA Percentage (0.0 - 1.0)
 	public int CurrentSeasonPointsAwarded { get; set; } // Points awarded in current season
 	public float CurrentSeasonPointsPerMatch { get; set; } // Points per match in current season
 	public int CurrentSeasonPpm { get; set; } // Points per match in current season
 	public int CurrentSeasonTotalPoints { get; set; } // Total points in current season
 	public int CurrentSeasonSkillLevel { get; set; } // Skill level in current season
-	public int LifetimeMatchesWon { get; internal set; }
 
-	// --- Method to Check Validity --- //
+	/// <summary>
+	/// Initializes a new instance of PlayerStats with default values.
+	/// </summary>
+	public PlayerStats()
+		{
+		LifetimeGamesWon = 0;
+		LifetimeGamesPlayed = 0;
+		LifetimeMatchesWon = 0;
+		LifetimeMatchesPlayed = 0;
+		LifetimeBreakAndRun = 0;
+		LifetimeNineOnTheSnap = 0;
+		LifetimeMiniSlams = 0;
+		LifetimeShutouts = 0;
+		LifetimeDefensiveShotAverage = 0f;
+
+		CurrentSeasonMatchesPlayed = 0;
+		CurrentSeasonMatchesWon = 0;
+		CurrentSeasonBreakAndRun = 0;
+		CurrentSeasonDefensiveShotAverage = 0f;
+		CurrentSeasonMiniSlams = 0;
+		CurrentSeasonNineOnTheSnap = 0;
+		CurrentSeasonShutouts = 0;
+		CurrentSeasonPaPercentage = 0f;
+		CurrentSeasonPointsAwarded = 0;
+		CurrentSeasonPointsPerMatch = 0f;
+		CurrentSeasonPpm = 0;
+		CurrentSeasonTotalPoints = 0;
+		CurrentSeasonSkillLevel = 1;
+		}
+
+	/// <summary>
+	/// Validates that all stats are within logical limits.
+	/// </summary>
 	public bool IsValid()
 		{
-		// Basic validation for stats
 		return LifetimeGamesPlayed >= 0 && LifetimeGamesWon >= 0 &&
-			   CurrentSeasonMatchesPlayed >= 0 && CurrentSeasonMatchesWon >= 0;
+			   LifetimeMatchesPlayed >= 0 && LifetimeMatchesWon >= 0 &&
+			   LifetimeGamesWon <= LifetimeGamesPlayed &&
+			   LifetimeMatchesWon <= LifetimeMatchesPlayed &&
+			   CurrentSeasonMatchesPlayed >= 0 && CurrentSeasonMatchesWon >= 0 &&
+			   CurrentSeasonMatchesWon <= CurrentSeasonMatchesPlayed &&
+			   CurrentSeasonDefensiveShotAverage >= 0f && CurrentSeasonDefensiveShotAverage <= 1f &&
+			   CurrentSeasonPaPercentage >= 0f && CurrentSeasonPaPercentage <= 1f;
 		}
 	}

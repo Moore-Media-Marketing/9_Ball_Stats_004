@@ -1,15 +1,14 @@
+using System;
+
 public class Player
 	{
-	private string v;
-	private PlayerStats playerStats;
-
 	public int PlayerId { get; set; }
 	public string PlayerName { get; set; }
-	public int TeamId { get; set; } // Team ID reference
+	public int TeamId { get; set; }
 	public PlayerStats Stats { get; set; } = new PlayerStats();
 
-	// Constructor that aligns with CSV loading and DatabaseManager references
-	public Player(int playerId, string playerName, int teamId, PlayerStats stats, int skillLevel)
+	// Constructor matching CSV loading and DatabaseManager
+	public Player(int playerId, string playerName, int teamId, PlayerStats stats)
 		{
 		PlayerId = playerId;
 		PlayerName = playerName;
@@ -17,17 +16,34 @@ public class Player
 		Stats = stats ?? new PlayerStats();
 		}
 
-	public Player(int playerId, string v, int teamId, PlayerStats playerStats)
-		{
-		PlayerId = playerId;
-		this.v = v;
-		TeamId = teamId;
-		this.playerStats = playerStats;
-		}
-
-	// Shortcut property to fetch current skill level from PlayerStats
+	// Read-only property for skill level in the current season
 	public int SkillLevel => Stats.CurrentSeasonSkillLevel;
 
-	// Fetch the team name based on TeamId
+	// Fetch the team name dynamically based on TeamId
 	public string TeamName => PlayersAndTeamsManager.Instance.GetTeamNameById(TeamId);
+
+	// Update the current season stats for the player
+	public void UpdateCurrentSeasonStats(int gamesWon, int gamesPlayed, int totalPoints, int ppm, float pa, int breakAndRun,
+		int miniSlams, int nineOnTheSnap, int shutouts, int skillLevel)
+		{
+		// Directly update the properties in Stats (CurrentSeasonStats)
+		Stats.CurrentSeasonMatchesWon = gamesWon;
+		Stats.CurrentSeasonMatchesPlayed = gamesPlayed;
+		Stats.CurrentSeasonTotalPoints = totalPoints;
+		Stats.CurrentSeasonPpm = ppm;
+		Stats.CurrentSeasonPaPercentage = pa;
+		Stats.CurrentSeasonBreakAndRun = breakAndRun;
+		Stats.CurrentSeasonMiniSlams = miniSlams;
+		Stats.CurrentSeasonNineOnTheSnap = nineOnTheSnap;
+		Stats.CurrentSeasonShutouts = shutouts;
+
+		// Update skill level
+		Stats.CurrentSeasonSkillLevel = skillLevel;
+		}
+
+	// Helper method to validate player stats
+	public bool ValidateStats()
+		{
+		return Stats.IsValid();
+		}
 	}

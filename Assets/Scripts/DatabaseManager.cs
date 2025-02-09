@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 using UnityEngine;
 
@@ -11,12 +13,10 @@ public class DatabaseManager:MonoBehaviour
 
 	// --- Region: File Paths ---
 	private string playersDataFilePath = "Assets/PlayerData.csv";
-
 	private string teamsDataFilePath = "Assets/TeamsData.csv";
 
 	// --- Region: Data Lists ---
 	public List<Team> teams = new();
-
 	public List<Player> players = new();
 
 	// --- Region: Initialization ---
@@ -37,6 +37,7 @@ public class DatabaseManager:MonoBehaviour
 		LoadTeamsAndPlayers();  // Load the teams and players from CSV on start
 		}
 
+	// --- Region: Load Teams and Players ---
 	public void LoadTeamsAndPlayers()
 		{
 		// --- Load Teams ---
@@ -132,7 +133,7 @@ public class DatabaseManager:MonoBehaviour
 		}
 
 	// --- Region: Player Management Methods ---
-	public void AddPlayer(string playerName, int teamId, int skillLevel, SampleDataGenerator sampleDataGenerator)
+	public void AddPlayer(string playerName, int playerId, int teamId, PlayerStats stats)
 		{
 		if (players.Any(p => p.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
 			{
@@ -140,12 +141,39 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		int newPlayerId = players.Count > 0 ? players.Max(p => p.PlayerId) + 1 : 1;
-		Player newPlayer = new(newPlayerId, playerName, teamId, new PlayerStats());
+		// Create a new player and add to the list
+		Player newPlayer = new(playerId, playerName, teamId, stats);
 		players.Add(newPlayer);
-		sampleDataGenerator.GeneratePlayerStats(newPlayerId, skillLevel); // Generate stats for new player
 
+		// Save to CSV (you should save the players to CSV here if needed)
 		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
+
+		Debug.Log($"Player '{playerName}' added successfully.");
+		}
+
+	public void SavePlayersToCSV()
+		{
+		// Assuming you have a list of players to save
+		List<Player> players = GetAllPlayers(); // Assuming GetAllPlayers retrieves all players
+		StringBuilder sb = new();
+
+		// Add headers (assuming player properties match your columns)
+		sb.AppendLine("PlayerId,PlayerName,TeamId,GamesWon,GamesPlayed,TotalPoints,PPM,PA,BreakAndRun,MiniSlams,NineOnTheSnap,Shutouts,SkillLevel");
+
+		// Add each player's stats
+		foreach (Player player in players)
+			{
+			sb.AppendLine($"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.Stats.CurrentSeasonMatchesWon},{player.Stats.CurrentSeasonMatchesPlayed},{player.Stats.CurrentSeasonTotalPoints},{player.Stats.CurrentSeasonPpm},{player.Stats.CurrentSeasonPaPercentage},{player.Stats.CurrentSeasonBreakAndRun},{player.Stats.CurrentSeasonMiniSlams},{player.Stats.CurrentSeasonNineOnTheSnap},{player.Stats.CurrentSeasonShutouts},{player.Stats.CurrentSeasonSkillLevel}");
+			}
+
+		// Save to a file (modify path as needed)
+		File.WriteAllText("players_data.csv", sb.ToString());
+		}
+
+
+	private static Player GetNewPlayer(string playerName, int newPlayerId, PlayerStats generatedStats, int teamId)
+		{
+		return new Player(newPlayerId, playerName, teamId, generatedStats);
 		}
 
 	public void AssignPlayerToTeam(int playerId, int newTeamId)
@@ -160,6 +188,13 @@ public class DatabaseManager:MonoBehaviour
 		if (!teams.Any(t => t.TeamId == newTeamId))
 			{
 			Debug.LogWarning($"Team with ID '{newTeamId}' does not exist.");
+			return;
+			}
+
+		// Ensure player is not already assigned to the team
+		if (player.TeamId == newTeamId)
+			{
+			Debug.LogWarning($"Player is already assigned to team '{newTeamId}'.");
 			return;
 			}
 

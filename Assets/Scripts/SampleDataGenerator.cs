@@ -1,119 +1,139 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
 
 public class SampleDataGenerator:MonoBehaviour
 	{
-	public int numberOfTeams = 10; // --- Number of teams to generate --- //
-	public int numberOfPlayersPerTeam; // --- Number of players per team --- //
-	public float malePercentage = 0.65f; // --- Percentage of male players (65%) --- //
+	// Singleton instance
+	public static SampleDataGenerator Instance { get; private set; }
 
-	// --- Name arrays --- 
-	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas", "Christopher", "Daniel", "Paul", "Mark", "Donald", "George", "Kenneth", "Steven", "Edward", "Brian", "Anthony", "Kevin", "Jason", "Jeff", "Ryan" };
+	public int numberOfTeams = 10; // Default number of teams
+	public float malePercentage = 0.65f; // 65% probability for male players
 
-	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy", "Lisa", "Nancy", "Karen", "Betty", "Helen", "Sandra", "Donna", "Carol", "Ruth", "Sharon", "Michelle", "Laura", "Sarah", "Kimberly", "Jessica" };
+	// --- Name Pools ---  
+	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas" };
+	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy" };
+	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez" };
+	private static readonly string[] teamNames = { "Atomic Squirrels", "Crimson Cobras", "Electric Eels", "Phantom Phantoms", "Rainbow Raptors" };
 
-	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott", "Green", "Adams", "Baker", "Hall", "Nelson", "Carter", "Mitchell", "Parker", "Evans", "Edwards", "Collins", "Stewart", "Morris", "Morgan" };
-
-	private static readonly string[] teamNames = { "Atomic Squirrels", "Crimson Cobras", "Electric Eels", "Phantom Phantoms", "Rainbow Raptors", "Mystic Moose", "Silent Serpents", "Cosmic Crusaders", "Neon Ninjas", "Lunar Lions", "Galactic Gorillas", "Iron Eagles", "Shadow Strikers", "Velocity Vipers", "Quicksilver Quails", "Turbo Turtles", "Diamond Dragons", "Emerald Emus", "Golden Geckos", "Icy Iguanas", "Jade Jaguars", "Kinetic Kangaroos", "Laser Lemurs", "Magma Monkeys", "Nova Narwhals", "Onyx Owls", "Plasma Pandas", "Quantum Quetzals", "Ruby Rhinos", "Sapphire Sharks", "Titanium Tigers", "Uranium Unicorns", "Violet Vultures", "Wild Wolverines", "X-Ray Xenopus", "Yellow Yetis", "Zebra Zephyrs" };
+	private void Awake()
+		{
+		// Ensure only one instance exists
+		if (Instance == null) Instance = this;
+		else Destroy(gameObject);
+		}
 
 	private void Start()
 		{
-		numberOfPlayersPerTeam = Random.Range(5, 9); // Set random number of players per team
 		GenerateSampleTeamsAndPlayers();
 		}
 
+	// Generate sample teams and players
 	public void GenerateSampleTeamsAndPlayers()
 		{
-		int numberOfTeams = Random.Range(3, 6); // Random number of teams between 3 and 5
-		int teamId = 1; // Start at team ID 1
+		int generatedTeams = Random.Range(3, 6); // Generate 3 to 5 teams
+		List<Team> existingTeams = DatabaseManager.Instance.GetAllTeams();
 
-		for (int i = 0; i < numberOfTeams; i++)
+		for (int i = 0; i < generatedTeams; i++)
 			{
-			Team newTeam = new Team(teamId++, teamNames[Random.Range(0, teamNames.Length)]); // Random team name from the array
+			string teamName = teamNames[Random.Range(0, teamNames.Length)];
 
-			// --- Updated to call AddTeam with the team name instead of Team object --- //
-			DatabaseManager.Instance.AddTeam(newTeam.TeamName); // Assuming AddTeam expects teamName as a string
+			// Check if team already exists
+			if (existingTeams.Any(t => t.TeamName == teamName))
+				{
+				Debug.Log($"Skipping duplicate team: {teamName}");
+				continue;
+				}
 
-			int numberOfPlayers = Random.Range(5, 9); // Random number of players between 5 and 8
+			// Add team to database
+			DatabaseManager.Instance.AddTeam(teamName);
+			Team newTeam = DatabaseManager.Instance.GetAllTeams().FirstOrDefault(t => t.TeamName == teamName);
+
+			if (newTeam == null)
+				{
+				Debug.LogError($"Failed to add team: {teamName}");
+				continue;
+				}
+
+			// Generate players for the team
+			int numberOfPlayers = Random.Range(5, 9);
 			for (int j = 0; j < numberOfPlayers; j++)
 				{
-				Player newPlayer = GeneratePlayer(newTeam.TeamId); // Use GeneratePlayer to create player details
-																   // Generate player stats (using SampleDataGenerator) for testing
-				DatabaseManager.Instance.AddPlayer(newPlayer.PlayerName, newPlayer.PlayerId, newPlayer.TeamId, this); // Pass 'this' (current SampleDataGenerator instance)
-				GeneratePlayerStats(newPlayer.PlayerId, newPlayer.SkillLevel);
+				Player newPlayer = GeneratePlayer(newTeam.TeamId);
+				DatabaseManager.Instance.AddPlayer(newPlayer.PlayerName, newPlayer.PlayerId, newPlayer.TeamId, newPlayer.Stats);
 				}
 			}
+
+		Debug.Log($"Generated {generatedTeams} teams with players.");
 		}
 
+	// Generate a single player
 	private Player GeneratePlayer(int teamId)
 		{
-		// --- Determine gender based on percentage --- //
+		// Determine gender probability
 		bool isMale = Random.Range(0f, 1f) <= malePercentage;
-
-		// --- Generate first name based on gender --- //
 		string firstName = isMale ? firstNamesMale[Random.Range(0, firstNamesMale.Length)] : firstNamesFemale[Random.Range(0, firstNamesFemale.Length)];
-
-		// --- Generate a random last name for the player --- //
 		string lastName = lastNames[Random.Range(0, lastNames.Length)];
 		string playerName = $"{firstName} {lastName}";
 
-		// --- Generate skill level as a whole number between 1 and 9 --- //
-		int skillLevel = Random.Range(1, 9); // --- Whole number between 1 and 9 --- //
+		// Generate unique PlayerId
+		int playerId = GenerateUniquePlayerId();
 
-		// --- Generating player stats based on skill level --- //
+		// Random skill level between 1 and 9
+		int skillLevel = Random.Range(1, 10);
+
+		// Generate player stats
 		PlayerStats stats = GeneratePlayerStats(skillLevel);
 
-		// --- Return new player with stats --- //
-		return new Player(Random.Range(1, 1000), playerName, teamId, stats, skillLevel); // Assuming PlayerId is generated randomly
+		return new Player(playerId, playerName, teamId, stats);
 		}
 
-	private PlayerStats GeneratePlayerStats(int skillLevel)
+	/// <summary>
+	/// Generates the player stats based on the skill level.
+	/// </summary>
+	public PlayerStats GeneratePlayerStats(int skillLevel)
 		{
-		// --- Placeholder for actual player stats generation logic --- //
-		// Stats will be generated in `GeneratePlayerStats` method below
-		return new PlayerStats(); // Returning empty stats here, will populate them in the stats generation logic
-		}
-
-	public void GeneratePlayerStats(int playerId, int skillLevel)
-		{
-		// Find the player by their ID in the database
-		Player player = DatabaseManager.Instance.players.FirstOrDefault(p => p.PlayerId == playerId);
-		if (player == null)
+		PlayerStats stats = new()
 			{
-			Debug.LogWarning($"Player with ID '{playerId}' not found.");
-			return;
-			}
+			CurrentSeasonMatchesPlayed = Random.Range(5, 30),
+			CurrentSeasonMatchesWon = Mathf.Clamp((int) (Random.Range(5, 30) * skillLevel * 0.1f), 0, 30),
+			CurrentSeasonBreakAndRun = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.1f)), 0, 10),
+			CurrentSeasonDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f),
+			CurrentSeasonMiniSlams = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.05f)), 0, 10),
+			CurrentSeasonNineOnTheSnap = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.03f)), 0, 10),
+			CurrentSeasonPaPercentage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f),
+			CurrentSeasonPointsAwarded = Mathf.Clamp(Random.Range(10, 300), 0, 300),
+			CurrentSeasonPointsPerMatch = Mathf.Clamp(Random.Range(1, 10), 0, 10),
+			CurrentSeasonPpm = Mathf.Clamp(Random.Range(1, 10), 0, 10),
+			CurrentSeasonShutouts = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.02f)), 0, 10),
+			CurrentSeasonSkillLevel = skillLevel,
+			CurrentSeasonTotalPoints = Mathf.Clamp(Random.Range(10, 300), 0, 300),
 
-		// --- Initialize PlayerStats object before use --- //
-		PlayerStats stats = new PlayerStats
-			{
-			// --- Current Season Stats --- //
-			CurrentSeasonMatchesPlayed = Random.Range(5, 30)
+			LifetimeMatchesPlayed = Random.Range(10, 100),
+			LifetimeMatchesWon = Mathf.Clamp((int) (Random.Range(10, 100) * skillLevel * 0.1f), 0, 100),
+			LifetimeBreakAndRun = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.05f)), 0, 10),
+			LifetimeDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f),
+			LifetimeMiniSlams = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.05f)), 0, 10),
+			LifetimeNineOnTheSnap = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.03f)), 0, 10),
+			LifetimeShutouts = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.02f)), 0, 10),
 			};
-		stats.CurrentSeasonMatchesWon = Mathf.Clamp((int) (stats.CurrentSeasonMatchesPlayed * skillLevel * 0.1f), 0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonBreakAndRun = Mathf.Clamp((int) (stats.CurrentSeasonMatchesWon * (skillLevel * 0.1f)), 0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
-		stats.CurrentSeasonMiniSlams = Mathf.Clamp((int) (stats.CurrentSeasonMatchesWon * (skillLevel * 0.05f)), 0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonNineOnTheSnap = Mathf.Clamp((int) (stats.CurrentSeasonMatchesWon * (skillLevel * 0.03f)), 0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonPaPercentage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
-		stats.CurrentSeasonPointsAwarded = Mathf.Clamp(stats.CurrentSeasonMatchesPlayed * skillLevel, 0, stats.CurrentSeasonMatchesPlayed * 10);
-		stats.CurrentSeasonPointsPerMatch = Mathf.Clamp(stats.CurrentSeasonPointsAwarded / stats.CurrentSeasonMatchesPlayed, 0, 10);
-		stats.CurrentSeasonPpm = Mathf.Clamp((int) (stats.CurrentSeasonPointsPerMatch), 0, 10);
-		stats.CurrentSeasonShutouts = Mathf.Clamp((int) (stats.CurrentSeasonMatchesWon * (skillLevel * 0.02f)), 0, stats.CurrentSeasonMatchesPlayed);
-		stats.CurrentSeasonSkillLevel = skillLevel;
-		stats.CurrentSeasonTotalPoints = Mathf.Clamp(stats.CurrentSeasonPointsAwarded, 0, stats.CurrentSeasonMatchesPlayed * 10);
 
-		// --- Lifetime Stats --- //
-		stats.LifetimeMatchesPlayed = Random.Range(10, 100);
-		stats.LifetimeMatchesWon = Mathf.Clamp((int) (stats.LifetimeMatchesPlayed * skillLevel * 0.1f), 0, stats.LifetimeMatchesPlayed);
-		stats.LifetimeBreakAndRun = Mathf.Clamp((int) (stats.LifetimeMatchesWon * (skillLevel * 0.05f)), 0, stats.LifetimeMatchesPlayed);
-		stats.LifetimeDefensiveShotAverage = Mathf.Clamp(skillLevel * 0.1f + Random.Range(0.0f, 0.5f), 0.0f, 1.0f);
-		stats.LifetimeMiniSlams = Mathf.Clamp((int) (stats.LifetimeMatchesWon * (skillLevel * 0.05f)), 0, stats.LifetimeMatchesPlayed);
-		stats.LifetimeNineOnTheSnap = Mathf.Clamp((int) (stats.LifetimeMatchesWon * (skillLevel * 0.03f)), 0, stats.LifetimeMatchesPlayed);
-		stats.LifetimeShutouts = Mathf.Clamp((int) (stats.LifetimeMatchesWon * (skillLevel * 0.02f)), 0, stats.LifetimeMatchesPlayed);
+		return stats;
+		}
 
-		// Now update the player's stats in the database
-		DatabaseManager.Instance.UpdatePlayerStats(playerId, stats);
+
+	// Generate a unique player ID
+	private int GenerateUniquePlayerId()
+		{
+		List<int> existingIds = DatabaseManager.Instance.GetAllPlayers().Select(p => p.PlayerId).ToList();
+		int newId;
+
+		do
+			{
+			newId = Random.Range(1, 10000);
+			} while (existingIds.Contains(newId));
+
+		return newId;
 		}
 	}
