@@ -1,17 +1,21 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections.Generic;
+
+using TMPro;
+
+using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerLifetimeDataInputPanel:MonoBehaviour
 	{
 	[Header("UI Elements")]
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 
 	// Lifetime data input fields
 	public TMP_InputField lifetimeGamesWonInputField;
+
 	public TMP_InputField lifetimeGamesPlayedInputField;
 	public TMP_InputField lifetimeDefensiveShotAvgInputField;
 	public TMP_InputField matchesPlayedInLast2YearsInputField;
@@ -22,16 +26,19 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 
 	// Buttons
 	public Button updateLifetimeButton;
+
 	public Button saveToCSVButton;
 	public Button backButton;
 	public TMP_Text backButtonText;
 
 	// Lists to store team and player data
 	private List<Team> teams = new();
+
 	private List<Player> players = new();
 
 	// Currently selected IDs
 	private int selectedTeamId = -1;
+
 	private int selectedPlayerId = -1;
 
 	// Start is called before the first frame update
@@ -147,14 +154,55 @@ public class PlayerLifetimeDataInputPanel:MonoBehaviour
 			}
 
 		// Gather the input data
-		int gamesWon = int.Parse(lifetimeGamesWonInputField.text);
-		int gamesPlayed = int.Parse(lifetimeGamesPlayedInputField.text);
-		float defensiveShotAvg = float.Parse(lifetimeDefensiveShotAvgInputField.text);
-		int matchesPlayedInLast2Years = int.Parse(matchesPlayedInLast2YearsInputField.text);
-		int breakAndRun = int.Parse(lifetimeBreakAndRunInputField.text);
-		int nineOnTheSnap = int.Parse(nineOnTheSnapInputField.text);
-		int miniSlams = int.Parse(lifetimeMiniSlamsInputField.text);
-		int shutouts = int.Parse(lifetimeShutoutsInputField.text);
+
+		// Try to parse the input fields and log errors if invalid
+		if (!int.TryParse(lifetimeGamesWonInputField.text, out int gamesWon))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Games Won.");
+			return;
+			}
+
+		if (!int.TryParse(lifetimeGamesPlayedInputField.text, out int gamesPlayed))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Games Played.");
+			return;
+			}
+
+		if (!float.TryParse(lifetimeDefensiveShotAvgInputField.text, out float defensiveShotAvg))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Defensive Shot Average.");
+			return;
+			}
+
+		if (!int.TryParse(matchesPlayedInLast2YearsInputField.text, out int matchesPlayedInLast2Years))
+			{
+			Debug.LogWarning("Invalid input for Matches Played in Last 2 Years.");
+			return;
+			}
+
+		if (!int.TryParse(lifetimeBreakAndRunInputField.text, out int breakAndRun))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Break and Run.");
+			return;
+			}
+
+		if (!int.TryParse(nineOnTheSnapInputField.text, out int nineOnTheSnap))
+			{
+			Debug.LogWarning("Invalid input for Nine on the Snap.");
+			return;
+			}
+
+		if (!int.TryParse(lifetimeMiniSlamsInputField.text, out int miniSlams))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Mini Slams.");
+			return;
+			}
+
+		if (!int.TryParse(lifetimeShutoutsInputField.text, out int shutouts))
+			{
+			Debug.LogWarning("Invalid input for Lifetime Shutouts.");
+			return;
+			}
 
 		// Update the player data (using the PlayerStats object for lifetime data)
 		PlayersAndTeamsManager.Instance.UpdatePlayerLifetimeData(selectedPlayerId, gamesWon, gamesPlayed, defensiveShotAvg,

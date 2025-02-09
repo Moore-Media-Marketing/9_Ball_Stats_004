@@ -10,6 +10,7 @@ public class UIManager:MonoBehaviour
 	// Panels
 	[Header("Panels")]
 	public GameObject homePanel;
+
 	public GameObject settingsPanel;
 	public GameObject playerManagementPanel;
 	public GameObject teamManagementPanel;

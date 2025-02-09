@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 using UnityEngine;
 
 public class DatabaseManager:MonoBehaviour
 	{
-	// --- Singleton Instance ---
+	// --- Region: Singleton Instance ---
 	public static DatabaseManager Instance { get; private set; }
 
-	// --- File Paths ---
+	// --- Region: File Paths ---
 	private string playersDataFilePath = "Assets/PlayerData.csv";
+
 	private string teamsDataFilePath = "Assets/TeamsData.csv";
 
-	// --- Data Lists ---
+	// --- Region: Data Lists ---
 	public List<Team> teams = new();
+
 	public List<Player> players = new();
 
-	// --- Initialization ---
+	// --- Region: Initialization ---
 	private void Awake()
 		{
+		// Ensure that only one instance of DatabaseManager exists
 		if (Instance == null)
 			{
 			Instance = this;
@@ -32,20 +34,17 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		LoadTeamsAndPlayers();
+		LoadTeamsAndPlayers();  // Load the teams and players from CSV on start
 		}
 
-	/// <summary>
-	/// Loads teams and players from CSV files.
-	/// </summary>
 	public void LoadTeamsAndPlayers()
 		{
-		// Load teams
+		// --- Load Teams ---
 		teams = CSVManager.LoadCSV(teamsDataFilePath)
 			.Select(line =>
 			{
 				string[] values = line.Split(',');
-				if (values.Length >= 2 && int.TryParse(values[0], out int teamId))
+				if (IsValidData(values, 2) && int.TryParse(values[0], out int teamId) && !string.IsNullOrEmpty(values[1]))
 					{
 					return new Team(teamId, values[1]);
 					}
@@ -58,12 +57,13 @@ public class DatabaseManager:MonoBehaviour
 			.Where(team => team != null)
 			.ToList();
 
-		// Load players
+		// --- Load Players ---
 		players = CSVManager.LoadCSV(playersDataFilePath)
 			.Select(line =>
 			{
 				string[] values = line.Split(',');
-				if (values.Length >= 4 && int.TryParse(values[0], out int playerId) && int.TryParse(values[2], out int teamId) && int.TryParse(values[3], out int skillLevel))
+				if (IsValidData(values, 17) && int.TryParse(values[0], out int playerId) && int.TryParse(values[2], out int teamId)
+					&& int.TryParse(values[3], out int skillLevel) && !string.IsNullOrEmpty(values[1]))
 					{
 					return new Player(playerId, values[1], teamId, new PlayerStats());
 					}
@@ -79,9 +79,12 @@ public class DatabaseManager:MonoBehaviour
 		Debug.Log($"Loaded {teams.Count} teams and {players.Count} players.");
 		}
 
-	/// <summary>
-	/// Adds a new team.
-	/// </summary>
+	private bool IsValidData(string[] values, int requiredLength)
+		{
+		return values.Length >= requiredLength && values.All(v => !string.IsNullOrWhiteSpace(v));
+		}
+
+	// --- Region: Team Management Methods ---
 	public void AddTeam(string teamName)
 		{
 		if (teams.Any(t => t.TeamName.Equals(teamName, StringComparison.OrdinalIgnoreCase)))
@@ -95,9 +98,6 @@ public class DatabaseManager:MonoBehaviour
 		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
 		}
 
-	/// <summary>
-	/// Modifies an existing team's name.
-	/// </summary>
 	public void ModifyTeam(int teamId, string newTeamName)
 		{
 		Team team = teams.FirstOrDefault(t => t.TeamId == teamId);
@@ -111,9 +111,6 @@ public class DatabaseManager:MonoBehaviour
 		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
 		}
 
-	/// <summary>
-	/// Deletes a team and assigns its players to 'Unassigned'.
-	/// </summary>
 	public void DeleteTeam(int teamId)
 		{
 		Team teamToDelete = teams.FirstOrDefault(t => t.TeamId == teamId);
@@ -127,17 +124,15 @@ public class DatabaseManager:MonoBehaviour
 
 		foreach (var player in players.Where(p => p.TeamId == teamId))
 			{
-			player.TeamId = -1;
+			player.TeamId = -1;  // Assign players to 'Unassigned'
 			}
 
 		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
 		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
 		}
 
-	/// <summary>
-	/// Adds a new player.
-	/// </summary>
-	public void AddPlayer(string playerName, int teamId, int skillLevel)
+	// --- Region: Player Management Methods ---
+	public void AddPlayer(string playerName, int teamId, int skillLevel, SampleDataGenerator sampleDataGenerator)
 		{
 		if (players.Any(p => p.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
 			{
@@ -146,13 +141,13 @@ public class DatabaseManager:MonoBehaviour
 			}
 
 		int newPlayerId = players.Count > 0 ? players.Max(p => p.PlayerId) + 1 : 1;
-		players.Add(new Player(newPlayerId, playerName, teamId, new PlayerStats()));
+		Player newPlayer = new(newPlayerId, playerName, teamId, new PlayerStats());
+		players.Add(newPlayer);
+		sampleDataGenerator.GeneratePlayerStats(newPlayerId, skillLevel); // Generate stats for new player
+
 		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
 		}
 
-	/// <summary>
-	/// Assigns a player to a new team.
-	/// </summary>
 	public void AssignPlayerToTeam(int playerId, int newTeamId)
 		{
 		Player player = players.FirstOrDefault(p => p.PlayerId == playerId);
@@ -172,9 +167,6 @@ public class DatabaseManager:MonoBehaviour
 		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
 		}
 
-	/// <summary>
-	/// Deletes a player from the database.
-	/// </summary>
 	public void DeletePlayer(int playerId)
 		{
 		Player player = players.FirstOrDefault(p => p.PlayerId == playerId);
@@ -188,25 +180,23 @@ public class DatabaseManager:MonoBehaviour
 		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
 		}
 
-	/// <summary>
-	/// Retrieves all players.
-	/// </summary>
+	// --- Region: Additional Functions ---
 	public List<Player> GetAllPlayers() => new(players);
 
-	/// <summary>
-	/// Retrieves all teams.
-	/// </summary>
 	public List<Team> GetAllTeams() => new(teams);
 
-	/// <summary>
-	/// Updates the stats of a player.
-	/// </summary>
 	public void UpdatePlayerStats(int playerId, PlayerStats newStats)
 		{
 		Player player = players.FirstOrDefault(p => p.PlayerId == playerId);
 		if (player == null)
 			{
 			Debug.LogWarning($"Player with ID '{playerId}' not found.");
+			return;
+			}
+
+		if (newStats == null || !newStats.IsValid())  // Assuming IsValid() exists in PlayerStats
+			{
+			Debug.LogWarning("Invalid player stats.");
 			return;
 			}
 

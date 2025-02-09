@@ -1,13 +1,16 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+
+using TMPro;
+
+using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerManagementPanel:MonoBehaviour
 	{
 	// UI Elements
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
@@ -69,8 +72,20 @@ public class PlayerManagementPanel:MonoBehaviour
 				return;
 				}
 
-			DatabaseManager.Instance.AddPlayer(playerName, teamId, skillLevel);
-			PopulatePlayerDropdown();  // Update player dropdown after adding a new player
+			// Generate player stats (using SampleDataGenerator) for testing
+			Player newPlayer = new Player
+				{
+				PlayerName = playerName,
+				TeamId = teamId,
+				SkillLevel = skillLevel,
+				Stats = SampleDataGenerator.Instance.GeneratePlayerStats()  // Use SampleDataGenerator to generate stats
+				};
+
+			// Add player to the database
+			DatabaseManager.Instance.AddPlayer(newPlayer);
+
+			// Update player dropdown after adding the new player
+			PopulatePlayerDropdown();
 			}
 		else
 			{

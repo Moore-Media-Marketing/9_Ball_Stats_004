@@ -1,14 +1,24 @@
-using UnityEngine;
 using System.Collections.Generic;
+
+using UnityEngine;
 
 public class PlayersAndTeamsManager:MonoBehaviour
 	{
+	// --- Region: Singleton Instance ---
+	// This ensures that only one instance of PlayersAndTeamsManager exists.
 	public static PlayersAndTeamsManager Instance;
+
+	// --- Region: Data Storage ---
+	// Lists to store all teams and players
 	public List<Team> teams = new();
+
 	public List<Player> players = new();
 
+	// --- Region: Initialization ---
+	// Called when the script is first run to set the singleton instance.
 	private void Awake()
 		{
+		// Ensure that only one instance of PlayersAndTeamsManager exists
 		if (Instance == null)
 			{
 			Instance = this;
@@ -19,13 +29,19 @@ public class PlayersAndTeamsManager:MonoBehaviour
 			}
 		}
 
-	// Get all teams
+	// --- Region: Team Management Methods ---
+
+	/// <summary>
+	/// Get all teams in the system.
+	/// </summary>
 	public List<Team> GetAllTeams()
 		{
 		return teams;
 		}
 
-	// Get players by team ID
+	/// <summary>
+	/// Get all players by team ID.
+	/// </summary>
 	public List<Player> GetPlayersByTeamId(int teamId)
 		{
 		List<Player> teamPlayers = new();
@@ -39,7 +55,9 @@ public class PlayersAndTeamsManager:MonoBehaviour
 		return teamPlayers;
 		}
 
-	// Get team name by team ID
+	/// <summary>
+	/// Get the team name by team ID.
+	/// </summary>
 	public string GetTeamNameById(int teamId)
 		{
 		Team team = teams.Find(t => t.TeamId == teamId);
@@ -53,7 +71,9 @@ public class PlayersAndTeamsManager:MonoBehaviour
 			}
 		}
 
-	// Add a new team
+	/// <summary>
+	/// Add a new team to the system.
+	/// </summary>
 	public void AddTeam(string teamName)
 		{
 		// Check if the team already exists
@@ -69,7 +89,9 @@ public class PlayersAndTeamsManager:MonoBehaviour
 		Debug.Log($"Added new team: {teamName}");
 		}
 
-	// Modify an existing team's name
+	/// <summary>
+	/// Modify the name of an existing team by team ID.
+	/// </summary>
 	public void ModifyTeam(int teamId, string newTeamName)
 		{
 		Team teamToModify = teams.Find(t => t.TeamId == teamId);
@@ -84,7 +106,9 @@ public class PlayersAndTeamsManager:MonoBehaviour
 			}
 		}
 
-	// Delete a team and reassign players to "Unassigned"
+	/// <summary>
+	/// Delete a team and reassign players to "Unassigned".
+	/// </summary>
 	public void DeleteTeam(int teamId)
 		{
 		Team teamToDelete = teams.Find(t => t.TeamId == teamId);
@@ -109,7 +133,11 @@ public class PlayersAndTeamsManager:MonoBehaviour
 			}
 		}
 
-	// Update player's lifetime data
+	// --- Region: Player Management Methods ---
+
+	/// <summary>
+	/// Update player's lifetime data.
+	/// </summary>
 	public void UpdatePlayerLifetimeData(int playerId, int gamesWon, int gamesPlayed, float defensiveShotAvg,
 										 int matchesPlayedInLast2Years, int breakAndRun, int nineOnTheSnap,
 										 int miniSlams, int shutouts)
@@ -133,4 +161,7 @@ public class PlayersAndTeamsManager:MonoBehaviour
 			Debug.LogWarning($"Player with ID {playerId} not found.");
 			}
 		}
+
+	// --- Region: Additional Functions ---
+	// You can add any additional helper methods here if needed.
 	}
