@@ -1,6 +1,7 @@
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
 /// Manages the settings panel UI, including toggles and buttons.
@@ -9,6 +10,7 @@ public class SettingsPanel:MonoBehaviour
 	{
 	[Header("UI Elements")]
 	public TextMeshProUGUI headerText; // Header text
+
 	public Toggle sampleDataGeneratorToggle; // Toggle for sample data generator
 	public Text sampleDataLabel; // Label for the sample data toggle
 	public Button currentSeasonWeightSettingsButton; // Button for current season weight settings
@@ -35,8 +37,12 @@ public class SettingsPanel:MonoBehaviour
 	private void InitializeSettingsPanel()
 		{
 		headerText.text = "Settings"; // Set header text
-		sampleDataGeneratorToggle.isOn = false; // Default state of the toggle
-		sampleDataLabel.text = "Enable Sample Data Generation"; // Set toggle label text
+
+		// Load last known state of the sample data generator
+		bool isSampleDataEnabled = SampleDataGenerator.Instance != null && SampleDataGenerator.Instance.IsSampleDataEnabled();
+		sampleDataGeneratorToggle.isOn = SampleDataGenerator.Instance.IsSampleDataEnabled();
+
+		UpdateSampleDataLabel(isSampleDataEnabled);
 		}
 
 	/// <summary>
@@ -63,18 +69,32 @@ public class SettingsPanel:MonoBehaviour
 	/// <param name="isOn">The toggle state.</param>
 	private void ToggleSampleDataGenerator(bool isOn)
 		{
+		if (SampleDataGenerator.Instance == null)
+			{
+			Debug.LogError("SampleDataGenerator instance not found!");
+			return;
+			}
+
 		if (isOn)
 			{
 			Debug.Log("Sample Data Generator Enabled");
-			// Logic to enable the sample data generator
 			SampleDataGenerator.Instance.EnableSampleDataGeneration();
 			}
 		else
 			{
 			Debug.Log("Sample Data Generator Disabled");
-			// Logic to disable the sample data generator
 			SampleDataGenerator.Instance.DisableSampleDataGeneration();
 			}
+
+		UpdateSampleDataLabel(isOn);
+		}
+
+	/// <summary>
+	/// Updates the label text for the sample data toggle.
+	/// </summary>
+	private void UpdateSampleDataLabel(bool isEnabled)
+		{
+		sampleDataLabel.text = isEnabled ? "Sample Data Generation: ON" : "Sample Data Generation: OFF";
 		}
 
 	/// <summary>

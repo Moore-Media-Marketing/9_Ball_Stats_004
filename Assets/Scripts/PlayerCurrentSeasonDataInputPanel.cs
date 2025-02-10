@@ -10,6 +10,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 	{
 	// UI Elements
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField gamesWonInputField;
@@ -28,7 +29,7 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 
 	private List<Player> players;
 
-	void Start()
+	private void Start()
 		{
 		// Initialize player list and dropdowns
 		players = DatabaseManager.Instance.GetAllPlayers();
@@ -123,7 +124,6 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		Debug.Log($"Current season data for {selectedPlayer.PlayerName} saved.");
 		}
 
-
 	// Validate all input fields
 	private bool ValidateInputs()
 		{
@@ -143,5 +143,4 @@ public class PlayerCurrentSeasonDataInputPanel:MonoBehaviour
 		{
 		UIManager.Instance.ShowComparisonPanel(); // Replace GoToPanel with ShowComparisonPanel
 		}
-
 	}

@@ -1,5 +1,3 @@
-using System;
-
 /// <summary>
 /// Represents a team in the system.
 /// </summary>

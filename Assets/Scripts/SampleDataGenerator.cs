@@ -17,7 +17,7 @@ public class SampleDataGenerator:MonoBehaviour
 	// Flag to control sample data generation
 	private bool isSampleDataGenerationEnabled = false;
 
-	// --- Name Pools ---  
+	// --- Name Pools ---
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas" };
 	private static readonly string[] firstNamesFemale = { "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan", "Margaret", "Dorothy" };
 	private static readonly string[] lastNames = { "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez" };
@@ -120,6 +120,7 @@ public class SampleDataGenerator:MonoBehaviour
 		{
 		PlayerStats stats = new()
 			{
+			// Current Season Stats
 			CurrentSeasonMatchesPlayed = Random.Range(5, 30),
 			CurrentSeasonMatchesWon = Mathf.Clamp((int) (Random.Range(5, 30) * skillLevel * 0.1f), 0, 30),
 			CurrentSeasonBreakAndRun = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.1f)), 0, 10),
@@ -134,6 +135,7 @@ public class SampleDataGenerator:MonoBehaviour
 			CurrentSeasonSkillLevel = skillLevel,
 			CurrentSeasonTotalPoints = Mathf.Clamp(Random.Range(10, 300), 0, 300),
 
+			// Lifetime Stats
 			LifetimeMatchesPlayed = Random.Range(10, 100),
 			LifetimeMatchesWon = Mathf.Clamp((int) (Random.Range(10, 100) * skillLevel * 0.1f), 0, 100),
 			LifetimeBreakAndRun = Mathf.Clamp((int) (Random.Range(1, 10) * (skillLevel * 0.05f)), 0, 10),
@@ -144,6 +146,12 @@ public class SampleDataGenerator:MonoBehaviour
 			};
 
 		return stats;
+		}
+
+	// Check if sample data generation is enabled
+	public bool IsSampleDataEnabled()
+		{
+		return isSampleDataGenerationEnabled;
 		}
 
 	// Generate a unique player ID

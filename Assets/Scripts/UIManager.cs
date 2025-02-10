@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+
 using TMPro; // Import for TextMeshPro
+
+using UnityEngine;
 
 /// <summary>
 /// Manages the UI navigation, panel transitions, and feedback system.
@@ -14,6 +16,7 @@ public class UIManager:MonoBehaviour
 	// Panels
 	[Header("Panels")]
 	public GameObject homePanel; // Home panel
+
 	public GameObject settingsPanel; // Settings panel
 	public GameObject currentSeasonWeightSettingsPanel; // Current season weight settings panel
 	public GameObject lifetimeWeightSettingsPanel; // Lifetime weight settings panel
@@ -25,6 +28,7 @@ public class UIManager:MonoBehaviour
 	// Feedback System
 	[Header("Feedback System")]
 	public GameObject feedbackPanel; // UI panel for feedback
+
 	public TMP_Text feedbackText; // UI text for feedback
 
 	// Panel History (for backtracking)

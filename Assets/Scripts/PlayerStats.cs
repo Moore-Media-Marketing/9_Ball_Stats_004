@@ -1,5 +1,3 @@
-using System;
-
 /// <summary>
 /// Represents player statistics, including lifetime and current season data.
 /// </summary>
@@ -7,6 +5,7 @@ public class PlayerStats
 	{
 	// --- Lifetime Stats --- //
 	public int LifetimeGamesWon { get; set; }
+
 	public int LifetimeGamesPlayed { get; set; }
 	public int LifetimeMatchesWon { get; set; }
 	public int LifetimeMatchesPlayed { get; set; }
@@ -18,6 +17,7 @@ public class PlayerStats
 
 	// --- Current Season Stats --- //
 	public int CurrentSeasonMatchesPlayed { get; set; }
+
 	public int CurrentSeasonMatchesWon { get; set; }
 	public int CurrentSeasonBreakAndRun { get; set; }
 	public float CurrentSeasonDefensiveShotAverage { get; set; }

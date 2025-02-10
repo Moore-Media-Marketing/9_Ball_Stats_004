@@ -15,10 +15,12 @@ public class DatabaseManager:MonoBehaviour
 
 	// --- File Paths ---
 	private string playersDataFilePath = "Assets/PlayerData.csv";
+
 	private string teamsDataFilePath = "Assets/TeamsData.csv";
 
 	// --- Data Lists ---
 	private List<Team> teams = new();
+
 	private List<Player> players = new();
 
 	// --- Initialization ---
@@ -243,10 +245,22 @@ public class DatabaseManager:MonoBehaviour
 	public void SavePlayersToCSV()
 		{
 		using StreamWriter writer = new(playersDataFilePath);
-		writer.WriteLine("PlayerId,PlayerName,TeamId,SkillLevel");
+		// Writing the header with all player stats
+		writer.WriteLine("PlayerId,PlayerName,TeamId,SkillLevel,CurrentSeasonMatchesPlayed,CurrentSeasonMatchesWon,CurrentSeasonBreakAndRun,CurrentSeasonDefensiveShotAverage,CurrentSeasonMiniSlams,CurrentSeasonNineOnTheSnap,CurrentSeasonPaPercentage,CurrentSeasonPointsAwarded,CurrentSeasonPointsPerMatch,CurrentSeasonPpm,CurrentSeasonShutouts,CurrentSeasonTotalPoints,LifetimeMatchesPlayed,LifetimeMatchesWon,LifetimeBreakAndRun,LifetimeDefensiveShotAverage,LifetimeMiniSlams,LifetimeNineOnTheSnap,LifetimeShutouts");
+
 		foreach (Player player in players)
 			{
-			writer.WriteLine($"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.Stats.CurrentSeasonSkillLevel}");
+			// Accessing all player stats from the player object
+			PlayerStats stats = player.Stats;
+
+			writer.WriteLine(
+				$"{player.PlayerId},{player.PlayerName},{player.TeamId},{stats.CurrentSeasonSkillLevel}," +
+				$"{stats.CurrentSeasonMatchesPlayed},{stats.CurrentSeasonMatchesWon},{stats.CurrentSeasonBreakAndRun}," +
+				$"{stats.CurrentSeasonDefensiveShotAverage},{stats.CurrentSeasonMiniSlams},{stats.CurrentSeasonNineOnTheSnap}," +
+				$"{stats.CurrentSeasonPaPercentage},{stats.CurrentSeasonPointsAwarded},{stats.CurrentSeasonPointsPerMatch}," +
+				$"{stats.CurrentSeasonPpm},{stats.CurrentSeasonShutouts},{stats.CurrentSeasonTotalPoints}," +
+				$"{stats.LifetimeMatchesPlayed},{stats.LifetimeMatchesWon},{stats.LifetimeBreakAndRun}," +
+				$"{stats.LifetimeDefensiveShotAverage},{stats.LifetimeMiniSlams},{stats.LifetimeNineOnTheSnap},{stats.LifetimeShutouts}");
 			}
 		}
 	}

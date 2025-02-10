@@ -1,5 +1,3 @@
-using System;
-
 /// <summary>
 /// Represents a player in the system.
 /// </summary>

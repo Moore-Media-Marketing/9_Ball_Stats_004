@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
 /// Manages team-related operations such as adding, modifying, and deleting teams.
@@ -38,6 +40,7 @@ public class TeamManagementPanel:MonoBehaviour
 
 	// --- Data Management --- //
 	private List<Team> teams = new();
+
 	private int selectedTeamId = -1;
 
 	// --- Initialization --- //
@@ -219,6 +222,4 @@ public class TeamManagementPanel:MonoBehaviour
 
 		gameObject.SetActive(false);
 		}
-
-
 	}

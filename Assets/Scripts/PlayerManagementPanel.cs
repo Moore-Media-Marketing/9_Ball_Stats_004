@@ -13,6 +13,7 @@ public class PlayerManagementPanel:MonoBehaviour
 	{
 	// --- UI Elements ---
 	public TMP_Text headerText;
+
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
 	public TMP_InputField playerNameInputField;
@@ -24,6 +25,7 @@ public class PlayerManagementPanel:MonoBehaviour
 
 	// --- Data Storage ---
 	private List<Player> players;
+
 	private List<Team> teams;
 
 	/// <summary>

@@ -1,11 +1,13 @@
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class LifetimeWeightSettingsPanel:MonoBehaviour
 	{
 	[Header("UI Elements")]
 	public TMP_Text headerText;
+
 	public TMP_InputField lifetimeGamesWonInputField;
 	public TMP_InputField lifetimeMiniSlamsInputField;
 	public TMP_InputField lifetimeNineOnTheSnapInputField;
@@ -18,7 +20,7 @@ public class LifetimeWeightSettingsPanel:MonoBehaviour
 	public Button backButton;
 	public TMP_Text backButtonText;
 
-	void Start()
+	private void Start()
 		{
 		// Load existing values if available
 		LoadLifetimeWeightSettings();

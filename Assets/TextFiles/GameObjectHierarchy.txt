@@ -249,101 +249,73 @@ Canvas
       UpdateBackButtonText
   MatchupComparisonPanel
     HeaderText
-    TeamASelectionPanel
+    Team1Dropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    Team2Dropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
+    Team1SelectionPanel
       SelectTeamAText
-      TeamADropdown
-        Label
-        Arrow
-        Template
-          Viewport
-            Content
-              Item
-                Item Background
-                Item Checkmark
-                Item Label
-          Scrollbar
-            Sliding Area
-              Handle
-          Canvas
-      TeamAPlayerScrollView
-        Viewport
-          Content
-            playerTogglePrefab
-              Background
-                Checkmark
-              Label
-              PlayerNameText (TMP_Text)
-        Scrollbar Horizontal
-          Sliding Area
-            Handle
-        Scrollbar Vertical
-          Sliding Area
-            Handle
-    TeamBSelectionPanel
+    Team2SelectionPanel
       SelectTeamBText
-      TeamBDropdown
-        Label
-        Arrow
-        Template
-          Viewport
-            Content
-              Item
-                Item Background
-                Item Checkmark
-                Item Label
-          Scrollbar
-            Sliding Area
-              Handle
-          Canvas
-      TeamBPlayerScrollView
-        Viewport
-          Content
-            playerTogglePrefab
-              Background
-                Checkmark
-              Label
-              PlayerNameText (TMP_Text)
-        Scrollbar Horizontal
-          Sliding Area
-            Handle
-        Scrollbar Vertical
-          Sliding Area
-            Handle
     CompareButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
-  MatchupResultsPanel
-    HeaderText
-    TeamAHeaderText
-    TeamAWinProbabilityText
-    TeamBHeaderText
-    TeamBWinProbabilityText
-    MatchupsScrollView
-      Viewport
-        MatchupListContent
-          MatchupEntry_Template
-            MatchupDetailsText
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    BestMatchupHeaderText
-    BestMatchupsScrollView
-      Viewport
-        BestMatchupListContent
-          MatchupEntry_Template
-            MatchupDetailsText
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    BackButton
-      UpdateBackButtonText
+    MatchupResultsPanel
+      HeaderText
+      Team1HeaderText
+      Team1WinProbabilityText
+      Team2HeaderText
+      Team2WinProbabilityText
+      MatchupsScrollView
+        Viewport
+          MatchupListContent
+            MatchupEntry_Template
+              MatchupDetailsText
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+      BestMatchupHeaderText
+      BestMatchupsScrollView
+        Viewport
+          BestMatchupListContent
+            MatchupEntry_Template
+              MatchupDetailsText
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+      BackButton
+        UpdateBackButtonText
   SettingsPanel
     HeaderText
     SampleDataGeneratorToggle

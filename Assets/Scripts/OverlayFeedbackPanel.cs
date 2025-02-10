@@ -1,5 +1,6 @@
-using UnityEngine;
 using TMPro;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -22,6 +23,7 @@ public class OverlayFeedbackPanel:MonoBehaviour
 
 	// Action callbacks for button interactions
 	private System.Action onOkPressed;
+
 	private System.Action onCancelPressed;
 
 	/// <summary>
