@@ -6,9 +6,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the UI and logic for player management, including adding, deleting, and updating players.
+/// </summary>
 public class PlayerManagementPanel:MonoBehaviour
 	{
-	// UI Elements
+	// --- UI Elements ---
 	public TMP_Text headerText;
 	public TMP_Dropdown teamNameDropdown;
 	public TMP_Dropdown playerNameDropdown;
@@ -19,16 +22,24 @@ public class PlayerManagementPanel:MonoBehaviour
 	public Button saveToCSVButton;
 	public Button backButton;
 
+	// --- Data Storage ---
 	private List<Player> players;
+	private List<Team> teams;
 
-	void Start()
+	/// <summary>
+	/// Initializes the panel, populates dropdowns, and assigns button listeners.
+	/// </summary>
+	private void Start()
 		{
-		// Initialize players and dropdowns
+		// Load data from the database
 		players = DatabaseManager.Instance.GetAllPlayers();
+		teams = DatabaseManager.Instance.GetAllTeams();
+
+		// Populate dropdowns
 		PopulateTeamDropdown();
 		PopulatePlayerDropdown();
 
-		// Button listeners
+		// Attach button listeners
 		addPlayerButton.onClick.AddListener(AddPlayer);
 		deletePlayerButton.onClick.AddListener(DeletePlayer);
 		addPlayerDetailsButton.onClick.AddListener(AddPlayerDetails);
@@ -36,37 +47,62 @@ public class PlayerManagementPanel:MonoBehaviour
 		backButton.onClick.AddListener(() => UIManager.Instance.GoBackToPreviousPanel());
 		}
 
-	// Populate team dropdown
+	/// <summary>
+	/// Populates the team dropdown with team names from the database.
+	/// </summary>
 	private void PopulateTeamDropdown()
 		{
-		List<Team> teams = DatabaseManager.Instance.GetAllTeams();
 		teamNameDropdown.ClearOptions();
-		teamNameDropdown.AddOptions(teams.Select(t => t.TeamName).ToList());
+		teams = DatabaseManager.Instance.GetAllTeams();
+
+		if (teams != null && teams.Count > 0)
+			{
+			teamNameDropdown.AddOptions(teams.Select(t => t.TeamName).ToList());
+			}
+		else
+			{
+			Debug.LogWarning("No teams available to populate the dropdown.");
+			}
 		}
 
-	// Populate player dropdown
+	/// <summary>
+	/// Populates the player dropdown with player names from the database.
+	/// </summary>
 	private void PopulatePlayerDropdown()
 		{
 		playerNameDropdown.ClearOptions();
 		players = DatabaseManager.Instance.GetAllPlayers();
-		playerNameDropdown.AddOptions(players.Select(p => p.PlayerName).ToList());
+
+		if (players != null && players.Count > 0)
+			{
+			playerNameDropdown.AddOptions(players.Select(p => p.PlayerName).ToList());
+			}
+		else
+			{
+			Debug.LogWarning("No players available to populate the dropdown.");
+			}
 		}
 
-	// Add player to database
+	/// <summary>
+	/// Adds a new player to the database and refreshes the dropdown.
+	/// </summary>
 	private void AddPlayer()
 		{
 		string playerName = playerNameInputField.text;
-		string teamName = teamNameDropdown.options[teamNameDropdown.value].text;
-
-		if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(teamName))
+		if (string.IsNullOrEmpty(playerName))
 			{
-			Debug.LogWarning("Please fill in both player name and team.");
+			Debug.LogWarning("Player name cannot be empty.");
 			return;
 			}
 
-		// Get teamId based on selected team name
-		int teamId = DatabaseManager.Instance.GetAllTeams()
-						.FirstOrDefault(t => t.TeamName == teamName)?.TeamId ?? -1;
+		if (teamNameDropdown.options.Count == 0)
+			{
+			Debug.LogWarning("No teams available to assign the player.");
+			return;
+			}
+
+		string teamName = teamNameDropdown.options[teamNameDropdown.value].text;
+		int teamId = teams.FirstOrDefault(t => t.TeamName == teamName)?.TeamId ?? -1;
 
 		if (teamId == -1)
 			{
@@ -74,26 +110,28 @@ public class PlayerManagementPanel:MonoBehaviour
 			return;
 			}
 
-		// Generate unique player ID
+		// Generate a unique player ID
 		int playerId = GeneratePlayerId();
 
-		// Get the skill level from user input or set a default (example: 5)
-		int skillLevel = 5;  // Example skill level (you can modify this based on your UI/input)
+		// Default skill level (can be modified based on UI input later)
+		int skillLevel = 5;
 
-		// Generate player stats using SampleDataGenerator, passing skillLevel
+		// Generate initial player stats
 		PlayerStats stats = SampleDataGenerator.Instance.GeneratePlayerStats(skillLevel);
 
-		// Create a new player object
-		Player newPlayer = new(playerId, playerName, teamId, stats);
+		// Add player to database
+		DatabaseManager.Instance.AddPlayer(playerId, playerName, teamId, stats);
 
-		// Add player to the database
-		DatabaseManager.Instance.AddPlayer(newPlayer.PlayerName, newPlayer.PlayerId, newPlayer.TeamId, newPlayer.Stats);
+		Debug.Log($"Player '{playerName}' added to team '{teamName}'.");
 
-		// Refresh the dropdown after adding the player
+		// Refresh UI
 		PopulatePlayerDropdown();
+		playerNameInputField.text = "";
 		}
 
-	// Delete player from database
+	/// <summary>
+	/// Deletes the selected player from the database.
+	/// </summary>
 	private void DeletePlayer()
 		{
 		if (playerNameDropdown.value < 0 || playerNameDropdown.value >= players.Count)
@@ -112,10 +150,15 @@ public class PlayerManagementPanel:MonoBehaviour
 			}
 
 		DatabaseManager.Instance.DeletePlayer(playerId);
-		PopulatePlayerDropdown(); // Refresh dropdown after deletion
+		Debug.Log($"Player '{playerName}' deleted.");
+
+		// Refresh UI
+		PopulatePlayerDropdown();
 		}
 
-	// Add or update player details (stats)
+	/// <summary>
+	/// Updates the selected player's stats.
+	/// </summary>
 	private void AddPlayerDetails()
 		{
 		if (playerNameDropdown.value < 0 || playerNameDropdown.value >= players.Count)
@@ -126,17 +169,21 @@ public class PlayerManagementPanel:MonoBehaviour
 
 		Player selectedPlayer = players[playerNameDropdown.value];
 
-		// Log the update
-		Debug.Log($"Updated player {selectedPlayer.PlayerName} with new stats.");
+		// Apply new stats (modify this part to allow user inputs for stats)
+		selectedPlayer.Stats = SampleDataGenerator.Instance.GeneratePlayerStats(selectedPlayer.Stats.CurrentSeasonSkillLevel);
 
-		// Save updated player stats back to DatabaseManager
+		// Save updated stats to the database
 		DatabaseManager.Instance.UpdatePlayerStats(selectedPlayer.PlayerId, selectedPlayer.Stats);
 
-		// Refresh the dropdown
+		Debug.Log($"Updated player {selectedPlayer.PlayerName} with new stats.");
+
+		// Refresh UI
 		PopulatePlayerDropdown();
 		}
 
-	// Save to CSV
+	/// <summary>
+	/// Saves player data to a CSV file.
+	/// </summary>
 	private void SaveToCSV()
 		{
 		string path = System.IO.Path.Combine(Application.persistentDataPath, "PlayerData.csv");
@@ -145,9 +192,12 @@ public class PlayerManagementPanel:MonoBehaviour
 		Debug.Log($"Player data saved successfully at: {path}");
 		}
 
-	// Generate a unique player ID (simple method, could be improved)
+	/// <summary>
+	/// Generates a unique player ID by finding the max ID and incrementing it.
+	/// </summary>
 	private int GeneratePlayerId()
 		{
+		players = DatabaseManager.Instance.GetAllPlayers();
 		return players.Count > 0 ? players.Max(p => p.PlayerId) + 1 : 1;
 		}
 	}

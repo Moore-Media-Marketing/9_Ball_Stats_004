@@ -1,7 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
+using TMPro; // Import for TextMeshPro
 
+/// <summary>
+/// Manages the UI navigation, panel transitions, and feedback system.
+/// </summary>
 public class UIManager:MonoBehaviour
 	{
 	// Singleton instance
@@ -9,28 +13,34 @@ public class UIManager:MonoBehaviour
 
 	// Panels
 	[Header("Panels")]
-	public GameObject homePanel;
+	public GameObject homePanel; // Home panel
+	public GameObject settingsPanel; // Settings panel
+	public GameObject currentSeasonWeightSettingsPanel; // Current season weight settings panel
+	public GameObject lifetimeWeightSettingsPanel; // Lifetime weight settings panel
+	public GameObject teamManagementPanel; // Team management panel
+	public GameObject playerManagementPanel; // Player management panel
+	public GameObject comparisonPanel; // Comparison panel
 
-	public GameObject settingsPanel;
-	public GameObject playerManagementPanel;
-	public GameObject teamManagementPanel;
-	public GameObject comparisonPanel;
+	// Feedback System
+	[Header("Feedback System")]
+	public GameObject feedbackPanel; // UI panel for feedback
+	public TMP_Text feedbackText; // UI text for feedback
 
-	// Panel History (a list of panels for backtracking or history)
-	public List<GameObject> panelHistory = new();
+	// Panel History (for backtracking)
+	private List<GameObject> panelHistory = new();
 
 	// Awake method to initialize the instance
-	public void Awake()
+	private void Awake()
 		{
-		// Check if there's already an instance
+		// Ensure Singleton pattern
 		if (Instance == null)
 			{
-			Instance = this; // Assign the current instance to the static Instance
-			DontDestroyOnLoad(gameObject); // Keep the instance between scenes if needed
+			Instance = this;
+			DontDestroyOnLoad(gameObject); // Persist across scenes if needed
 			}
 		else
 			{
-			Destroy(gameObject); // Destroy duplicate instances
+			Destroy(gameObject);
 			}
 		}
 
@@ -44,40 +54,56 @@ public class UIManager:MonoBehaviour
 	public void ShowHomePanel()
 		{
 		homePanel.SetActive(true);
-		panelHistory.Add(homePanel); // Add to panel history
-		DeactivateOtherPanels(homePanel); // Hide other panels
+		panelHistory.Add(homePanel);
+		DeactivateOtherPanels(homePanel);
 		}
 
 	// --- Show Settings Panel --- //
 	public void ShowSettingsPanel()
 		{
 		settingsPanel.SetActive(true);
-		panelHistory.Add(settingsPanel); // Add to panel history
-		DeactivateOtherPanels(settingsPanel); // Hide other panels
+		panelHistory.Add(settingsPanel);
+		DeactivateOtherPanels(settingsPanel);
 		}
 
-	// --- Show Player Management Panel --- //
-	public void ShowPlayerManagementPanel()
+	// --- Show Current Season Weight Settings Panel --- //
+	public void ShowCurrentSeasonWeightSettingsPanel()
 		{
-		playerManagementPanel.SetActive(true);
-		panelHistory.Add(playerManagementPanel); // Add to panel history
-		DeactivateOtherPanels(playerManagementPanel); // Hide other panels
+		currentSeasonWeightSettingsPanel.SetActive(true);
+		panelHistory.Add(currentSeasonWeightSettingsPanel);
+		DeactivateOtherPanels(currentSeasonWeightSettingsPanel);
+		}
+
+	// --- Show Lifetime Weight Settings Panel --- //
+	public void ShowLifetimeWeightSettingsPanel()
+		{
+		lifetimeWeightSettingsPanel.SetActive(true);
+		panelHistory.Add(lifetimeWeightSettingsPanel);
+		DeactivateOtherPanels(lifetimeWeightSettingsPanel);
 		}
 
 	// --- Show Team Management Panel --- //
 	public void ShowTeamManagementPanel()
 		{
 		teamManagementPanel.SetActive(true);
-		panelHistory.Add(teamManagementPanel); // Add to panel history
-		DeactivateOtherPanels(teamManagementPanel); // Hide other panels
+		panelHistory.Add(teamManagementPanel);
+		DeactivateOtherPanels(teamManagementPanel);
+		}
+
+	// --- Show Player Management Panel --- //
+	public void ShowPlayerManagementPanel()
+		{
+		playerManagementPanel.SetActive(true);
+		panelHistory.Add(playerManagementPanel);
+		DeactivateOtherPanels(playerManagementPanel);
 		}
 
 	// --- Show Comparison Panel --- //
 	public void ShowComparisonPanel()
 		{
 		comparisonPanel.SetActive(true);
-		panelHistory.Add(comparisonPanel); // Add to panel history
-		DeactivateOtherPanels(comparisonPanel); // Hide other panels
+		panelHistory.Add(comparisonPanel);
+		DeactivateOtherPanels(comparisonPanel);
 		}
 
 	// --- Go Back to Previous Panel --- //
@@ -92,22 +118,51 @@ public class UIManager:MonoBehaviour
 			// Show the previous panel
 			GameObject previousPanel = panelHistory[^1];
 			previousPanel.SetActive(true);
-			currentPanel.SetActive(false); // Hide the current panel
+			currentPanel.SetActive(false);
 			}
 		else
 			{
-			Debug.LogWarning("No previous panel in history.");
+			ShowFeedback("No previous panel to return to.");
 			}
 		}
 
 	// --- Deactivate all panels except the given one --- //
-	public void DeactivateOtherPanels(GameObject activePanel)
+	private void DeactivateOtherPanels(GameObject activePanel)
 		{
-		// Deactivate all panels except the active one
 		if (homePanel != activePanel) homePanel.SetActive(false);
 		if (settingsPanel != activePanel) settingsPanel.SetActive(false);
-		if (playerManagementPanel != activePanel) playerManagementPanel.SetActive(false);
+		if (currentSeasonWeightSettingsPanel != activePanel) currentSeasonWeightSettingsPanel.SetActive(false);
+		if (lifetimeWeightSettingsPanel != activePanel) lifetimeWeightSettingsPanel.SetActive(false);
 		if (teamManagementPanel != activePanel) teamManagementPanel.SetActive(false);
+		if (playerManagementPanel != activePanel) playerManagementPanel.SetActive(false);
 		if (comparisonPanel != activePanel) comparisonPanel.SetActive(false);
+		}
+
+	// --- Show Feedback Message --- //
+	public void ShowFeedback(string message, System.Action callback = null)
+		{
+		if (feedbackPanel != null && feedbackText != null)
+			{
+			feedbackText.text = message;
+			feedbackPanel.SetActive(true);
+
+			// Auto-hide feedback after 3 seconds
+			StartCoroutine(HideFeedbackAfterDelay(3f));
+
+			// Invoke callback if provided
+			callback?.Invoke();
+			}
+		else
+			{
+			Debug.LogWarning("Feedback panel or text is not assigned in UIManager!");
+			}
+		}
+
+
+	// --- Hide Feedback Panel After Delay --- //
+	private IEnumerator HideFeedbackAfterDelay(float delay)
+		{
+		yield return new WaitForSeconds(delay);
+		feedbackPanel.SetActive(false);
 		}
 	}

@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-
-using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
+/// <summary>
+/// Manages team-related operations such as adding, modifying, and deleting teams.
+/// Integrates with DatabaseManager for persistent data storage.
+/// Displays user feedback using OverlayFeedbackPanel.
+/// </summary>
 public class TeamManagementPanel:MonoBehaviour
 	{
 	// --- UI Elements --- //
 	[Header("UI Elements")]
 	[Tooltip("Text displaying the header of the Team Management panel.")]
 	public TMP_Text headerText;
-
-	[Tooltip("Text displaying the name of the team.")]
-	public TMP_Text teamNameText;
 
 	[Tooltip("Input field for adding or modifying a team name.")]
 	public TMP_InputField teamNameInputField;
@@ -36,80 +36,58 @@ public class TeamManagementPanel:MonoBehaviour
 	[Tooltip("Button to navigate back.")]
 	public Button backButton;
 
-	[Tooltip("Text displaying the back button.")]
-	public TMP_Text backButtonText;
-
 	// --- Data Management --- //
 	private List<Team> teams = new();
-
 	private int selectedTeamId = -1;
 
 	// --- Initialization --- //
 	private void Start()
 		{
-		// Populate the team dropdown with available teams
 		PopulateTeamDropdown();
-
-		// Set up button listeners for various interactions
 		SetupButtonListeners();
 		}
 
-	// --- Region: Button Setup --- //
+	// --- Setup Buttons --- //
 	private void SetupButtonListeners()
 		{
-		// Add or Update team button
 		if (addUpdateTeamButton != null)
 			addUpdateTeamButton.onClick.AddListener(AddOrUpdateTeam);
 
-		// Clear team name button
 		if (clearTeamNameButton != null)
 			clearTeamNameButton.onClick.AddListener(ClearTeamName);
 
-		// Modify selected team button
 		if (modifyTeamNameButton != null)
 			modifyTeamNameButton.onClick.AddListener(ModifySelectedTeam);
 
-		// Delete selected team button
 		if (deleteButton != null)
 			deleteButton.onClick.AddListener(DeleteSelectedTeam);
 
-		// Back button
 		if (backButton != null)
 			backButton.onClick.AddListener(HandleBackButton);
 
-		// Team dropdown selection change
 		if (teamDropdown != null)
 			teamDropdown.onValueChanged.AddListener(OnTeamSelected);
 		}
 
-	// --- Region: Dropdown Population --- //
+	// --- Populate Dropdown with Teams --- //
 	private void PopulateTeamDropdown()
 		{
 		if (teamDropdown == null)
 			{
-			Debug.LogError("TeamDropdown reference is missing!");
+			OverlayFeedbackPanel.Instance.ShowFeedback("Error: TeamDropdown reference is missing.");
 			return;
 			}
 
-		// Fetch the teams from the manager
-		var manager = PlayersAndTeamsManager.Instance;
-		if (manager == null)
-			{
-			Debug.LogError("PlayersAndTeamsManager instance is missing!");
-			return;
-			}
-
-		teams = manager.GetAllTeams();
+		teams = DatabaseManager.Instance.GetAllTeams();
 		teamDropdown.ClearOptions();
 
-		// Handle case where there are no teams
 		if (teams.Count == 0)
 			{
-			Debug.LogWarning("No teams found! Clearing dropdown.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("No teams found. Please add a new team.");
+			teamDropdown.AddOptions(new List<string> { "No Teams Available" });
 			return;
 			}
 
-		// Add teams to the dropdown
 		List<string> teamNames = new();
 		foreach (var team in teams)
 			{
@@ -120,108 +98,127 @@ public class TeamManagementPanel:MonoBehaviour
 		teamDropdown.RefreshShownValue();
 		}
 
-	// --- Region: Team Actions --- //
+	// --- Add or Update Team --- //
 	private void AddOrUpdateTeam()
 		{
-		var manager = PlayersAndTeamsManager.Instance;
-		if (manager == null)
-			{
-			Debug.LogError("PlayersAndTeamsManager instance is missing!");
-			return;
-			}
-
 		string newTeamName = teamNameInputField.text.Trim();
 		if (string.IsNullOrEmpty(newTeamName))
 			{
-			Debug.LogWarning("Team name cannot be empty.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("Team name cannot be empty.");
 			return;
 			}
 
 		if (selectedTeamId == -1)
 			{
-			manager.AddTeam(newTeamName); // Add new team
+			DatabaseManager.Instance.AddTeam(newTeamName); // Add new team
+			OverlayFeedbackPanel.Instance.ShowFeedback($"Team '{newTeamName}' added successfully.");
 			}
 		else
 			{
-			manager.ModifyTeam(selectedTeamId, newTeamName); // Modify existing team
+			DatabaseManager.Instance.ModifyTeam(selectedTeamId, newTeamName); // Modify existing team
+			OverlayFeedbackPanel.Instance.ShowFeedback($"Team '{newTeamName}' updated successfully.");
 			}
 
-		// Refresh dropdown and clear input field
-		PopulateTeamDropdown();
-		ClearTeamName();
+		RefreshUI();
 		}
 
+	// --- Modify Selected Team --- //
 	private void ModifySelectedTeam()
 		{
 		if (selectedTeamId == -1)
 			{
-			Debug.LogWarning("No team selected for modification.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("No team selected for modification.");
 			return;
 			}
 
 		string newTeamName = teamNameInputField.text.Trim();
 		if (string.IsNullOrEmpty(newTeamName))
 			{
-			Debug.LogWarning("Team name cannot be empty.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("Team name cannot be empty.");
 			return;
 			}
 
-		var manager = PlayersAndTeamsManager.Instance;
-		if (manager == null)
-			{
-			Debug.LogError("PlayersAndTeamsManager instance is missing!");
-			return;
-			}
-
-		manager.ModifyTeam(selectedTeamId, newTeamName); // Modify selected team
-		PopulateTeamDropdown();
-		ClearTeamName();
+		DatabaseManager.Instance.ModifyTeam(selectedTeamId, newTeamName);
+		OverlayFeedbackPanel.Instance.ShowFeedback($"Team '{newTeamName}' modified successfully.");
+		RefreshUI();
 		}
 
+	// --- Delete Selected Team --- //
 	private void DeleteSelectedTeam()
 		{
 		if (selectedTeamId == -1)
 			{
-			Debug.LogWarning("No team selected for deletion.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("No team selected for deletion.");
 			return;
 			}
 
-		var manager = PlayersAndTeamsManager.Instance;
-		if (manager == null)
+		string teamName = teams.Find(t => t.TeamId == selectedTeamId)?.TeamName;
+
+		OverlayFeedbackPanel.Instance.ShowFeedback(
+			$"Are you sure you want to delete '{teamName}'? This will move its players to 'Unassigned Players'.",
+			() =>
 			{
-			Debug.LogError("PlayersAndTeamsManager instance is missing!");
-			return;
-			}
-
-		manager.DeleteTeam(selectedTeamId); // Delete selected team
-		PopulateTeamDropdown();
-		ClearTeamName();
+				DatabaseManager.Instance.DeleteTeam(selectedTeamId);
+				OverlayFeedbackPanel.Instance.ShowFeedback($"Team '{teamName}' deleted successfully.");
+				RefreshUI();
+			},
+			() => OverlayFeedbackPanel.Instance.ShowFeedback("Deletion canceled.")
+		);
 		}
 
-	// --- Region: Navigation --- //
-	private void HandleBackButton()
-		{
-		Debug.Log("Back button pressed.");
-		gameObject.SetActive(false); // Hides the panel
-		}
-
-	// --- Region: Dropdown Selection --- //
+	// --- Handle Dropdown Selection --- //
 	private void OnTeamSelected(int index)
 		{
 		if (index < 0 || index >= teams.Count)
 			{
-			Debug.LogWarning("Invalid team selection.");
+			OverlayFeedbackPanel.Instance.ShowFeedback("Invalid team selection.");
 			return;
 			}
 
 		selectedTeamId = teams[index].TeamId;
-		teamNameInputField.text = teams[index].TeamName; // Prepopulate the team name input field
+		teamNameInputField.text = teams[index].TeamName;
 		}
 
-	// --- Region: Utility Functions --- //
+	// --- Refresh UI After Changes --- //
+	private void RefreshUI()
+		{
+		PopulateTeamDropdown();
+		ClearTeamName();
+		}
+
+	// --- Clear Input Field --- //
 	private void ClearTeamName()
 		{
 		teamNameInputField.text = "";
 		selectedTeamId = -1;
 		}
+
+	// --- Handle Back Button --- //
+	private void HandleBackButton()
+		{
+		Debug.Log("HandleBackButton called");
+
+		if (OverlayFeedbackPanel.Instance != null)
+			{
+			OverlayFeedbackPanel.Instance.ShowFeedback("Returning to the previous menu...");
+			}
+		else
+			{
+			Debug.LogError("OverlayFeedbackPanel instance is null.");
+			}
+
+		if (UIManager.Instance != null)
+			{
+			Debug.Log("UIManager instance found, calling GoBackToPreviousPanel");
+			UIManager.Instance.GoBackToPreviousPanel();
+			}
+		else
+			{
+			Debug.LogError("UIManager.Instance is null.");
+			}
+
+		gameObject.SetActive(false);
+		}
+
+
 	}

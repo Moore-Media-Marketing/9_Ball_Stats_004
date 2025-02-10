@@ -3,6 +3,9 @@ using System.Linq;
 
 using UnityEngine;
 
+/// <summary>
+/// Class for generating sample teams and players.
+/// </summary>
 public class SampleDataGenerator:MonoBehaviour
 	{
 	// Singleton instance
@@ -10,6 +13,9 @@ public class SampleDataGenerator:MonoBehaviour
 
 	public int numberOfTeams = 10; // Default number of teams
 	public float malePercentage = 0.65f; // 65% probability for male players
+
+	// Flag to control sample data generation
+	private bool isSampleDataGenerationEnabled = false;
 
 	// --- Name Pools ---  
 	private static readonly string[] firstNamesMale = { "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas" };
@@ -26,7 +32,24 @@ public class SampleDataGenerator:MonoBehaviour
 
 	private void Start()
 		{
-		GenerateSampleTeamsAndPlayers();
+		if (isSampleDataGenerationEnabled)
+			{
+			GenerateSampleTeamsAndPlayers();
+			}
+		}
+
+	// Enable sample data generation
+	public void EnableSampleDataGeneration()
+		{
+		isSampleDataGenerationEnabled = true;
+		GenerateSampleTeamsAndPlayers(); // Generate data immediately when enabled
+		}
+
+	// Disable sample data generation
+	public void DisableSampleDataGeneration()
+		{
+		isSampleDataGenerationEnabled = false; // Just stop generating data
+		Debug.Log("Sample Data Generation Disabled");
 		}
 
 	// Generate sample teams and players
@@ -61,7 +84,8 @@ public class SampleDataGenerator:MonoBehaviour
 			for (int j = 0; j < numberOfPlayers; j++)
 				{
 				Player newPlayer = GeneratePlayer(newTeam.TeamId);
-				DatabaseManager.Instance.AddPlayer(newPlayer.PlayerName, newPlayer.PlayerId, newPlayer.TeamId, newPlayer.Stats);
+				// Corrected argument order for AddPlayer method
+				DatabaseManager.Instance.AddPlayer(newPlayer.PlayerId, newPlayer.PlayerName, newPlayer.TeamId, newPlayer.Stats);
 				}
 			}
 
@@ -121,7 +145,6 @@ public class SampleDataGenerator:MonoBehaviour
 
 		return stats;
 		}
-
 
 	// Generate a unique player ID
 	private int GenerateUniquePlayerId()

@@ -1,5 +1,8 @@
 using System;
 
+/// <summary>
+/// Represents a player in the system.
+/// </summary>
 public class Player
 	{
 	public int PlayerId { get; set; }

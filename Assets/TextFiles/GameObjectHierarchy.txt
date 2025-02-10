@@ -1,10 +1,8 @@
-AdaptivePerformanceManager
+GenerateGameObjectList
+PlayersAndTeamsManager
 SampleDataGenerator
 DatabaseManager
-SettingsManager
-ComparisonManager
 UIManager
-GenerateGameObjectList
 Main Camera
 EventSystem
 Canvas
@@ -193,6 +191,20 @@ Canvas
           Sliding Area
             Handle
         Canvas
+    SkillLevelDropdown
+      Label
+      Arrow
+      Template
+        Viewport
+          Content
+            Item
+              Item Background
+              Item Checkmark
+              Item Label
+        Scrollbar
+          Sliding Area
+            Handle
+        Canvas
     GamesWonInputField
       Text Area
         Placeholder
@@ -229,45 +241,47 @@ Canvas
       Text Area
         Placeholder
         Text
-    SkillLevelDropdown
-      Label
-      Arrow
-      Template
-        Viewport
-          Content
-            Item
-              Item Background
-              Item Checkmark
-              Item Label
-        Scrollbar
-          Sliding Area
-            Handle
-        Canvas
-    AddPlayerButton
-      Text (TMP)
-    RemovePlayerButton
-      Text (TMP)
     SaveToCSVButton
+      Text (TMP)
+    MatchupComparisonButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
   MatchupComparisonPanel
+    TeamASelectionPanel
+      TeamADropdown
+        Label
+        Arrow
+        Template
+          Viewport
+            Content
+              Item
+                Item Background
+                Item Checkmark
+                Item Label
+          Scrollbar
+            Sliding Area
+              Handle
+          Canvas
+      teamAPlayerContainer
+    TeamASelectionPanel_1
+      TeamBDropdown
+        Label
+        Arrow
+        Template
+          Viewport
+            Content
+              Item
+                Item Background
+                Item Checkmark
+                Item Label
+          Scrollbar
+            Sliding Area
+              Handle
+          Canvas
+      teamBPlayerContainer
     HeaderText
     SelectTeamAText
-    TeamADropdown
-      Label
-      Arrow
-      Template
-        Viewport
-          Content
-            Item
-              Item Background
-              Item Checkmark
-              Item Label
-        Scrollbar
-          Sliding Area
-            Handle
-        Canvas
     TeamAPlayerScrollView
       Viewport
         Content
@@ -275,7 +289,7 @@ Canvas
             Background
               Checkmark
             Label
-            Text (TMP)
+            PlayerNameText (TMP_Text)
       Scrollbar Horizontal
         Sliding Area
           Handle
@@ -283,20 +297,6 @@ Canvas
         Sliding Area
           Handle
     TeamBTeamText
-    TeamBDropdown
-      Label
-      Arrow
-      Template
-        Viewport
-          Content
-            Item
-              Item Background
-              Item Checkmark
-              Item Label
-        Scrollbar
-          Sliding Area
-            Handle
-        Canvas
     TeamBPlayerScrollView
       Viewport
         Content

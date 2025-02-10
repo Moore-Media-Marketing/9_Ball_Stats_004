@@ -2,90 +2,114 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using UnityEngine;
 
+/// <summary>
+/// Manages the database of teams and players, including loading from and saving to CSV files.
+/// </summary>
 public class DatabaseManager:MonoBehaviour
 	{
-	// --- Region: Singleton Instance ---
+	// --- Singleton Instance ---
 	public static DatabaseManager Instance { get; private set; }
 
-	// --- Region: File Paths ---
+	// --- File Paths ---
 	private string playersDataFilePath = "Assets/PlayerData.csv";
 	private string teamsDataFilePath = "Assets/TeamsData.csv";
 
-	// --- Region: Data Lists ---
-	public List<Team> teams = new();
-	public List<Player> players = new();
+	// --- Data Lists ---
+	private List<Team> teams = new();
+	private List<Player> players = new();
 
-	// --- Region: Initialization ---
+	// --- Initialization ---
 	private void Awake()
 		{
-		// Ensure that only one instance of DatabaseManager exists
 		if (Instance == null)
 			{
 			Instance = this;
+			LoadTeamsAndPlayers();
 			DontDestroyOnLoad(gameObject);
 			}
 		else
 			{
 			Destroy(gameObject);
-			return;
 			}
-
-		LoadTeamsAndPlayers();  // Load the teams and players from CSV on start
 		}
 
-	// --- Region: Load Teams and Players ---
-	public void LoadTeamsAndPlayers()
+	// --- Public Methods to Retrieve Data ---
+
+	/// <summary>
+	/// Returns a list of all teams.
+	/// </summary>
+	public List<Team> GetAllTeams()
 		{
-		// --- Load Teams ---
-		teams = CSVManager.LoadCSV(teamsDataFilePath)
-			.Select(line =>
-			{
-				string[] values = line.Split(',');
-				if (IsValidData(values, 2) && int.TryParse(values[0], out int teamId) && !string.IsNullOrEmpty(values[1]))
-					{
-					return new Team(teamId, values[1]);
-					}
-				else
-					{
-					Debug.LogWarning($"Invalid team data: {line}");
-					return null;
-					}
-			})
-			.Where(team => team != null)
-			.ToList();
+		return new List<Team>(teams);
+		}
 
-		// --- Load Players ---
-		players = CSVManager.LoadCSV(playersDataFilePath)
-			.Select(line =>
-			{
-				string[] values = line.Split(',');
-				if (IsValidData(values, 17) && int.TryParse(values[0], out int playerId) && int.TryParse(values[2], out int teamId)
-					&& int.TryParse(values[3], out int skillLevel) && !string.IsNullOrEmpty(values[1]))
-					{
-					return new Player(playerId, values[1], teamId, new PlayerStats());
-					}
-				else
-					{
-					Debug.LogWarning($"Invalid player data: {line}");
-					return null;
-					}
-			})
-			.Where(player => player != null)
-			.ToList();
+	/// <summary>
+	/// Returns a list of all players.
+	/// </summary>
+	public List<Player> GetAllPlayers()
+		{
+		return new List<Player>(players);
+		}
 
+	// --- Load Methods ---
+	private void LoadTeamsAndPlayers()
+		{
+		LoadTeams();
+		LoadPlayers();
 		Debug.Log($"Loaded {teams.Count} teams and {players.Count} players.");
 		}
 
-	private bool IsValidData(string[] values, int requiredLength)
+	private void LoadTeams()
 		{
-		return values.Length >= requiredLength && values.All(v => !string.IsNullOrWhiteSpace(v));
+		teams.Clear();
+		if (File.Exists(teamsDataFilePath))
+			{
+			string[] lines = File.ReadAllLines(teamsDataFilePath);
+			foreach (string line in lines.Skip(1)) // Skip header
+				{
+				string[] values = line.Split(',');
+				if (values.Length >= 2 && int.TryParse(values[0], out int teamId) && !string.IsNullOrEmpty(values[1]))
+					{
+					teams.Add(new Team(teamId, values[1]));
+					}
+				}
+			}
+		else
+			{
+			Debug.LogError("Teams data file not found: " + teamsDataFilePath);
+			}
 		}
 
-	// --- Region: Team Management Methods ---
+	private void LoadPlayers()
+		{
+		players.Clear();
+		if (File.Exists(playersDataFilePath))
+			{
+			string[] lines = File.ReadAllLines(playersDataFilePath);
+			foreach (string line in lines.Skip(1)) // Skip header
+				{
+				string[] values = line.Split(',');
+				if (values.Length >= 4 &&
+					int.TryParse(values[0], out int playerId) &&
+					!string.IsNullOrEmpty(values[1]) &&
+					int.TryParse(values[2], out int teamId) &&
+					int.TryParse(values[3], out int skillLevel))
+					{
+					PlayerStats stats = new() { CurrentSeasonSkillLevel = skillLevel };
+					players.Add(new Player(playerId, values[1], teamId, stats));
+					}
+				}
+			}
+		else
+			{
+			Debug.LogError("Players data file not found: " + playersDataFilePath);
+			}
+		}
+
+	// --- Team Management ---
 	public void AddTeam(string teamName)
 		{
 		if (teams.Any(t => t.TeamName.Equals(teamName, StringComparison.OrdinalIgnoreCase)))
@@ -96,7 +120,8 @@ public class DatabaseManager:MonoBehaviour
 
 		int newTeamId = teams.Count > 0 ? teams.Max(t => t.TeamId) + 1 : 1;
 		teams.Add(new Team(newTeamId, teamName));
-		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
+		SaveTeamsToCSV();
+		Debug.Log($"Team '{teamName}' added with ID {newTeamId}.");
 		}
 
 	public void ModifyTeam(int teamId, string newTeamName)
@@ -109,7 +134,8 @@ public class DatabaseManager:MonoBehaviour
 			}
 
 		team.TeamName = newTeamName;
-		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
+		SaveTeamsToCSV();
+		Debug.Log($"Team ID {teamId} modified to '{newTeamName}'.");
 		}
 
 	public void DeleteTeam(int teamId)
@@ -123,57 +149,30 @@ public class DatabaseManager:MonoBehaviour
 
 		teams.Remove(teamToDelete);
 
+		// Unassign players from the deleted team.
 		foreach (var player in players.Where(p => p.TeamId == teamId))
 			{
-			player.TeamId = -1;  // Assign players to 'Unassigned'
+			player.TeamId = -1;  // -1 means "Unassigned"
 			}
 
-		CSVManager.SaveTeamsToCSV(teamsDataFilePath, teams);
-		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
+		SaveTeamsToCSV();
+		SavePlayersToCSV();
+		Debug.Log($"Team '{teamToDelete.TeamName}' deleted and players unassigned.");
 		}
 
-	// --- Region: Player Management Methods ---
-	public void AddPlayer(string playerName, int playerId, int teamId, PlayerStats stats)
+	// --- Player Management ---
+	public void AddPlayer(int playerId, string playerName, int teamId, PlayerStats stats)
 		{
-		if (players.Any(p => p.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
+		if (players.Any(p => p.PlayerId == playerId))
 			{
-			Debug.LogWarning($"Player '{playerName}' already exists.");
+			Debug.LogWarning($"Player with ID '{playerId}' already exists.");
 			return;
 			}
 
-		// Create a new player and add to the list
 		Player newPlayer = new(playerId, playerName, teamId, stats);
 		players.Add(newPlayer);
-
-		// Save to CSV (you should save the players to CSV here if needed)
-		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
-
-		Debug.Log($"Player '{playerName}' added successfully.");
-		}
-
-	public void SavePlayersToCSV()
-		{
-		// Assuming you have a list of players to save
-		List<Player> players = GetAllPlayers(); // Assuming GetAllPlayers retrieves all players
-		StringBuilder sb = new();
-
-		// Add headers (assuming player properties match your columns)
-		sb.AppendLine("PlayerId,PlayerName,TeamId,GamesWon,GamesPlayed,TotalPoints,PPM,PA,BreakAndRun,MiniSlams,NineOnTheSnap,Shutouts,SkillLevel");
-
-		// Add each player's stats
-		foreach (Player player in players)
-			{
-			sb.AppendLine($"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.Stats.CurrentSeasonMatchesWon},{player.Stats.CurrentSeasonMatchesPlayed},{player.Stats.CurrentSeasonTotalPoints},{player.Stats.CurrentSeasonPpm},{player.Stats.CurrentSeasonPaPercentage},{player.Stats.CurrentSeasonBreakAndRun},{player.Stats.CurrentSeasonMiniSlams},{player.Stats.CurrentSeasonNineOnTheSnap},{player.Stats.CurrentSeasonShutouts},{player.Stats.CurrentSeasonSkillLevel}");
-			}
-
-		// Save to a file (modify path as needed)
-		File.WriteAllText("players_data.csv", sb.ToString());
-		}
-
-
-	private static Player GetNewPlayer(string playerName, int newPlayerId, PlayerStats generatedStats, int teamId)
-		{
-		return new Player(newPlayerId, playerName, teamId, generatedStats);
+		SavePlayersToCSV();
+		Debug.Log($"Player '{playerName}' added with ID {playerId}.");
 		}
 
 	public void AssignPlayerToTeam(int playerId, int newTeamId)
@@ -191,15 +190,9 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		// Ensure player is not already assigned to the team
-		if (player.TeamId == newTeamId)
-			{
-			Debug.LogWarning($"Player is already assigned to team '{newTeamId}'.");
-			return;
-			}
-
 		player.TeamId = newTeamId;
-		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
+		SavePlayersToCSV();
+		Debug.Log($"Player ID {playerId} assigned to team ID {newTeamId}.");
 		}
 
 	public void DeletePlayer(int playerId)
@@ -212,15 +205,11 @@ public class DatabaseManager:MonoBehaviour
 			}
 
 		players.Remove(player);
-		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
+		SavePlayersToCSV();
+		Debug.Log($"Player '{player.PlayerName}' with ID {playerId} deleted.");
 		}
 
-	// --- Region: Additional Functions ---
-	public List<Player> GetAllPlayers() => new(players);
-
-	public List<Team> GetAllTeams() => new(teams);
-
-	public void UpdatePlayerStats(int playerId, PlayerStats newStats)
+	public void UpdatePlayerStats(int playerId, PlayerStats updatedStats)
 		{
 		Player player = players.FirstOrDefault(p => p.PlayerId == playerId);
 		if (player == null)
@@ -229,14 +218,35 @@ public class DatabaseManager:MonoBehaviour
 			return;
 			}
 
-		if (newStats == null || !newStats.IsValid())  // Assuming IsValid() exists in PlayerStats
+		if (updatedStats == null || !updatedStats.IsValid())
 			{
 			Debug.LogWarning("Invalid player stats.");
 			return;
 			}
 
-		player.Stats = newStats;
-		CSVManager.SavePlayersToCSV(playersDataFilePath, players);
-		Debug.Log($"Player stats updated for {player.PlayerName}");
+		player.Stats = updatedStats;
+		SavePlayersToCSV();
+		Debug.Log($"Player stats updated for {player.PlayerName}.");
+		}
+
+	// --- CSV Saving Methods ---
+	public void SaveTeamsToCSV()
+		{
+		using StreamWriter writer = new(teamsDataFilePath);
+		writer.WriteLine("TeamId,TeamName");
+		foreach (Team team in teams)
+			{
+			writer.WriteLine($"{team.TeamId},{team.TeamName}");
+			}
+		}
+
+	public void SavePlayersToCSV()
+		{
+		using StreamWriter writer = new(playersDataFilePath);
+		writer.WriteLine("PlayerId,PlayerName,TeamId,SkillLevel");
+		foreach (Player player in players)
+			{
+			writer.WriteLine($"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.Stats.CurrentSeasonSkillLevel}");
+			}
 		}
 	}

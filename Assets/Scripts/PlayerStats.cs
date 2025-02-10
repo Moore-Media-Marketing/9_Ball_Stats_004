@@ -1,33 +1,35 @@
+using System;
+
 /// <summary>
 /// Represents player statistics, including lifetime and current season data.
 /// </summary>
 public class PlayerStats
 	{
 	// --- Lifetime Stats --- //
-	public int LifetimeGamesWon { get; set; } // Total games won in lifetime
-	public int LifetimeGamesPlayed { get; set; } // Total games played in lifetime
-	public int LifetimeMatchesWon { get; set; } // Total matches won in lifetime
-	public int LifetimeMatchesPlayed { get; set; } // Total matches played in lifetime
-	public int LifetimeBreakAndRun { get; set; } // Lifetime Break and Run occurrences
-	public int LifetimeNineOnTheSnap { get; set; } // Lifetime Nine on the Snap occurrences
-	public int LifetimeMiniSlams { get; set; } // Lifetime Mini Slams occurrences
-	public int LifetimeShutouts { get; set; } // Lifetime Shutouts
-	public float LifetimeDefensiveShotAverage { get; set; } // Defensive Shot Average in lifetime
+	public int LifetimeGamesWon { get; set; }
+	public int LifetimeGamesPlayed { get; set; }
+	public int LifetimeMatchesWon { get; set; }
+	public int LifetimeMatchesPlayed { get; set; }
+	public int LifetimeBreakAndRun { get; set; }
+	public int LifetimeNineOnTheSnap { get; set; }
+	public int LifetimeMiniSlams { get; set; }
+	public int LifetimeShutouts { get; set; }
+	public float LifetimeDefensiveShotAverage { get; set; }
 
 	// --- Current Season Stats --- //
-	public int CurrentSeasonMatchesPlayed { get; set; } // Matches played in current season
-	public int CurrentSeasonMatchesWon { get; set; } // Matches won in current season
-	public int CurrentSeasonBreakAndRun { get; set; } // Current season Break and Run
-	public float CurrentSeasonDefensiveShotAverage { get; set; } // Current season Defensive Shot Average
-	public int CurrentSeasonMiniSlams { get; set; } // Current season Mini Slams
-	public int CurrentSeasonNineOnTheSnap { get; set; } // Current season Nine on the Snap
-	public int CurrentSeasonShutouts { get; set; } // Current season Shutouts
-	public float CurrentSeasonPaPercentage { get; set; } // PA Percentage (0.0 - 1.0)
-	public int CurrentSeasonPointsAwarded { get; set; } // Points awarded in current season
-	public float CurrentSeasonPointsPerMatch { get; set; } // Points per match in current season
-	public int CurrentSeasonPpm { get; set; } // Points per match in current season
-	public int CurrentSeasonTotalPoints { get; set; } // Total points in current season
-	public int CurrentSeasonSkillLevel { get; set; } // Skill level in current season
+	public int CurrentSeasonMatchesPlayed { get; set; }
+	public int CurrentSeasonMatchesWon { get; set; }
+	public int CurrentSeasonBreakAndRun { get; set; }
+	public float CurrentSeasonDefensiveShotAverage { get; set; }
+	public int CurrentSeasonMiniSlams { get; set; }
+	public int CurrentSeasonNineOnTheSnap { get; set; }
+	public int CurrentSeasonShutouts { get; set; }
+	public float CurrentSeasonPaPercentage { get; set; }
+	public int CurrentSeasonPointsAwarded { get; set; }
+	public float CurrentSeasonPointsPerMatch { get; set; }
+	public int CurrentSeasonPpm { get; set; }
+	public int CurrentSeasonTotalPoints { get; set; }
+	public int CurrentSeasonSkillLevel { get; set; }
 
 	/// <summary>
 	/// Initializes a new instance of PlayerStats with default values.

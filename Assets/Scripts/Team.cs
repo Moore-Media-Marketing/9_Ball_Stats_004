@@ -1,4 +1,8 @@
-// --- Team Class --- //
+using System;
+
+/// <summary>
+/// Represents a team in the system.
+/// </summary>
 public class Team
 	{
 	public int TeamId { get; set; }

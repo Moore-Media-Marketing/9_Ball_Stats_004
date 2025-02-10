@@ -36,7 +36,7 @@ public class CSVManager
 		}
 
 	/// <summary>
-	/// Saves a list of players to a CSV file.
+	/// Saves a list of players to a CSV file with headers.
 	/// </summary>
 	/// <param name="filePath">Path to save the CSV file.</param>
 	/// <param name="players">List of players to save.</param>
@@ -51,9 +51,13 @@ public class CSVManager
 
 		try
 			{
-			// Create the CSV lines from the player data
-			List<string> lines = players.Select(player =>
-				$"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.SkillLevel}").ToList();
+			// Create the CSV lines from the player data, including a header row
+			List<string> lines = new()
+				{
+				"PlayerId,PlayerName,TeamId,SkillLevel" // Header
+            };
+			lines.AddRange(players.Select(player =>
+				$"{player.PlayerId},{player.PlayerName},{player.TeamId},{player.SkillLevel}").ToList());
 
 			// Write the lines to the CSV file
 			File.WriteAllLines(filePath, lines);
@@ -67,7 +71,7 @@ public class CSVManager
 		}
 
 	/// <summary>
-	/// Saves a list of teams to a CSV file.
+	/// Saves a list of teams to a CSV file with headers.
 	/// </summary>
 	/// <param name="filePath">Path to save the CSV file.</param>
 	/// <param name="teams">List of teams to save.</param>
@@ -82,8 +86,12 @@ public class CSVManager
 
 		try
 			{
-			// Create the CSV lines from the team data
-			List<string> lines = teams.Select(team => $"{team.TeamId},{team.TeamName}").ToList();
+			// Create the CSV lines from the team data, including a header row
+			List<string> lines = new()
+				{
+				"TeamId,TeamName" // Header
+            };
+			lines.AddRange(teams.Select(team => $"{team.TeamId},{team.TeamName}").ToList());
 
 			// Write the lines to the CSV file
 			File.WriteAllLines(filePath, lines);
