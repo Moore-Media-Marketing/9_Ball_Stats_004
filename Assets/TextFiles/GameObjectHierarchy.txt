@@ -249,6 +249,7 @@ Canvas
       UpdateBackButtonText
   MatchupComparisonPanel
     HeaderText
+    SelectTeam1Text
     Team1Dropdown
       Label
       Arrow
@@ -263,6 +264,21 @@ Canvas
           Sliding Area
             Handle
         Canvas
+    Team1PlayerScrollView
+      Viewport
+        Content
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+      playerTogglePrefab
+        Background
+          Checkmark
+        Label
+        PlayerNameText (TMP_Text)
+    SelectTeam2Text
     Team2Dropdown
       Label
       Arrow
@@ -277,10 +293,20 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    Team1SelectionPanel
-      SelectTeamAText
-    Team2SelectionPanel
-      SelectTeamBText
+    Team2PlayerScrollView
+      Viewport
+        Content
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+      playerTogglePrefab
+        Background
+          Checkmark
+        Label
+        PlayerNameText (TMP_Text)
     CompareButton
       Text (TMP)
     BackButton

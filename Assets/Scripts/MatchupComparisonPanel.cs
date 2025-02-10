@@ -7,17 +7,17 @@ using System.Linq;
 public class MatchupComparisonPanel:MonoBehaviour
 	{
 	// References to UI elements
-	public TMP_Dropdown teamADropdown;
-	public TMP_Dropdown teamBDropdown;
+	public TMP_Dropdown team1Dropdown;
+	public TMP_Dropdown team2Dropdown;
 	public GameObject playerTogglePrefab;
-	public Transform teamAPlayerScrollViewContent;
-	public Transform teamBPlayerScrollViewContent;
+	public Transform team1PlayerScrollViewContent;
+	public Transform team2PlayerScrollViewContent;
 	public GameObject matchupResultsPanel;
 	public GameObject matchupComparisonPanel;
 	public Button compareButton; // Added the reference for the Compare button
 
-	private List<Player> selectedTeamAPlayers = new();
-	private List<Player> selectedTeamBPlayers = new();
+	private List<Player> selectedTeam1Players = new();
+	private List<Player> selectedTeam2Players = new();
 
 	private void Start()
 		{
@@ -25,8 +25,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 		PopulateTeamDropdowns();
 
 		// Add listeners to dropdowns to load players when the team changes
-		teamADropdown.onValueChanged.AddListener(delegate { LoadTeamPlayers(true); });
-		teamBDropdown.onValueChanged.AddListener(delegate { LoadTeamPlayers(false); });
+		team1Dropdown.onValueChanged.AddListener(delegate { LoadTeamPlayers(true); });
+		team2Dropdown.onValueChanged.AddListener(delegate { LoadTeamPlayers(false); });
 
 		// Add listener for the Compare button to trigger the matchup comparison
 		compareButton.onClick.AddListener(CompareMatchup);
@@ -36,8 +36,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 	private void PopulateTeamDropdowns()
 		{
 		// Clear existing options
-		teamADropdown.ClearOptions();
-		teamBDropdown.ClearOptions();
+		team1Dropdown.ClearOptions();
+		team2Dropdown.ClearOptions();
 
 		// Get all teams from the database
 		List<Team> allTeams = DatabaseManager.Instance.GetAllTeams();
@@ -49,25 +49,25 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 		// Add the teams to the dropdown lists
 		List<string> teamNames = allTeams.Select(team => team.TeamName).ToList();
-		teamADropdown.AddOptions(teamNames);
-		teamBDropdown.AddOptions(teamNames);
+		team1Dropdown.AddOptions(teamNames);
+		team2Dropdown.AddOptions(teamNames);
 
 		// Optionally select the first team by default
 		if (teamNames.Count > 0)
 			{
-			teamADropdown.value = 0;
-			teamBDropdown.value = 0;
-			LoadTeamPlayers(true); // Load players for team A by default
-			LoadTeamPlayers(false); // Load players for team B by default
+			team1Dropdown.value = 0;
+			team2Dropdown.value = 0;
+			LoadTeamPlayers(true); // Load players for team 1 by default
+			LoadTeamPlayers(false); // Load players for team 2 by default
 			}
 		}
 
 	// Loads players for the selected team into the player selection UI
-	private void LoadTeamPlayers(bool isTeamA)
+	private void LoadTeamPlayers(bool isTeam1)
 		{
-		TMP_Dropdown teamDropdown = isTeamA ? teamADropdown : teamBDropdown;
-		Transform contentContainer = isTeamA ? teamAPlayerScrollViewContent : teamBPlayerScrollViewContent;
-		List<Player> selectedPlayers = isTeamA ? selectedTeamAPlayers : selectedTeamBPlayers;
+		TMP_Dropdown teamDropdown = isTeam1 ? team1Dropdown : team2Dropdown;
+		Transform contentContainer = isTeam1 ? team1PlayerScrollViewContent : team2PlayerScrollViewContent;
+		List<Player> selectedPlayers = isTeam1 ? selectedTeam1Players : selectedTeam2Players;
 
 		// Clear previous selections
 		foreach (Transform child in contentContainer)
@@ -124,7 +124,7 @@ public class MatchupComparisonPanel:MonoBehaviour
 						}
 
 					// Log selected players count
-					Debug.Log($"Selected players for team {(isTeamA ? "A" : "B")}: {selectedPlayers.Count}");
+					Debug.Log($"Selected players for team {(isTeam1 ? "1" : "2")}: {selectedPlayers.Count}");
 					});
 			}
 		}
@@ -135,32 +135,33 @@ public class MatchupComparisonPanel:MonoBehaviour
 		Debug.Log("CompareMatchup called");
 
 		// Debug log the number of selected players for both teams
-		Debug.Log($"Team A selected players count: {selectedTeamAPlayers.Count}");
-		Debug.Log($"Team B selected players count: {selectedTeamBPlayers.Count}");
-
-		// Check if the matchup results panel reference is missing
-		if (matchupResultsPanel == null)
-			{
-			Debug.LogError("MatchupResultsPanel reference is missing!");
-			return;
-			}
+		Debug.Log($"Team 1 selected players count: {selectedTeam1Players.Count}");
+		Debug.Log($"Team 2 selected players count: {selectedTeam2Players.Count}");
 
 		// Check if both teams have at least one player selected
-		if (selectedTeamAPlayers.Count == 0 || selectedTeamBPlayers.Count == 0)
+		if (selectedTeam1Players.Count == 0 || selectedTeam2Players.Count == 0)
 			{
 			Debug.LogError("Both teams must have at least one selected player!");
 			return;
 			}
 
 		// Debug log the selected players
-		Debug.Log($"Team A selected players: {selectedTeamAPlayers.Count}");
-		Debug.Log($"Team B selected players: {selectedTeamBPlayers.Count}");
+		Debug.Log($"Team 1 selected players: {selectedTeam1Players.Count}");
+		foreach (var player in selectedTeam1Players)
+			{
+			Debug.Log($"- {player.PlayerName}");
+			}
+
+		Debug.Log($"Team 2 selected players: {selectedTeam2Players.Count}");
+		foreach (var player in selectedTeam2Players)
+			{
+			Debug.Log($"- {player.PlayerName}");
+			}
 
 		// Open the MatchupResultsPanel and pass data for display
-		MatchupResultsPanel.Instance.DisplayMatchupResults(selectedTeamAPlayers, selectedTeamBPlayers);
+		MatchupResultsPanel.Instance.DisplayMatchupResults(selectedTeam1Players, selectedTeam2Players);
 
 		// Close the current MatchupComparisonPanel
 		matchupComparisonPanel.SetActive(false);
 		}
-
 	}
