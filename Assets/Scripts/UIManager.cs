@@ -20,6 +20,7 @@ public class UIManager:MonoBehaviour
 	public GameObject teamManagementPanel; // Team management panel
 	public GameObject playerManagementPanel; // Player management panel
 	public GameObject comparisonPanel; // Comparison panel
+	public GameObject matchupResultsPanel; // Matchup results panel
 
 	// Feedback System
 	[Header("Feedback System")]
@@ -106,6 +107,14 @@ public class UIManager:MonoBehaviour
 		DeactivateOtherPanels(comparisonPanel);
 		}
 
+	// --- Show Matchup Results Panel --- //
+	public void ShowMatchupResultsPanel()
+		{
+		matchupResultsPanel.SetActive(true);
+		panelHistory.Add(matchupResultsPanel);
+		DeactivateOtherPanels(matchupResultsPanel);
+		}
+
 	// --- Go Back to Previous Panel --- //
 	public void GoBackToPreviousPanel()
 		{
@@ -129,6 +138,7 @@ public class UIManager:MonoBehaviour
 	// --- Deactivate all panels except the given one --- //
 	private void DeactivateOtherPanels(GameObject activePanel)
 		{
+		// Deactivate all panels except the active one
 		if (homePanel != activePanel) homePanel.SetActive(false);
 		if (settingsPanel != activePanel) settingsPanel.SetActive(false);
 		if (currentSeasonWeightSettingsPanel != activePanel) currentSeasonWeightSettingsPanel.SetActive(false);
@@ -136,6 +146,7 @@ public class UIManager:MonoBehaviour
 		if (teamManagementPanel != activePanel) teamManagementPanel.SetActive(false);
 		if (playerManagementPanel != activePanel) playerManagementPanel.SetActive(false);
 		if (comparisonPanel != activePanel) comparisonPanel.SetActive(false);
+		if (matchupResultsPanel != activePanel) matchupResultsPanel.SetActive(false);
 		}
 
 	// --- Show Feedback Message --- //
@@ -157,7 +168,6 @@ public class UIManager:MonoBehaviour
 			Debug.LogWarning("Feedback panel or text is not assigned in UIManager!");
 			}
 		}
-
 
 	// --- Hide Feedback Panel After Delay --- //
 	private IEnumerator HideFeedbackAfterDelay(float delay)

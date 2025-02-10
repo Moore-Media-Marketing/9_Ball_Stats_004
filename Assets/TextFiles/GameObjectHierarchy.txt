@@ -248,7 +248,9 @@ Canvas
     BackButton
       UpdateBackButtonText
   MatchupComparisonPanel
+    HeaderText
     TeamASelectionPanel
+      SelectTeamAText
       TeamADropdown
         Label
         Arrow
@@ -263,8 +265,22 @@ Canvas
             Sliding Area
               Handle
           Canvas
-      teamAPlayerContainer
-    TeamASelectionPanel_1
+      TeamAPlayerScrollView
+        Viewport
+          Content
+            playerTogglePrefab
+              Background
+                Checkmark
+              Label
+              PlayerNameText (TMP_Text)
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+    TeamBSelectionPanel
+      SelectTeamBText
       TeamBDropdown
         Label
         Arrow
@@ -279,38 +295,20 @@ Canvas
             Sliding Area
               Handle
           Canvas
-      teamBPlayerContainer
-    HeaderText
-    SelectTeamAText
-    TeamAPlayerScrollView
-      Viewport
-        Content
-          playerTogglePrefab
-            Background
-              Checkmark
-            Label
-            PlayerNameText (TMP_Text)
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    TeamBTeamText
-    TeamBPlayerScrollView
-      Viewport
-        Content
-          playerTogglePrefab
-            Background
-              Checkmark
-            Label
-            Text (TMP)
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
+      TeamBPlayerScrollView
+        Viewport
+          Content
+            playerTogglePrefab
+              Background
+                Checkmark
+              Label
+              PlayerNameText (TMP_Text)
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
     CompareButton
       Text (TMP)
     BackButton

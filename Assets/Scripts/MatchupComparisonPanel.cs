@@ -12,11 +12,13 @@ public class MatchupComparisonPanel:MonoBehaviour
 	[Header("UI Elements")]
 	public TMP_Dropdown teamADropdown;
 	public TMP_Dropdown teamBDropdown;
-	public Transform teamAPlayerContainer;
-	public Transform teamBPlayerContainer;
-	public GameObject playerTogglePrefab;
+	public GameObject playerTogglePrefab; // Prefab for individual player toggle
 	public Button compareButton;
 	public Button backButton;
+
+	[Header("UI Containers")]
+	public Transform teamAPlayerScrollViewContent; // Content container for Team A player toggles
+	public Transform teamBPlayerScrollViewContent; // Content container for Team B player toggles
 
 	private List<Player> selectedTeamAPlayers = new();
 	private List<Player> selectedTeamBPlayers = new();
@@ -56,10 +58,10 @@ public class MatchupComparisonPanel:MonoBehaviour
 	private void LoadTeamPlayers(bool isTeamA)
 		{
 		TMP_Dropdown teamDropdown = isTeamA ? teamADropdown : teamBDropdown;
-		Transform container = isTeamA ? teamAPlayerContainer : teamBPlayerContainer;
+		Transform contentContainer = isTeamA ? teamAPlayerScrollViewContent : teamBPlayerScrollViewContent;
 
 		// Clear previous player list
-		foreach (Transform child in container)
+		foreach (Transform child in contentContainer)
 			{
 			Destroy(child.gameObject);
 			}
@@ -77,12 +79,14 @@ public class MatchupComparisonPanel:MonoBehaviour
 
 		foreach (Player player in teamPlayers)
 			{
-			GameObject toggleObj = Instantiate(playerTogglePrefab, container);
+			// Instantiate the player toggle inside the scroll view content container (teamAPlayerScrollViewContent or teamBPlayerScrollViewContent)
+			GameObject toggleObj = Instantiate(playerTogglePrefab, contentContainer);
 			Toggle playerToggle = toggleObj.GetComponent<Toggle>();
 			TMP_Text playerText = toggleObj.GetComponentInChildren<TMP_Text>();
 
 			playerText.text = $"{player.PlayerName} (Skill {player.Stats.CurrentSeasonSkillLevel})";
 
+			// Add listener to add/remove the player from the selected list
 			playerToggle.onValueChanged.AddListener(delegate
 				{
 					if (playerToggle.isOn)
