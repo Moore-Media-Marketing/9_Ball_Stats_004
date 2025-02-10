@@ -10,11 +10,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 	public TMP_Dropdown team1Dropdown;
 	public TMP_Dropdown team2Dropdown;
 	public GameObject playerTogglePrefab;
-	public Transform team1PlayerScrollViewContent;
-	public Transform team2PlayerScrollViewContent;
+	public Transform team1PlayerPanel;  // Panel to hold Player1Toggle through Player8Toggle for Team1
+	public Transform team2PlayerPanel;  // Panel to hold Player1Toggle through Player8Toggle for Team2
 	public GameObject matchupResultsPanel;
 	public GameObject matchupComparisonPanel;
-	public Button compareButton; // Added the reference for the Compare button
+	public Button compareButton;  // Button to trigger comparison
 
 	private List<Player> selectedTeam1Players = new();
 	private List<Player> selectedTeam2Players = new();
@@ -57,8 +57,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 			{
 			team1Dropdown.value = 0;
 			team2Dropdown.value = 0;
-			LoadTeamPlayers(true); // Load players for team 1 by default
-			LoadTeamPlayers(false); // Load players for team 2 by default
+			LoadTeamPlayers(true);  // Load players for team 1 by default
+			LoadTeamPlayers(true); // Load players for team 2 by default
 			}
 		}
 
@@ -66,10 +66,10 @@ public class MatchupComparisonPanel:MonoBehaviour
 	private void LoadTeamPlayers(bool isTeam1)
 		{
 		TMP_Dropdown teamDropdown = isTeam1 ? team1Dropdown : team2Dropdown;
-		Transform contentContainer = isTeam1 ? team1PlayerScrollViewContent : team2PlayerScrollViewContent;
+		Transform contentContainer = isTeam1 ? team1PlayerPanel : team2PlayerPanel;
 		List<Player> selectedPlayers = isTeam1 ? selectedTeam1Players : selectedTeam2Players;
 
-		// Clear previous selections
+		// Clear previous selections (reset all toggle states)
 		foreach (Transform child in contentContainer)
 			{
 			Destroy(child.gameObject);
@@ -96,8 +96,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 		// Debug log the number of players being loaded
 		Debug.Log($"Loaded {teamPlayers.Count} players for team: {selectedTeamName}");
 
+		int index = 0;
 		foreach (Player player in teamPlayers)
 			{
+			if (index >= 8) break;  // Limit the number of toggles to 8 players (Player1Toggle through Player8Toggle)
+
 			GameObject toggleObj = Instantiate(playerTogglePrefab, contentContainer);
 			Toggle playerToggle = toggleObj.GetComponent<Toggle>();
 			TMP_Text playerText = toggleObj.GetComponentInChildren<TMP_Text>();
@@ -126,6 +129,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 					// Log selected players count
 					Debug.Log($"Selected players for team {(isTeam1 ? "1" : "2")}: {selectedPlayers.Count}");
 					});
+
+			index++;
 			}
 		}
 
@@ -145,13 +150,14 @@ public class MatchupComparisonPanel:MonoBehaviour
 			return;
 			}
 
-		// Debug log the selected players
+		// Debug log the selected players for team 1
 		Debug.Log($"Team 1 selected players: {selectedTeam1Players.Count}");
 		foreach (var player in selectedTeam1Players)
 			{
 			Debug.Log($"- {player.PlayerName}");
 			}
 
+		// Debug log the selected players for team 2
 		Debug.Log($"Team 2 selected players: {selectedTeam2Players.Count}");
 		foreach (var player in selectedTeam2Players)
 			{
@@ -164,4 +170,5 @@ public class MatchupComparisonPanel:MonoBehaviour
 		// Close the current MatchupComparisonPanel
 		matchupComparisonPanel.SetActive(false);
 		}
+
 	}

@@ -264,21 +264,6 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    Team1PlayerScrollView
-      Viewport
-        Content
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-      playerTogglePrefab
-        Background
-          Checkmark
-        Label
-        PlayerNameText (TMP_Text)
-    SelectTeam2Text
     Team2Dropdown
       Label
       Arrow
@@ -293,20 +278,73 @@ Canvas
           Sliding Area
             Handle
         Canvas
-    Team2PlayerScrollView
-      Viewport
-        Content
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-      playerTogglePrefab
+    Team1Panel
+      Player1Toggle
         Background
           Checkmark
         Label
-        PlayerNameText (TMP_Text)
+      Player2Toggle
+        Background
+          Checkmark
+        Label
+      Player3Toggle
+        Background
+          Checkmark
+        Label
+      Player4Toggle
+        Background
+          Checkmark
+        Label
+      Player5Toggle
+        Background
+          Checkmark
+        Label
+      Player6Toggle
+        Background
+          Checkmark
+        Label
+      Player7Toggle
+        Background
+          Checkmark
+        Label
+      Player8Toggle
+        Background
+          Checkmark
+        Label
+    Team2Panel
+      Player1Toggle
+        Background
+          Checkmark
+        Label
+      Player2Toggle
+        Background
+          Checkmark
+        Label
+      Player3Toggle
+        Background
+          Checkmark
+        Label
+      Player4Toggle
+        Background
+          Checkmark
+        Label
+      Player5Toggle
+        Background
+          Checkmark
+        Label
+      Player6Toggle
+        Background
+          Checkmark
+        Label
+      Player7Toggle
+        Background
+          Checkmark
+        Label
+      Player8Toggle
+        Background
+          Checkmark
+        Label
+    SelectTeam2Text
     CompareButton
       Text (TMP)
     BackButton
