@@ -349,37 +349,16 @@ Canvas
       Text (TMP)
     BackButton
       UpdateBackButtonText
-    MatchupResultsPanel
-      HeaderText
-      Team1HeaderText
-      Team1WinProbabilityText
-      Team2HeaderText
-      Team2WinProbabilityText
-      MatchupsScrollView
-        Viewport
-          MatchupListContent
-            MatchupEntry_Template
-              MatchupDetailsText
-        Scrollbar Horizontal
-          Sliding Area
-            Handle
-        Scrollbar Vertical
-          Sliding Area
-            Handle
-      BestMatchupHeaderText
-      BestMatchupsScrollView
-        Viewport
-          BestMatchupListContent
-            MatchupEntry_Template
-              MatchupDetailsText
-        Scrollbar Horizontal
-          Sliding Area
-            Handle
-        Scrollbar Vertical
-          Sliding Area
-            Handle
-      BackButton
-        UpdateBackButtonText
+  MatchupResultsPanel
+    HeaderText
+    Team1HeaderText
+    Team1WinProbabilityText
+    Team2HeaderText
+    Team2WinProbabilityText
+    MatchupListContainer
+    BestMatchupListContainer
+    BackButton
+      UpdateBackButtonText
   SettingsPanel
     HeaderText
     SampleDataGeneratorToggle

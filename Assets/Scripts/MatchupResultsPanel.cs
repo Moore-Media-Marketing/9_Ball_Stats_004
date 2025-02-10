@@ -39,9 +39,9 @@ public class MatchupResultsPanel:MonoBehaviour
 	public void DisplayMatchupResults(List<Player> team1Players, List<Player> team2Players)
 		{
 		// Ensure valid player lists are received
-		if (team1Players == null || team2Players == null)
+		if (team1Players == null || team2Players == null || team1Players.Count == 0 || team2Players.Count == 0)
 			{
-			Debug.LogError("Null teams received in MatchupResultsPanel!");
+			Debug.LogError("Invalid player lists received in MatchupResultsPanel!");
 			return;
 			}
 
@@ -69,10 +69,14 @@ public class MatchupResultsPanel:MonoBehaviour
 		{
 		// Clear previous entries
 		foreach (Transform child in matchupListContainer)
+			{
 			Destroy(child.gameObject);
+			}
 
 		foreach (Transform child in bestMatchupListContainer)
+			{
 			Destroy(child.gameObject);
+			}
 
 		GameObject bestMatchupEntry = null;
 		float highestWinChance = 0;
@@ -105,5 +109,11 @@ public class MatchupResultsPanel:MonoBehaviour
 			Instantiate(bestMatchupEntry, bestMatchupListContainer);
 			Debug.Log($"Best matchup identified: {bestMatchupEntry.GetComponent<TMP_Text>().text}");
 			}
+		}
+
+	// Optional method to hide the panel when no longer needed
+	public void HidePanel()
+		{
+		gameObject.SetActive(false);
 		}
 	}
