@@ -12,7 +12,6 @@ public class MatchupResultsPanel:MonoBehaviour
 
 	[Header("UI Elements")]
 	public TMP_Text team1WinProbabilityText;   // Team 1 win probability text
-
 	public TMP_Text team2WinProbabilityText;   // Team 2 win probability text
 	public Transform matchupListContainer;     // List container for matchups
 	public Transform bestMatchupListContainer; // List container for best matchups
@@ -25,11 +24,11 @@ public class MatchupResultsPanel:MonoBehaviour
 		if (Instance == null)
 			{
 			Instance = this;
-			Debug.Log(" MatchupResultsPanel Singleton Initialized.");
+			Debug.Log("✅ MatchupResultsPanel Singleton Initialized.");
 			}
 		else
 			{
-			Debug.LogWarning(" Duplicate MatchupResultsPanel detected! Destroying new one.");
+			Debug.LogWarning("⚠️ Duplicate MatchupResultsPanel detected! Destroying new one.");
 			Destroy(gameObject);
 			}
 		}
@@ -39,7 +38,7 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Ensure the panel initializes properly
 		if (Instance == null)
 			{
-			Debug.LogError(" MatchupResultsPanel Instance was not initialized in Awake()! Forcing initialization.");
+			Debug.LogError("🚨 MatchupResultsPanel Instance was not initialized in Awake()! Forcing initialization.");
 			Instance = this;
 			}
 
@@ -59,14 +58,14 @@ public class MatchupResultsPanel:MonoBehaviour
 		// Ensure MatchupResultsPanel instance exists
 		if (Instance == null)
 			{
-			Debug.LogError(" MatchupResultsPanel.Instance is NULL! Cannot display matchups.");
+			Debug.LogError("🚨 MatchupResultsPanel.Instance is NULL! Cannot display matchups.");
 			return;
 			}
 
 		// Validate player lists
 		if (team1Players == null || team2Players == null || team1Players.Count == 0 || team2Players.Count == 0)
 			{
-			Debug.LogError(" Invalid player lists received in MatchupResultsPanel!");
+			Debug.LogError("❌ Invalid player lists received in MatchupResultsPanel!");
 			return;
 			}
 
@@ -133,7 +132,7 @@ public class MatchupResultsPanel:MonoBehaviour
 		if (bestMatchupEntry != null)
 			{
 			Instantiate(bestMatchupEntry, bestMatchupListContainer);
-			Debug.Log($" Best matchup identified: {bestMatchupEntry.GetComponent<TMP_Text>().text}");
+			Debug.Log($"🏆 Best matchup identified: {bestMatchupEntry.GetComponent<TMP_Text>().text}");
 			}
 		}
 
@@ -142,7 +141,7 @@ public class MatchupResultsPanel:MonoBehaviour
 	/// </summary>
 	public void HidePanel()
 		{
-		Debug.Log(" Hiding MatchupResultsPanel.");
+		Debug.Log("📢 Hiding MatchupResultsPanel.");
 		gameObject.SetActive(false);
 		}
 	}

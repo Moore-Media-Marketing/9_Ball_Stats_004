@@ -18,6 +18,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 	[Header("Player Selection Panels")]
 	public GameObject team1Panel;
 	public GameObject team2Panel;
+	public ScrollRect team1ScrollRect;  // Scrollable container for Team 1
+	public ScrollRect team2ScrollRect;  // Scrollable container for Team 2
 
 	private Toggle[] team1PlayerToggles;
 	private Text[] team1PlayerLabels;
@@ -39,21 +41,19 @@ public class MatchupComparisonPanel:MonoBehaviour
 			Destroy(gameObject);
 			}
 
-		FindTogglesAndLabels(); // Auto-find toggles & labels at runtime
+		FindTogglesAndLabels();
 		}
 
 	private void Start()
 		{
 		LoadTeams();
 		compareButton.onClick.AddListener(CompareTeams);
-		backButton.onClick.AddListener(GoBack); // Link back button to UIManager
+		backButton.onClick.AddListener(GoBack);
 		}
 
 	// --- Finds toggles and labels dynamically under Team1Panel and Team2Panel. --- //
-
 	private void FindTogglesAndLabels()
 		{
-		// Find toggles and labels inside Team1Panel
 		team1PlayerToggles = team1Panel.GetComponentsInChildren<Toggle>(true);
 		team1PlayerLabels = new Text[team1PlayerToggles.Length];
 
@@ -62,7 +62,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 			team1PlayerLabels[i] = team1PlayerToggles[i].GetComponentInChildren<Text>();
 			}
 
-		// Find toggles and labels inside Team2Panel
 		team2PlayerToggles = team2Panel.GetComponentsInChildren<Toggle>(true);
 		team2PlayerLabels = new Text[team2PlayerToggles.Length];
 
@@ -75,14 +74,13 @@ public class MatchupComparisonPanel:MonoBehaviour
 		}
 
 	// --- Loads teams into TMP_Dropdowns from the DatabaseManager. --- //
-
 	private void LoadTeams()
 		{
 		teams = DatabaseManager.Instance.GetAllTeams();
 		team1Dropdown.ClearOptions();
 		team2Dropdown.ClearOptions();
 
-		List<string> teamNames = new List<string>();
+		List<string> teamNames = new();
 		foreach (var team in teams)
 			{
 			teamNames.Add(team.TeamName);
@@ -94,13 +92,11 @@ public class MatchupComparisonPanel:MonoBehaviour
 		team1Dropdown.onValueChanged.AddListener(delegate { PopulatePlayers(1); });
 		team2Dropdown.onValueChanged.AddListener(delegate { PopulatePlayers(2); });
 
-		// Populate players for default selections
 		PopulatePlayers(1);
 		PopulatePlayers(2);
 		}
 
 	// --- Populates the player toggles for the selected team. --- //
-
 	private void PopulatePlayers(int teamNumber)
 		{
 		int selectedTeamIndex = (teamNumber == 1) ? team1Dropdown.value : team2Dropdown.value;
@@ -120,84 +116,54 @@ public class MatchupComparisonPanel:MonoBehaviour
 			if (i < selectedPlayers.Count)
 				{
 				playerLabels[i].text = selectedPlayers[i].PlayerName;
+				playerToggles[i].gameObject.SetActive(true);
+				playerToggles[i].isOn = true;
 				}
 			else
 				{
 				playerLabels[i].text = "";
+				playerToggles[i].gameObject.SetActive(false);
 				}
-
-			// Set all toggles to active
-			playerToggles[i].gameObject.SetActive(true);
-			playerToggles[i].isOn = true;  // You can set this to true if you want them to be pre-selected
 			}
+
+		// Ensure Scroll Position is reset when updating
+		if (teamNumber == 1) team1ScrollRect.verticalNormalizedPosition = 1;
+		else team2ScrollRect.verticalNormalizedPosition = 1;
 		}
 
-
 	// --- Gathers selected players and sends them to MatchupResultsPanel. --- //
-
 	private void CompareTeams()
 		{
-		List<Player> selectedTeam1Players = new List<Player>();
-		List<Player> selectedTeam2Players = new List<Player>();
+		List<Player> selectedTeam1Players = new();
+		List<Player> selectedTeam2Players = new();
 
-		// Debugging: Check if the players lists are null or empty
 		if (team1Players == null || team2Players == null)
 			{
 			Debug.LogError("team1Players or team2Players is null.");
 			return;
 			}
 
-		// Ensure that toggles are properly initialized and non-null
 		if (team1PlayerToggles == null || team2PlayerToggles == null)
 			{
 			Debug.LogError("Player toggles are not initialized.");
 			return;
 			}
 
-		// Debugging: Log the number of players
-		Debug.Log($"Team 1 has {team1Players.Count} players, Team 2 has {team2Players.Count} players.");
-
-		// Check if there are any toggles for the teams
-		if (team1PlayerToggles.Length == 0 || team2PlayerToggles.Length == 0)
-			{
-			Debug.LogError("No player toggles found for one of the teams.");
-			return;
-			}
-
-		// Selecting players for Team 1
 		for (int i = 0; i < team1PlayerToggles.Length; i++)
 			{
-			if (team1PlayerToggles[i].gameObject.activeSelf && team1PlayerToggles[i].isOn)
+			if (team1PlayerToggles[i].gameObject.activeSelf && team1PlayerToggles[i].isOn && i < team1Players.Count)
 				{
-				if (i < team1Players.Count)
-					{
-					selectedTeam1Players.Add(team1Players[i]);
-					}
-				else
-					{
-					Debug.LogError($"Player toggle {i} is active, but no corresponding player in Team 1.");
-					}
+				selectedTeam1Players.Add(team1Players[i]);
 				}
 			}
 
-		// Selecting players for Team 2
 		for (int i = 0; i < team2PlayerToggles.Length; i++)
 			{
-			if (team2PlayerToggles[i].gameObject.activeSelf && team2PlayerToggles[i].isOn)
+			if (team2PlayerToggles[i].gameObject.activeSelf && team2PlayerToggles[i].isOn && i < team2Players.Count)
 				{
-				if (i < team2Players.Count)
-					{
-					selectedTeam2Players.Add(team2Players[i]);
-					}
-				else
-					{
-					Debug.LogError($"Player toggle {i} is active, but no corresponding player in Team 2.");
-					}
+				selectedTeam2Players.Add(team2Players[i]);
 				}
 			}
-
-		// Debugging: Log selected players
-		Debug.Log($"Selected {selectedTeam1Players.Count} players for Team 1 and {selectedTeam2Players.Count} players for Team 2.");
 
 		if (selectedTeam1Players.Count == 0 || selectedTeam2Players.Count == 0)
 			{
@@ -205,26 +171,17 @@ public class MatchupComparisonPanel:MonoBehaviour
 			return;
 			}
 
+		if (MatchupResultsPanel.Instance == null)
+			{
+			Debug.LogError("MatchupResultsPanel.Instance is NULL.");
+			return;
+			}
 
-		// Debugging before line 209
-		if (team1Players == null) Debug.LogError("team1Players is NULL in CompareTeams()");
-		if (team2Players == null) Debug.LogError("team2Players is NULL in CompareTeams()");
-		if (team1PlayerToggles == null) Debug.LogError("team1PlayerToggles is NULL in CompareTeams()");
-		if (team2PlayerToggles == null) Debug.LogError("team2PlayerToggles is NULL in CompareTeams()");
-		if (MatchupResultsPanel.Instance == null) Debug.LogError("MatchupResultsPanel.Instance is NULL in CompareTeams()");
-		if (UIManager.Instance == null) Debug.LogError("UIManager.Instance is NULL in CompareTeams()");
-
-
-		// Send selected players to MatchupResultsPanel
 		MatchupResultsPanel.Instance.DisplayMatchupResults(selectedTeam1Players, selectedTeam2Players);
-
-		// Switch UI to results panel using UIManager
 		UIManager.Instance.ShowMatchupResultsPanel();
 		}
 
-
 	// --- Returns to the previous panel using UIManager. --- //
-
 	private void GoBack()
 		{
 		UIManager.Instance.GoBackToPreviousPanel();

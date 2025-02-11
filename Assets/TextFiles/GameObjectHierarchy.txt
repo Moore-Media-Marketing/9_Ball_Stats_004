@@ -355,8 +355,17 @@ Canvas
     Team1WinProbabilityText
     Team2HeaderText
     Team2WinProbabilityText
-    MatchupListContainer
     BestMatchupListContainer
+    Team1MatchupListScrollView
+      Viewport
+        Content
+          MatchupListContainer
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
     BackButton
       UpdateBackButtonText
   SettingsPanel
