@@ -278,6 +278,7 @@ Canvas
           Sliding Area
             Handle
         Canvas
+    SelectTeam2Text
     Team1Panel
       Player1Toggle
         Background
@@ -344,22 +345,26 @@ Canvas
         Background
           Checkmark
         Label
-    SelectTeam2Text
     CompareButton
       Text (TMP)
     BackButton
       UpdateBackButtonText
   MatchupResultsPanel
     HeaderText
-    Team1HeaderText
-    Team1WinProbabilityText
-    Team2HeaderText
-    Team2WinProbabilityText
-    BestMatchupListContainer
-    Team1MatchupListScrollView
+    MatchupListScrollView
       Viewport
         Content
           MatchupListContainer
+      Scrollbar Horizontal
+        Sliding Area
+          Handle
+      Scrollbar Vertical
+        Sliding Area
+          Handle
+    BestMatchupListScrollView
+      Viewport
+        Content
+          BestMatchupListContainer
       Scrollbar Horizontal
         Sliding Area
           Handle

@@ -7,141 +7,126 @@ using UnityEngine.UI;
 
 public class MatchupResultsPanel:MonoBehaviour
 	{
-	// Singleton instance
 	public static MatchupResultsPanel Instance { get; private set; }
 
-	[Header("UI Elements")]
-	public TMP_Text team1WinProbabilityText;   // Team 1 win probability text
-	public TMP_Text team2WinProbabilityText;   // Team 2 win probability text
-	public Transform matchupListContainer;     // List container for matchups
-	public Transform bestMatchupListContainer; // List container for best matchups
-	public GameObject matchupEntryPrefab;      // Prefab for each matchup entry
-	public Button backButton;                  // Button to close the panel
+	[Header("Win Odds ScrollView")]
+	public Transform winOddsContent;  // Parent container for Win Odds entries
+	public GameObject winOddsEntryPrefab;  // Prefab for displaying win odds
 
-	// Ensures Singleton instance is assigned
+	[Header("Best Matchups ScrollView")]
+	public Transform bestMatchupContent;  // Parent container for Best Matchup entries
+	public GameObject bestMatchupEntryPrefab;  // Prefab for displaying best matchups
+
+	[Header("Navigation Buttons")]
+	public Button backButton;
+
 	private void Awake()
 		{
 		if (Instance == null)
 			{
 			Instance = this;
-			Debug.Log("✅ MatchupResultsPanel Singleton Initialized.");
 			}
 		else
 			{
-			Debug.LogWarning("⚠️ Duplicate MatchupResultsPanel detected! Destroying new one.");
 			Destroy(gameObject);
 			}
+
+		backButton.onClick.AddListener(GoBack);
 		}
 
-	private void Start()
-		{
-		// Ensure the panel initializes properly
-		if (Instance == null)
-			{
-			Debug.LogError("🚨 MatchupResultsPanel Instance was not initialized in Awake()! Forcing initialization.");
-			Instance = this;
-			}
-
-		// If the panel was disabled at start, enable and disable to trigger Awake()
-		if (!gameObject.activeInHierarchy)
-			{
-			gameObject.SetActive(true);
-			gameObject.SetActive(false);
-			}
-		}
-
-	/// <summary>
-	/// Displays matchup results based on selected teams.
-	/// </summary>
+	// --- Displays Matchup Results with Win Odds and Best Matchups --- //
 	public void DisplayMatchupResults(List<Player> team1Players, List<Player> team2Players)
 		{
-		// Ensure MatchupResultsPanel instance exists
-		if (Instance == null)
+		if (team1Players == null || team2Players == null)
 			{
-			Debug.LogError("🚨 MatchupResultsPanel.Instance is NULL! Cannot display matchups.");
+			Debug.LogError("MatchupResultsPanel: Null team players received.");
 			return;
 			}
 
-		// Validate player lists
-		if (team1Players == null || team2Players == null || team1Players.Count == 0 || team2Players.Count == 0)
-			{
-			Debug.LogError("❌ Invalid player lists received in MatchupResultsPanel!");
-			return;
-			}
+		ClearExistingEntries(); // Clears previous matchup data
 
-		Debug.Log($"🔹 Displaying matchup: Team 1 ({team1Players.Count} players) vs Team 2 ({team2Players.Count} players)");
-
-		// Calculate win probabilities
-		float winChanceTeam1 = HandicapSystem.CalculateWinProbability(team1Players, team2Players);
-		float winChanceTeam2 = 1 - winChanceTeam1;
-
-		// Update UI with win probabilities
-		team1WinProbabilityText.text = $"Win Probability: {winChanceTeam1 * 100:F1}%";
-		team2WinProbabilityText.text = $"Win Probability: {winChanceTeam2 * 100:F1}%";
-
-		// Populate matchups and determine the best pairing
-		PopulateMatchupList(team1Players, team2Players);
-
-		// Make sure the panel is visible
-		gameObject.SetActive(true);
+		float winOdds = CalculateWinOdds(team1Players, team2Players);
+		DisplayWinOdds(winOdds);
+		DisplayBestMatchups(team1Players, team2Players);
 		}
 
-	/// <summary>
-	/// Populates the list of matchups and identifies the best matchup.
-	/// </summary>
-	private void PopulateMatchupList(List<Player> team1Players, List<Player> team2Players)
+	// --- Clears previous matchup entries from both scroll views --- //
+	private void ClearExistingEntries()
 		{
-		// Clear previous matchup entries
-		foreach (Transform child in matchupListContainer)
+		foreach (Transform child in winOddsContent)
 			{
 			Destroy(child.gameObject);
 			}
 
-		foreach (Transform child in bestMatchupListContainer)
+		foreach (Transform child in bestMatchupContent)
 			{
 			Destroy(child.gameObject);
 			}
+		}
 
-		GameObject bestMatchupEntry = null;
-		float highestWinChance = 0;
+	// --- Calculates the win probability of Team 1 based on players --- //
+	private float CalculateWinOdds(List<Player> team1Players, List<Player> team2Players)
+		{
+		float team1Skill = 0;
+		float team2Skill = 0;
 
-		// Loop through all players in both teams to create matchups
-		foreach (var player1 in team1Players)
+		foreach (var player in team1Players)
 			{
-			foreach (var player2 in team2Players)
-				{
-				// Calculate win probability for the current matchup
-				float matchupOdds = HandicapSystem.CalculateWinProbability(
-					new List<Player> { player1 },
-					new List<Player> { player2 });
-
-				// Create a matchup entry in the UI
-				GameObject matchupEntry = Instantiate(matchupEntryPrefab, matchupListContainer);
-				matchupEntry.GetComponent<TMP_Text>().text = $"{player1.PlayerName} vs {player2.PlayerName}: {matchupOdds * 100:F1}%";
-
-				// Identify the best matchup based on highest win probability
-				if (matchupOdds > highestWinChance)
-					{
-					highestWinChance = matchupOdds;
-					bestMatchupEntry = matchupEntry;
-					}
-				}
+			team1Skill += player.SkillLevel;
 			}
 
-		// Highlight the best matchup
-		if (bestMatchupEntry != null)
+		foreach (var player in team2Players)
 			{
-			Instantiate(bestMatchupEntry, bestMatchupListContainer);
-			Debug.Log($"🏆 Best matchup identified: {bestMatchupEntry.GetComponent<TMP_Text>().text}");
+			team2Skill += player.SkillLevel;
+			}
+
+		float totalSkill = team1Skill + team2Skill;
+		return (totalSkill > 0) ? (team1Skill / totalSkill) * 100f : 50f;
+		}
+
+	// --- Instantiates a UI entry for Win Odds --- //
+	private void DisplayWinOdds(float winOdds)
+		{
+		GameObject entry = Instantiate(winOddsEntryPrefab, winOddsContent);
+		TMP_Text winOddsText = entry.GetComponent<TMP_Text>();
+
+		if (winOddsText != null)
+			{
+			winOddsText.text = $"Win Probability: {winOdds:F2}%";
+			}
+		else
+			{
+			Debug.LogError("WinOddsEntry prefab missing TMP_Text component!");
 			}
 		}
 
-	/// <summary>
-	/// Hides the matchup results panel.
-	/// </summary>
-	public void HidePanel()
+	// --- Generates and displays best possible matchups for Team 1 to win --- //
+	private void DisplayBestMatchups(List<Player> team1Players, List<Player> team2Players)
 		{
-		Debug.Log("📢 Hiding MatchupResultsPanel.");
-		gameObject.SetActive(false);
+		List<Player> bestMatchupPlayers = CalculateBestMatchup(team1Players, team2Players);
+		GameObject entry = Instantiate(bestMatchupEntryPrefab, bestMatchupContent);
+		TMP_Text matchupText = entry.GetComponent<TMP_Text>();
+
+		if (matchupText != null)
+			{
+			matchupText.text = "Best Matchup: " + string.Join(", ", bestMatchupPlayers.ConvertAll(p => p.PlayerName));
+			}
+		else
+			{
+			Debug.LogError("BestMatchupEntry prefab missing TMP_Text component!");
+			}
+		}
+
+	// --- Determines the best player matchups for Team 1 to maximize win odds --- //
+	private List<Player> CalculateBestMatchup(List<Player> team1Players, List<Player> team2Players)
+		{
+		team1Players.Sort((a, b) => b.SkillLevel.CompareTo(a.SkillLevel)); // Sort by highest skill
+		return team1Players.GetRange(0, Mathf.Min(5, team1Players.Count)); // Select top 5 players
+		}
+
+	// --- Returns to the previous panel using UIManager --- //
+	private void GoBack()
+		{
+		UIManager.Instance.GoBackToPreviousPanel();
 		}
 	}

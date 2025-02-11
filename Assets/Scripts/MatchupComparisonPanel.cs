@@ -16,10 +16,8 @@ public class MatchupComparisonPanel:MonoBehaviour
 	public Button backButton;
 
 	[Header("Player Selection Panels")]
-	public GameObject team1Panel;
-	public GameObject team2Panel;
-	public ScrollRect team1ScrollRect;  // Scrollable container for Team 1
-	public ScrollRect team2ScrollRect;  // Scrollable container for Team 2
+	public GameObject team1Panel; // No ScrollRect, just regular Panel
+	public GameObject team2Panel; // No ScrollRect, just regular Panel
 
 	private Toggle[] team1PlayerToggles;
 	private Text[] team1PlayerLabels;
@@ -125,10 +123,6 @@ public class MatchupComparisonPanel:MonoBehaviour
 				playerToggles[i].gameObject.SetActive(false);
 				}
 			}
-
-		// Ensure Scroll Position is reset when updating
-		if (teamNumber == 1) team1ScrollRect.verticalNormalizedPosition = 1;
-		else team2ScrollRect.verticalNormalizedPosition = 1;
 		}
 
 	// --- Gathers selected players and sends them to MatchupResultsPanel. --- //
