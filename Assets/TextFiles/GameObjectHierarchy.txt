@@ -351,26 +351,34 @@ Canvas
       UpdateBackButtonText
   MatchupResultsPanel
     HeaderText
-    MatchupListScrollView
-      Viewport
-        Content
-          MatchupListContainer
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
-    BestMatchupListScrollView
-      Viewport
-        Content
-          BestMatchupListContainer
-      Scrollbar Horizontal
-        Sliding Area
-          Handle
-      Scrollbar Vertical
-        Sliding Area
-          Handle
+    Team1NameText
+    Team2NameText
+    WinProbabilityTeam1Text
+    WinProbabilityTeam2Text
+    WinOddsPanel
+      MatchupListScrollView
+        Viewport
+          Content
+            WinOddsEntry
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+    BestMatchupPanel
+      BestMatchupListScrollView
+        Viewport
+          Content
+            BestMatchupEntry
+        Scrollbar Horizontal
+          Sliding Area
+            Handle
+        Scrollbar Vertical
+          Sliding Area
+            Handle
+    ConfirmButton
+      Text (TMP)
     BackButton
       UpdateBackButtonText
   SettingsPanel

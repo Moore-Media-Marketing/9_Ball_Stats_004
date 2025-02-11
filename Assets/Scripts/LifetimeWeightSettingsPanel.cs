@@ -1,7 +1,8 @@
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System.Collections.Generic;
 
 public class LifetimeWeightSettingsPanel:MonoBehaviour
 	{
@@ -33,35 +34,55 @@ public class LifetimeWeightSettingsPanel:MonoBehaviour
 		UpdateBackButtonText("Back");
 		}
 
-	// Load saved settings (placeholder function)
+	// Load saved settings from CSV or other storage
 	private void LoadLifetimeWeightSettings()
 		{
-		// Example of loading values from a manager or PlayerPrefs (adjust as needed)
-		lifetimeGamesWonInputField.text = PlayerPrefs.GetString("LifetimeGamesWon", "");
-		lifetimeMiniSlamsInputField.text = PlayerPrefs.GetString("LifetimeMiniSlams", "");
-		lifetimeNineOnTheSnapInputField.text = PlayerPrefs.GetString("LifetimeNineOnTheSnap", "");
-		lifetimeShutoutsInputField.text = PlayerPrefs.GetString("LifetimeShutouts", "");
-		lifetimeBreakAndRunInputField.text = PlayerPrefs.GetString("LifetimeBreakAndRun", "");
-		lifetimeDefensiveShotAverageInputField.text = PlayerPrefs.GetString("LifetimeDefensiveShotAverage", "");
-		lifetimeMatchesPlayedInputField.text = PlayerPrefs.GetString("LifetimeMatchesPlayed", "");
-		lifetimeMatchesWonInputField.text = PlayerPrefs.GetString("LifetimeMatchesWon", "");
+		// Example of loading from a CSV file (adjust if you store it differently)
+		string filePath = "LifetimeWeightSettings.csv"; // Your CSV path
+		if (File.Exists(filePath))
+			{
+			string[] lines = File.ReadAllLines(filePath);
+			foreach (string line in lines)
+				{
+				string[] values = line.Split(',');
+				if (values.Length == 8) // Assuming 8 fields
+					{
+					lifetimeGamesWonInputField.text = values[0];
+					lifetimeMiniSlamsInputField.text = values[1];
+					lifetimeNineOnTheSnapInputField.text = values[2];
+					lifetimeShutoutsInputField.text = values[3];
+					lifetimeBreakAndRunInputField.text = values[4];
+					lifetimeDefensiveShotAverageInputField.text = values[5];
+					lifetimeMatchesPlayedInputField.text = values[6];
+					lifetimeMatchesWonInputField.text = values[7];
+					}
+				}
+			}
 		}
 
-	// Save the entered values (placeholder function)
+	// Save the entered values to a CSV file
 	private void SaveLifetimeWeightSettings()
 		{
-		// Example of saving to PlayerPrefs (replace with actual database logic if needed)
-		PlayerPrefs.SetString("LifetimeGamesWon", lifetimeGamesWonInputField.text);
-		PlayerPrefs.SetString("LifetimeMiniSlams", lifetimeMiniSlamsInputField.text);
-		PlayerPrefs.SetString("LifetimeNineOnTheSnap", lifetimeNineOnTheSnapInputField.text);
-		PlayerPrefs.SetString("LifetimeShutouts", lifetimeShutoutsInputField.text);
-		PlayerPrefs.SetString("LifetimeBreakAndRun", lifetimeBreakAndRunInputField.text);
-		PlayerPrefs.SetString("LifetimeDefensiveShotAverage", lifetimeDefensiveShotAverageInputField.text);
-		PlayerPrefs.SetString("LifetimeMatchesPlayed", lifetimeMatchesPlayedInputField.text);
-		PlayerPrefs.SetString("LifetimeMatchesWon", lifetimeMatchesWonInputField.text);
-		PlayerPrefs.Save();
+		// Get the values from the input fields
+		string gamesWon = lifetimeGamesWonInputField.text;
+		string miniSlams = lifetimeMiniSlamsInputField.text;
+		string nineOnTheSnap = lifetimeNineOnTheSnapInputField.text;
+		string shutouts = lifetimeShutoutsInputField.text;
+		string breakAndRun = lifetimeBreakAndRunInputField.text;
+		string defensiveShotAverage = lifetimeDefensiveShotAverageInputField.text;
+		string matchesPlayed = lifetimeMatchesPlayedInputField.text;
+		string matchesWon = lifetimeMatchesWonInputField.text;
 
-		Debug.Log("Lifetime weight settings saved.");
+		// Write to CSV file
+		string filePath = "LifetimeWeightSettings.csv";
+		List<string> lines = new()
+			{
+			$"{gamesWon},{miniSlams},{nineOnTheSnap},{shutouts},{breakAndRun},{defensiveShotAverage},{matchesPlayed},{matchesWon}"
+		};
+
+		File.AppendAllLines(filePath, lines); // Append data to CSV
+
+		Debug.Log("Lifetime weight settings saved to CSV.");
 		}
 
 	// Go back to the previous panel

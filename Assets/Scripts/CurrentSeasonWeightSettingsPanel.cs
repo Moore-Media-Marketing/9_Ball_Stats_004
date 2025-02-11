@@ -1,7 +1,8 @@
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System.Collections.Generic;
 
 /// <summary>
 /// Manages the Current Season Weight Settings Panel.
@@ -57,23 +58,48 @@ public class CurrentSeasonWeightSettingsPanel:MonoBehaviour
 		}
 
 	/// <summary>
-	/// Saves the current settings.
+	/// Saves the current settings to a CSV file.
 	/// </summary>
 	private void SaveSettings()
 		{
-		Debug.Log("Settings Saved:");
-		Debug.Log($"Points Awarded: {currentSeasonPointsAwardedInputField.text}");
-		Debug.Log($"Matches Won: {currentSeasonMatchesWonInputField.text}");
-		Debug.Log($"Defensive Shot Average: {currentSeasonDefensiveShotAverageInputField.text}");
-		Debug.Log($"Skill Level: {currentSeasonSkillLevelInputField.text}");
-		Debug.Log($"Points Per Match: {currentSeasonPpmInputField.text}");
-		Debug.Log($"Shutouts: {currentSeasonShutoutsInputField.text}");
-		Debug.Log($"Mini Slams: {currentSeasonMiniSlamsInputField.text}");
-		Debug.Log($"Nine On The Snap: {currentSeasonNineOnTheSnapInputField.text}");
-		Debug.Log($"Percentage: {currentSeasonPaPercentageInputField.text}");
-		Debug.Log($"Break and Run: {currentSeasonBreakAndRunInputField.text}");
+		// Get the values from the input fields
+		string pointsAwarded = currentSeasonPointsAwardedInputField.text;
+		string matchesWon = currentSeasonMatchesWonInputField.text;
+		string defensiveShotAverage = currentSeasonDefensiveShotAverageInputField.text;
+		string skillLevel = currentSeasonSkillLevelInputField.text;
+		string pointsPerMatch = currentSeasonPpmInputField.text;
+		string shutouts = currentSeasonShutoutsInputField.text;
+		string miniSlams = currentSeasonMiniSlamsInputField.text;
+		string nineOnTheSnap = currentSeasonNineOnTheSnapInputField.text;
+		string percentage = currentSeasonPaPercentageInputField.text;
+		string breakAndRun = currentSeasonBreakAndRunInputField.text;
 
-		// Logic to save these settings can be implemented here
+		// Log the data to the console (optional)
+		Debug.Log("Settings Saved:");
+		Debug.Log($"Points Awarded: {pointsAwarded}");
+		Debug.Log($"Matches Won: {matchesWon}");
+		Debug.Log($"Defensive Shot Average: {defensiveShotAverage}");
+		Debug.Log($"Skill Level: {skillLevel}");
+		Debug.Log($"Points Per Match: {pointsPerMatch}");
+		Debug.Log($"Shutouts: {shutouts}");
+		Debug.Log($"Mini Slams: {miniSlams}");
+		Debug.Log($"Nine On The Snap: {nineOnTheSnap}");
+		Debug.Log($"Percentage: {percentage}");
+		Debug.Log($"Break and Run: {breakAndRun}");
+
+		// Path to the CSV file
+		string filePath = "CurrentSeasonWeightSettings.csv";
+
+		// Prepare the data to be saved
+		List<string> lines = new()
+			{
+			$"{pointsAwarded},{matchesWon},{defensiveShotAverage},{skillLevel},{pointsPerMatch},{shutouts},{miniSlams},{nineOnTheSnap},{percentage},{breakAndRun}"
+		};
+
+		// Append the data to the CSV file
+		File.AppendAllLines(filePath, lines);
+
+		Debug.Log("Current season weight settings saved to CSV.");
 		}
 
 	/// <summary>
