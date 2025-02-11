@@ -205,6 +205,16 @@ public class MatchupComparisonPanel:MonoBehaviour
 			return;
 			}
 
+
+		// Debugging before line 209
+		if (team1Players == null) Debug.LogError("team1Players is NULL in CompareTeams()");
+		if (team2Players == null) Debug.LogError("team2Players is NULL in CompareTeams()");
+		if (team1PlayerToggles == null) Debug.LogError("team1PlayerToggles is NULL in CompareTeams()");
+		if (team2PlayerToggles == null) Debug.LogError("team2PlayerToggles is NULL in CompareTeams()");
+		if (MatchupResultsPanel.Instance == null) Debug.LogError("MatchupResultsPanel.Instance is NULL in CompareTeams()");
+		if (UIManager.Instance == null) Debug.LogError("UIManager.Instance is NULL in CompareTeams()");
+
+
 		// Send selected players to MatchupResultsPanel
 		MatchupResultsPanel.Instance.DisplayMatchupResults(selectedTeam1Players, selectedTeam2Players);
 
